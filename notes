@@ -1,0 +1,40 @@
+
+IND-CPA: indistinguishable under chosen plaintext attacks 
+INT-CTXT: ciphertext integrity
+AEAD: authenticated encryption with associated data
+IND$-CPA: 
+    means that the length of the ciphertext only depends on the length of the cleartext,
+    and that the ciphertext is indistinguishable from a random bitstring of the same length. 
+IND-CCA2: indistinguishable under adaptive chosen ciphertext attacks
+INT-PTXT: laintext integrity) 
+SPRP: super-pseudo-random permutation
+PRP: pseudo-random permutation
+
+Bounded:
+    means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other words, the type is a finite subset of bitstrings plus ⊥
+
+default.cvl (default.ocvl for the oracles front-end)
+
+IND_CPA_sym_enc(key , cleartext , ciphertext , enc, dec, injbot , Z , Penc)
+IND_CPA_sym_enc_all_args(key , cleartext , ciphertext , enc_seed , enc, enc_r , enc_r ′,dec, injbot , Z , Penc)
+IND_CPA_sym_enc_nonce(key , cleartext , ciphertext , nonce, enc, dec, injbot , Z , Penc)
+IND_CPA_sym_enc_nonce_all_args(key , cleartext , ciphertext , nonce, enc, enc′, dec,injbot , Z , Penc)
+IND_CPA_INT_CTXT_sym_enc(key , cleartext , ciphertext , enc, dec, injbot , Z , Penc,Pencctxt )
+IND_CPA_INT_CTXT_sym_enc_all_args(key , cleartext , ciphertext , enc_seed , enc, enc_r ,enc_r ′, dec, injbot , Z , Penc, Pencctxt )
+IND_CPA_INT_CTXT_sym_enc_nonce(key , cleartext , ciphertext , nonce, enc, dec, injbot , Z ,Penc, Pencctxt )
+IND_CPA_INT_CTXT_sym_enc_nonce_all_args(key , cleartext , ciphertext , nonce, enc,enc′, dec, injbot , Z , Penc, Pencctxt )
+AEAD(key , cleartext , ciphertext , add _data , enc, dec, injbot , Z , Penc, Pencctxt )
+AEAD_all_args(key , cleartext , ciphertext , add _data , enc_seed , enc, enc_r , enc_r ′, dec,injbot , Z , Penc, Pencctxt )
+AEAD_nonce(key , cleartext , ciphertext , add _data , nonce, enc, dec, injbot , Z , Penc,Pencctxt )
+AEAD_nonce_all_args(key , cleartext , ciphertext , add _data , nonce, enc, enc′, dec, injbot ,Z , Penc, Pencctxt )
+INDdollar_CPA_sym_enc
+...
+IND_CCA2_sym_enc(key , cleartext , ciphertext , enc, dec, injbot , Z , Penc)
+IND_CCA2_sym_enc_all_args(key , cleartext , ciphertext , enc_seed , enc, enc_r , enc_r ′,dec, dec′, injbot , Z , Penc)
+INT_PTXT_sym_enc(key , cleartext , ciphertext , enc, dec, injbot , Pencptxt )
+INT_PTXT_sym_enc_all_args(key , cleartext , ciphertext , enc_seed , enc, enc_r , dec, dec′,injbot , Pencptxt )
+IND_CCA2_INT_PTXT_sym_enc(key , cleartext , ciphertext , enc, dec, injbot , Z , Penc,Pencptxt )
+IND_CCA2_INT_PTXT_sym_enc_all_args(key , cleartext , ciphertext , enc_seed , enc,enc_r , enc_r ′, dec, dec′, injbot , Z , Penc, Pencptxt )
+SPRP_cipher(key , blocksize, enc, dec, Penc)
+
+
