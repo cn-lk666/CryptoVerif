@@ -9,6 +9,9 @@ IND-CCA2: indistinguishable under adaptive chosen ciphertext attacks
 INT-PTXT: laintext integrity) 
 SPRP: super-pseudo-random permutation
 PRP: pseudo-random permutation
+SUF-CMA: strongly unforgeable under chosen message attacks
+
+
 
 Bounded:
     means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other words, the type is a finite subset of bitstrings plus ⊥
@@ -36,5 +39,46 @@ INT_PTXT_sym_enc_all_args(key , cleartext , ciphertext , enc_seed , enc, enc_r ,
 IND_CCA2_INT_PTXT_sym_enc(key , cleartext , ciphertext , enc, dec, injbot , Z , Penc,Pencptxt )
 IND_CCA2_INT_PTXT_sym_enc_all_args(key , cleartext , ciphertext , enc_seed , enc,enc_r , enc_r ′, dec, dec′, injbot , Z , Penc, Pencptxt )
 SPRP_cipher(key , blocksize, enc, dec, Penc)
+PRP_cipher(key , blocksize, enc, dec, Penc)
+ICM_cipher(cipherkey , key , blocksize, enc, dec, enc_dec_oracle, qE , qD )
+SUF_CMA_det_mac(mkey , macinput , macres , mac, check , Pmac)
+SUF_CMA_det_mac_all_args(mkey , macinput , macres , mac, mac′, check , Pmac)
+UF_CMA_proba_mac(mkey , macinput , macres , mac, check , Pmac)
+UF_CMA_proba_mac_all_args(mkey , macinput , macres , mac_seed , mac, mac_r ,mac_r ′, check , check ′, Pmac)
+SUF_CMA_proba_mac(mkey , macinput , macres , mac, check , Pmac)
+SUF_CMA_proba_mac_all_args(mkey , macinput , macres , mac_seed , mac, mac_r ,mac_r ′, check , Pmac)
+IND_CCA2_public_key_enc(keyseed , pkey , skey , cleartext , ciphertext , skgen , pkgen , enc,dec, injbot , Z , Penc, Penccoll )
+IND_CCA2_public_key_enc_all_args(keyseed , pkey , skey , cleartext , ciphertext ,enc_seed , skgen, skgen ′, pkgen , pkgen ′
+                , enc, enc_r , enc_r ′, dec, dec′, injbot , Z , Penc,Penccoll )
+UF_CMA_det_signature(keyseed , pkey , skey , signinput , signature, skgen, pkgen, sign ,check , Psign , Psigncoll )
+UF_CMA_det_signature_all_args(keyseed , pkey , skey , signinput , signature, skgen,skgen′, pkgen , pkgen ′, sign , sign ′, check , check ′, Psign , Psigncoll )
+SUF_CMA_det_signature(keyseed , pkey , skey , signinput , signature, skgen, pkgen, sign ,check , Psign , Psigncoll )
+SUF_CMA_det_signature_all_args(keyseed , pkey , skey , signinput , signature, skgen,skgen′, pkgen , pkgen ′, sign , sign ′, check , check ′, Psign , Psigncoll )
+UF_CMA_proba_signature(keyseed , pkey , skey , signinput , signature, skgen, pkgen, sign ,check , Psign , Psigncoll )
+UF_CMA_proba_signature_all_args(keyseed , pkey , skey , signinput , signature,sign _seed 
+                , skgen , skgen ′, pkgen , pkgen ′, sign , sign _r , sign _r ′, check , check ′, Psign , Psigncoll )
+SUF_CMA_proba_signature(keyseed , pkey , skey , signinput , signature, skgen, pkgen, sign ,check , Psign , Psigncoll )               
+SUF_CMA_proba_signature_all_args(keyseed , pkey , skey , signinput , signature,sign _seed , skgen, pkgen , sign , sign _r , check , Psign , Psigncoll )
+ROM_hash(key ,hashinput ,hashoutput ,hash ,hashoracle,qH )
+ROM_hash_large(key ,hashinput ,hashoutput ,hash,hashoracle,qH )
+CollisionResistant_hash(key ,hashinput ,hashoutput ,hash ,hashoracle,Phash )
+HiddenKeyCollisionResistant_hash(key , hashinput , hashoutput , hash, hashoracle, qH ,Phash ).
+SecondPreimageResistant_hash(key ,hashinput ,hashoutput ,hash ,hashoracle,Phash )
+HiddenKeySecondPreimageResistant_hash(key , hashinput , hashoutput , hash ,hashoracle, qH , Phash )
+FixedSecondPreimageResistant_hash(hashinput ,hashoutput ,hash,Phash )
+PreimageResistant_hash(key ,hashinput ,hashoutput ,hash,hashoracle,Phash )
+HiddenKeyPreimageResistant_hash(key , hashinput , hashoutput , hash , hashoracle, qH ,Phash )
+FixedPreimageResistant_hash(hashinput ,hashoutput ,hash ,Phash )
+...
+DH_basic(G,Z,g,exp,exp′,mult )
+DH_proba_collision(G,Z,g,exp,exp′,mult ,PCollKey1 ,PCollKey2 )
+square_DH_proba_collision(G,Z,g,exp,exp′,mult ,PCollKey1 ,PCollKey2 ,PCollKey3 )
+DH_good_group(G,Z,g,exp,exp′,mult )
+DH_single_coord_ladder(G, Z, g, exp, mult , subG , Znw , ZnwtoZ , g _k ,exp_div _k , exp_div _k ′, pow _k , subGtoG , zero, sub_zero)
+...
+keygen(keyseed ,key ,kgen)
+Auth_Enc_from_Enc_then_MAC(key ,cleartext ,ciphertext ,enc,dec,injbot ,Z ,Penc,Pmac)
 
 
+proof {〈command〉; ...;〈command〉}
+    Allows the user to include in the CryptoVerif input file the commands that must be executed by CryptoVerif in order to prove the protocol. The allowed commands are those described in Section 7,except that help and ? are not allowed and that the crypto command must be fully specified (so that no user interaction is required). If the command contains a string that is not a valid identifier, *, or ., then this string must be put between quotes ". This is useful in particular for variable names introduced internally by CryptoVerif and that contain @ (so that they cannot be confused with variables introduced by the user), for example "@2_r1".
