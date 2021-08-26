@@ -1,7 +1,8 @@
 (* Signed Diffie-Hellman protocol *)
 
 (* Example updated from CV 1.28 by Benjamin Beurdouche *)
-
+(* 两个用户A和B通过签名的DH协议交换对称秘钥，另外该demo也证明了验证了对称秘钥不可能被泄露，
+   以及A和B之间通信的correspondence*)
 param NA, NB, NK.
 
 type host [bounded].
@@ -18,11 +19,15 @@ type D [fixed].
 
 (* This collision assumption is needed to prove an injective
    correspondence, because we use ephemerals to distinguish sessions. *)
+(*the probability that exp(g,x) = Y where x is random and Y is independent of x is at most PCollKey1 *)
 proba PCollKey1.
+ (*the probability that exp(g,mult (x,y)) = Y where x and y are independent random private keys and
+    Y is independent of x or y is at most PCollKey2 *)
 proba PCollKey2.
 expand DH_proba_collision(G, Z, g, exp, exp', mult, PCollKey1, PCollKey2).
 
-(* CDH assumption *)
+(* CDH assumption: computational Diffie–Hellman (CDH) assumption,
+   该marco定义了，攻击者在DH秘钥交换的过程中，获取到交换秘钥的可能性 *)
 proba pCDH.
 expand CDH(G, Z, g, exp, exp', mult, pCDH).
 
@@ -35,11 +40,16 @@ expand ROM_hash(hashkey, G, D, h, hashoracle, qH).
 fun concatA(host, host, G, G):blocksize [data].
 fun concatB(host, host, G, G):blocksize [data].
 
+(* We assume the messages have a different encoding. *)
 equation forall x:host, y:host, z:G, t:G, x2:host, y2:host, z2:G, t2:G;
    concatA(x,y,z,t) <> concatB(x2,y2,z2,t2).
 
 (* Signatures *)
+
+(*Psign (t,N,l) is the probability of breaking the UF-CMA property in time t, for one key, N signature
+   queries with messages of length at most l.*)
 proba Psign.
+(*Psigncoll is the probability of collision between independently generated keys.*)
 proba Psigncoll.
 expand UF_CMA_proba_signature(keyseed, pkey, skey, blocksize, signature, skgen, pkgen, sign, check, Psign, Psigncoll).
 

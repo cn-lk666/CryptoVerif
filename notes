@@ -14,7 +14,8 @@ SUF-CMA: strongly unforgeable under chosen message attacks
 
 
 Bounded:
-    means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other words, the type is a finite subset of bitstrings plus ⊥
+    means that the type is a set of bitstrings of bounded length or perhaps ⊥. 
+    In other words, the type is a finite subset of bitstrings plus ⊥
 
 default.cvl (default.ocvl for the oracles front-end)
 
@@ -41,12 +42,16 @@ IND_CCA2_INT_PTXT_sym_enc_all_args(key , cleartext , ciphertext , enc_seed , enc
 SPRP_cipher(key , blocksize, enc, dec, Penc)
 PRP_cipher(key , blocksize, enc, dec, Penc)
 ICM_cipher(cipherkey , key , blocksize, enc, dec, enc_dec_oracle, qE , qD )
+
+MAC:
 SUF_CMA_det_mac(mkey , macinput , macres , mac, check , Pmac)
 SUF_CMA_det_mac_all_args(mkey , macinput , macres , mac, mac′, check , Pmac)
 UF_CMA_proba_mac(mkey , macinput , macres , mac, check , Pmac)
 UF_CMA_proba_mac_all_args(mkey , macinput , macres , mac_seed , mac, mac_r ,mac_r ′, check , check ′, Pmac)
 SUF_CMA_proba_mac(mkey , macinput , macres , mac, check , Pmac)
 SUF_CMA_proba_mac_all_args(mkey , macinput , macres , mac_seed , mac, mac_r ,mac_r ′, check , Pmac)
+
+Asymmetric:
 IND_CCA2_public_key_enc(keyseed , pkey , skey , cleartext , ciphertext , skgen , pkgen , enc,dec, injbot , Z , Penc, Penccoll )
 IND_CCA2_public_key_enc_all_args(keyseed , pkey , skey , cleartext , ciphertext ,enc_seed , skgen, skgen ′, pkgen , pkgen ′
                 , enc, enc_r , enc_r ′, dec, dec′, injbot , Z , Penc,Penccoll )
@@ -59,6 +64,8 @@ UF_CMA_proba_signature_all_args(keyseed , pkey , skey , signinput , signature,si
                 , skgen , skgen ′, pkgen , pkgen ′, sign , sign _r , sign _r ′, check , check ′, Psign , Psigncoll )
 SUF_CMA_proba_signature(keyseed , pkey , skey , signinput , signature, skgen, pkgen, sign ,check , Psign , Psigncoll )               
 SUF_CMA_proba_signature_all_args(keyseed , pkey , skey , signinput , signature,sign _seed , skgen, pkgen , sign , sign _r , check , Psign , Psigncoll )
+
+Hash:
 ROM_hash(key ,hashinput ,hashoutput ,hash ,hashoracle,qH )
 ROM_hash_large(key ,hashinput ,hashoutput ,hash,hashoracle,qH )
 CollisionResistant_hash(key ,hashinput ,hashoutput ,hash ,hashoracle,Phash )
@@ -70,6 +77,8 @@ PreimageResistant_hash(key ,hashinput ,hashoutput ,hash,hashoracle,Phash )
 HiddenKeyPreimageResistant_hash(key , hashinput , hashoutput , hash , hashoracle, qH ,Phash )
 FixedPreimageResistant_hash(hashinput ,hashoutput ,hash ,Phash )
 ...
+
+DH:
 DH_basic(G,Z,g,exp,exp′,mult )
 DH_proba_collision(G,Z,g,exp,exp′,mult ,PCollKey1 ,PCollKey2 )
 square_DH_proba_collision(G,Z,g,exp,exp′,mult ,PCollKey1 ,PCollKey2 ,PCollKey3 )

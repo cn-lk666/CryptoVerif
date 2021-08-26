@@ -1,55 +1,11 @@
-(*************************************************************
- *                                                           *
- *       Cryptographic protocol verifier                     *
- *                                                           *
- *       Bruno Blanchet and David Cadé                       *
- *                                                           *
- *       Copyright (C) ENS, CNRS, INRIA, 2005-2020           *
- *                                                           *
- *************************************************************)
-
-(*
-
-    Copyright ENS, CNRS, INRIA 
-    contributors: Bruno Blanchet, Bruno.Blanchet@inria.fr
-                  David Cadé
-
-This software is a computer program whose purpose is to verify 
-cryptographic protocols in the computational model.
-
-This software is governed by the CeCILL-B license under French law and
-abiding by the rules of distribution of free software.  You can  use, 
-modify and/ or redistribute the software under the terms of the CeCILL-B
-license as circulated by CEA, CNRS and INRIA at the following URL
-"http://www.cecill.info". 
-
-As a counterpart to the access to the source code and  rights to copy,
-modify and redistribute granted by the license, users are provided only
-with a limited warranty  and the software's author,  the holder of the
-economic rights,  and the successive licensors  have only  limited
-liability. 
-
-In this respect, the user's attention is drawn to the risks associated
-with loading,  using,  modifying and/or developing or reproducing the
-software by the user in light of its specific status of free software,
-that may mean  that it is complicated to manipulate,  and  that  also
-therefore means  that it is reserved for developers  and  experienced
-professionals having in-depth computer knowledge. Users are therefore
-encouraged to load and test the software's suitability as regards their
-requirements in conditions enabling the security of their systems and/or 
-data to be ensured and,  more generally, to use and operate it in the 
-same conditions as regards security. 
-
-The fact that you are presently reading this means that you have had
-knowledge of the CeCILL-B license and that you accept its terms.
-
-*)
-(* PFDH signature scheme
+(* PFDH signature scheme: Full domain hash
    The prover finds the same probability as for FDH, not the better
    reduction by J.S.Coron. This is ok, because we do not give the
    hypothesis of random self-reducibility.
  *)
-
+(*这个例子通过陷门函数证明了用私钥签名的信息是不可伪造的
+	原来的例子中，有一个seed的类型，个人感觉没有什么用，为了方便理解，给删除了，
+	可能seed在PFDH signature scheme中会有一些作用吧，反正不影响证明*)
 (* Example updated from CV 1.28 by Benjamin Beurdouche *)
 
 (*
@@ -71,14 +27,17 @@ param qS.
 type pkey [bounded].
 type skey [bounded].
 type keyseed [large,fixed].
-type seed [(*large,*)fixed].
 type D [large,fixed].
 
-(* One-way trapdoor permutation *)
+(* One-way trapdoor permutation: 陷门函数 *)
 proba pOW.
 expand OW_trapdoor_perm(keyseed, pkey, skey, D, pkgen, skgen, f, mf, pOW).
 
-(* Hash function, random oracle model *)
+(* Hash function, random oracle model,
+	 随机预言函数，随机预言机的定义要求其是一个有无限个输出的函数， 是一部预言机（简单说像是理论的黑箱），
+	 对任何输入都回传一个真正均匀随机的输出（请参考离散型均匀分布），
+	 不过对相同的输入，该预言机每次都会用同一方法输出。
+	 换句话说，随机预言机是一个将所有可能输入与输出作随机映射的函数*)
 
 type hashkey [fixed].
 expand ROM_hash_large(hashkey, bitstring, D, hash, hashoracle, qH).
@@ -93,12 +52,12 @@ channel c0, c1, c2, c3, start.
 let processS(hk:hashkey, sk:skey) =
 	! qS
 	in(c1, m:bitstring);
-	new sr:seed;
-	out(c2, (sr,mf(sk, hash(hk, (m,sr))))).
+	(*这里可以理解为用私钥签名*)
+	out(c2, (mf(sk, hash(hk, m)))).
 
 let processT(hk:hashkey, pk:pkey) =
-	in(c3, (m2:bitstring, sr:seed, s:D));
-	if f(pk, s) = hash(hk, (m2,sr)) then
+	in(c3, (m2:bitstring, s:D));
+	if f(pk, s) = hash(hk, m2) then
 	find j <= qS suchthat defined(m[j]) && (m2 = m[j]) then yield else
 	event bad.
 

@@ -1,5 +1,5 @@
 (* Example updated from CV 1.28 by Benjamin Beurdouche *)
-
+(* 这个例子说明了*)
 (* Trivial running example for conference paper. *)
 param NA, NB.
 
@@ -34,6 +34,7 @@ proba Pmac.
 expand SUF_CMA_proba_mac(mkey, bitstring, macs, mac, check, Pmac).
 
 (* Queries *)
+(*Here k2 is the  encrypted message, k3 is the decrypted message*)
 query secret k2 [cv_onesession].
 query secret k3 [cv_onesession].
 
