@@ -6,7 +6,7 @@ IND$-CPA:
     means that the length of the ciphertext only depends on the length of the cleartext,
     and that the ciphertext is indistinguishable from a random bitstring of the same length. 
 IND-CCA2: indistinguishable under adaptive chosen ciphertext attacks
-INT-PTXT: laintext integrity) 
+INT-PTXT: laintext integrity)
 SPRP: super-pseudo-random permutation
 PRP: pseudo-random permutation
 SUF-CMA: strongly unforgeable under chosen message attacks
