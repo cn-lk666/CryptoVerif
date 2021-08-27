@@ -1,7 +1,7 @@
 (* Signed Diffie-Hellman protocol *)
 
 (* Example updated from CV 1.28 by Benjamin Beurdouche *)
-(* 两个用户A和B通过签名的DH协议交换对称秘钥，另外该demo也证明了验证了对称秘钥不可能被泄露，
+(* 两个用户A和B通过签名的DH协议交换对称秘钥，另外该demo也验证了对称秘钥不可能被泄露，
    以及A和B之间通信的correspondence*)
 param NA, NB, NK.
 

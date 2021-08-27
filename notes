@@ -10,8 +10,10 @@ INT-PTXT: laintext integrity)
 SPRP: super-pseudo-random permutation
 PRP: pseudo-random permutation
 SUF-CMA: strongly unforgeable under chosen message attacks
-
-
+ROM: random oracle model 随机预言机
+PRP: pseudo-random permutation
+PRF: pseudo-random function
+RTT: round-trip time
 
 Bounded:
     means that the type is a set of bitstrings of bounded length or perhaps ⊥. 
