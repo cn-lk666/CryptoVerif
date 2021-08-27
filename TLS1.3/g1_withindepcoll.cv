@@ -1,0 +1,1195 @@
+       in(ch1, ());
+       new hk1_1: hashkey;
+       out(ch2, ());
+       ((
+         in(io33, ());
+         new kseedS: keyseed;
+         new kseedC: keyseed;
+         let skC: skey = skgen(kseedC) in
+         let pkC: certificate = pkcert(kseedC) in
+         out(io34, (pkgen2(kseedS), pkC));
+         ((
+           ! i1 <= N1
+           in(io1[i1], ());
+           new cr_1: nonce;
+           new x_2: Z;
+           let gx: elt = exp'(G, x_2) in
+           out(io2[i1], ClientHello(cr_1, gx));
+           in(io3[i1], ServerHelloIn(sr_1: nonce, cgy: elt, log0_1: bitstring));
+           let sil_2: bitstring = ServerHelloLogInfo(cr_1, gx, sr_1, cgy, log0_1) in
+           find j'' = j''_1 <= N6 suchthat defined(cr_4[j''_1], sr_3[j''_1], r_19[j''_1], gy_2[j''_1], j'[j''_1]) && (i1 = j'[j''_1]) && (cgy = gy_2[j''_1]) then
+           (
+             let r_7: two_keys = Derive_Secret_cs_hts(r_19[j''], sil_2) in
+             let server_hts: key = get2(r_7) in
+             let client_hts: key = get1(r_7) in
+             let client_hk_2: key = HKDF_expand_key_label(client_hts) in
+             let server_hk_2: key = HKDF_expand_key_label(server_hts) in
+             let client_hiv_2: key = HKDF_expand_iv_label(client_hts) in
+             let server_hiv_2: key = HKDF_expand_iv_label(server_hts) in
+             let cfk_4: key = HKDF_expand_fin_label(client_hts) in
+             let sfk_2: key = HKDF_expand_fin_label(server_hts) in
+             out(io4[i1], (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2));
+             in(io5[i1], (ServerFinishedIn(certS: certificate, scv: bitstring, m_3: bitstring, log1_2: bitstring), ClientAuth: bool, log2_2: bitstring));
+             let scl_1: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+             let scvl_1: bitstring = ServerCertificateVerifyLogInfo(scl_1, scv) in
+             if defined(corruptedServer) && (certS = pkgen2(kseedS)) then
+             (
+               if check2(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+               let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+               let masterSecret_6: extracted = HKDF_extract_zero(r_19[j'']) in
+               let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+               let ems: key = get3(cs_ats_exp) in
+               let sats: key = get2_1(cs_ats_exp) in
+               let cats: key = get1_1(cs_ats_exp) in
+               let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+               let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+               let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+               if ClientAuth then
+               (
+                 let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                 new r_32: sign_seed;
+                 let ccv_1: bitstring = sign_r(ccl_1, skC, r_32) in
+                 let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                 let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                 let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                 let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                 let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                 let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                 if defined(s_sfl[j''], log0_2[j''], log1_3[j''], scv_1[j''], sfk_4[j''], scvl_3[j'']) && check(scvl_3[j''], sfk_4[j''], m_3) && (scv = scv_1[j'']) && (log1_2 = log1_3[j'']) && (log0_1 = log0_2[j'']) && (sr_1 = sr_3[j'']) && (cr_1 = cr_4[j'']) then
+                 (
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                   event ClientTerm((cr_1, gx, sr_1, cgy, log0_1, log1_2, scv, m_3), (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems));
+                   event ClientAccept((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3, final_log_1), (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2), i1);
+                   let c_cats: key = cats in
+                   let c_sats: key = sats in
+                   let c_ems: key = ems in
+                   let c_resumption_secret: key = resumption_secret_2 in
+                   out(io6[i1], final_mess_1)
+                 )
+                 else
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                   out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+               )
+               else
+                 let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                 let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                 let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                 let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                 let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                 if defined(s_sfl[j''], log0_2[j''], log1_3[j''], scv_1[j''], sfk_4[j''], scvl_3[j'']) && check(scvl_3[j''], sfk_4[j''], m_3) && (scv = scv_1[j'']) && (log1_2 = log1_3[j'']) && (log0_1 = log0_2[j'']) && (sr_1 = sr_3[j'']) && (cr_1 = cr_4[j'']) then
+                 (
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                   event ClientTerm((cr_1, gx, sr_1, cgy, log0_1, log1_2, scv, m_3), (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems));
+                   event ClientAccept((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3, final_log_2), (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3), i1);
+                   let c_cats: key = cats in
+                   let c_sats: key = sats in
+                   let c_ems: key = ems in
+                   let c_resumption_secret: key = resumption_secret_3 in
+                   out(io6[i1], final_mess_2)
+                 )
+                 else
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                   out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+             )
+             else
+               if defined(r_10[j''], log0_2[j''], log1_3[j'']) && (certS = pkgen2(kseedS)) && (log1_2 = log1_3[j'']) && (log0_1 = log0_2[j'']) && (sr_1 = sr_3[j'']) && (cr_1 = cr_4[j'']) && check2(scl_1, certS, scv) then
+               (
+                 if check(scvl_1, sfk_2, m_3) then
+                 let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                 let masterSecret_6: extracted = HKDF_extract_zero(r_19[j'']) in
+                 let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                 let ems: key = get3(cs_ats_exp) in
+                 let sats: key = get2_1(cs_ats_exp) in
+                 let cats: key = get1_1(cs_ats_exp) in
+                 let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                 let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                 let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                 if ClientAuth then
+                 (
+                   let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                   new r_15: sign_seed;
+                   let ccv_1: bitstring = sign_r(ccl_1, skC, r_15) in
+                   let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                   let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                   let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                   let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                   let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                   let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                   event ClientTerm((cr_1, gx, sr_1, cgy, log0_1, log1_2, scv, m_3), (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems));
+                   event ClientAccept((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3, final_log_1), (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2), i1);
+                   let c_cats: key = cats in
+                   let c_sats: key = sats in
+                   let c_ems: key = ems in
+                   let c_resumption_secret: key = resumption_secret_2 in
+                   out(io6[i1], final_mess_1)
+                 )
+                 else
+                   let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                   let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                   let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                   let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                   let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                   event ClientTerm((cr_1, gx, sr_1, cgy, log0_1, log1_2, scv, m_3), (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems));
+                   event ClientAccept((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3, final_log_2), (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3), i1);
+                   let c_cats: key = cats in
+                   let c_sats: key = sats in
+                   let c_ems: key = ems in
+                   let c_resumption_secret: key = resumption_secret_3 in
+                   out(io6[i1], final_mess_2)
+               )
+               else
+                 if certS = pkgen2(kseedS) then
+                   yield
+                 else
+                   if verify(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                   let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                   let masterSecret_6: extracted = HKDF_extract_zero(r_19[j'']) in
+                   let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                   let ems: key = get3(cs_ats_exp) in
+                   let sats: key = get2_1(cs_ats_exp) in
+                   let cats: key = get1_1(cs_ats_exp) in
+                   let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                   let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                   let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                   if ClientAuth then
+                   (
+                     let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                     new r_31: sign_seed;
+                     let ccv_1: bitstring = sign_r(ccl_1, skC, r_31) in
+                     let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                     let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                     let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                     let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                     let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                     let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                     out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                   )
+                   else
+                     let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                     let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                     let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                     let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                     let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                     out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+           )
+           else
+             find [unique] u_21 = ri_21 <= N1 suchthat defined(r[ri_21], x_2[ri_21], cgy[ri_21]) && (exp'(cgy, x_2) = exp'(cgy[ri_21], x_2[ri_21])) then
+             (
+               let r_7: two_keys = Derive_Secret_cs_hts(r[u_21], sil_2) in
+               let server_hts: key = get2(r_7) in
+               let client_hts: key = get1(r_7) in
+               let client_hk_2: key = HKDF_expand_key_label(client_hts) in
+               let server_hk_2: key = HKDF_expand_key_label(server_hts) in
+               let client_hiv_2: key = HKDF_expand_iv_label(client_hts) in
+               let server_hiv_2: key = HKDF_expand_iv_label(server_hts) in
+               let cfk_4: key = HKDF_expand_fin_label(client_hts) in
+               let sfk_2: key = HKDF_expand_fin_label(server_hts) in
+               out(io4[i1], (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2));
+               in(io5[i1], (ServerFinishedIn(certS: certificate, scv: bitstring, m_3: bitstring, log1_2: bitstring), ClientAuth: bool, log2_2: bitstring));
+               let scl_1: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+               let scvl_1: bitstring = ServerCertificateVerifyLogInfo(scl_1, scv) in
+               if defined(corruptedServer) && (certS = pkgen2(kseedS)) then
+               (
+                 if check2(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                 let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                 let masterSecret_6: extracted = HKDF_extract_zero(r[u_21]) in
+                 let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                 let ems: key = get3(cs_ats_exp) in
+                 let sats: key = get2_1(cs_ats_exp) in
+                 let cats: key = get1_1(cs_ats_exp) in
+                 let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                 let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                 let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                 if ClientAuth then
+                 (
+                   let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                   new r_24: sign_seed;
+                   let ccv_1: bitstring = sign_r(ccl_1, skC, r_24) in
+                   let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                   let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                   let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                   let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                   let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                   let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                   out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                 )
+                 else
+                   let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                   let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                   let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                   let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                   let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                   out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+               )
+               else
+                 if certS = pkgen2(kseedS) then
+                   yield
+                 else
+                   if verify(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                   let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                   let masterSecret_6: extracted = HKDF_extract_zero(r[u_21]) in
+                   let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                   let ems: key = get3(cs_ats_exp) in
+                   let sats: key = get2_1(cs_ats_exp) in
+                   let cats: key = get1_1(cs_ats_exp) in
+                   let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                   let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                   let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                   if ClientAuth then
+                   (
+                     let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                     new r_23: sign_seed;
+                     let ccv_1: bitstring = sign_r(ccl_1, skC, r_23) in
+                     let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                     let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                     let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                     let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                     let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                     let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                     out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                   )
+                   else
+                     let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                     let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                     let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                     let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                     let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                     out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+             )
+             orfind u_19 = ri_19 <= N6 suchthat defined(r_18[ri_19], y_3[ri_19], sgx[ri_19]) && (exp(sgx[ri_19], y_3[ri_19]) = exp'(cgy, x_2)) then
+             (
+               let r_7: two_keys = Derive_Secret_cs_hts(r_18[u_19], sil_2) in
+               let server_hts: key = get2(r_7) in
+               let client_hts: key = get1(r_7) in
+               let client_hk_2: key = HKDF_expand_key_label(client_hts) in
+               let server_hk_2: key = HKDF_expand_key_label(server_hts) in
+               let client_hiv_2: key = HKDF_expand_iv_label(client_hts) in
+               let server_hiv_2: key = HKDF_expand_iv_label(server_hts) in
+               let cfk_4: key = HKDF_expand_fin_label(client_hts) in
+               let sfk_2: key = HKDF_expand_fin_label(server_hts) in
+               out(io4[i1], (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2));
+               in(io5[i1], (ServerFinishedIn(certS: certificate, scv: bitstring, m_3: bitstring, log1_2: bitstring), ClientAuth: bool, log2_2: bitstring));
+               let scl_1: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+               let scvl_1: bitstring = ServerCertificateVerifyLogInfo(scl_1, scv) in
+               if defined(corruptedServer) && (certS = pkgen2(kseedS)) then
+               (
+                 if check2(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                 let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                 let masterSecret_6: extracted = HKDF_extract_zero(r_18[u_19]) in
+                 let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                 let ems: key = get3(cs_ats_exp) in
+                 let sats: key = get2_1(cs_ats_exp) in
+                 let cats: key = get1_1(cs_ats_exp) in
+                 let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                 let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                 let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                 if ClientAuth then
+                 (
+                   let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                   new r_26: sign_seed;
+                   let ccv_1: bitstring = sign_r(ccl_1, skC, r_26) in
+                   let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                   let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                   let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                   let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                   let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                   let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                   out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                 )
+                 else
+                   let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                   let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                   let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                   let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                   let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                   out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+               )
+               else
+                 if certS = pkgen2(kseedS) then
+                   yield
+                 else
+                   if verify(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                   let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                   let masterSecret_6: extracted = HKDF_extract_zero(r_18[u_19]) in
+                   let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                   let ems: key = get3(cs_ats_exp) in
+                   let sats: key = get2_1(cs_ats_exp) in
+                   let cats: key = get1_1(cs_ats_exp) in
+                   let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                   let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                   let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                   if ClientAuth then
+                   (
+                     let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                     new r_25: sign_seed;
+                     let ccv_1: bitstring = sign_r(ccl_1, skC, r_25) in
+                     let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                     let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                     let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                     let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                     let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                     let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                     out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                   )
+                   else
+                     let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                     let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                     let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                     let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                     let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                     out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+             )
+             orfind u_18 = ri_18 <= N6 suchthat defined(r_19[ri_18], y_4[ri_18], x_2[j'[ri_18]]) && (i1 = j'[ri_18]) && (exp'(cgy, x_2[j'[ri_18]]) = exp'(G, mult(y_4[ri_18], x_2[j'[ri_18]]))) then
+             (
+               let r_7: two_keys = Derive_Secret_cs_hts(r_19[u_18], sil_2) in
+               let server_hts: key = get2(r_7) in
+               let client_hts: key = get1(r_7) in
+               let client_hk_2: key = HKDF_expand_key_label(client_hts) in
+               let server_hk_2: key = HKDF_expand_key_label(server_hts) in
+               let client_hiv_2: key = HKDF_expand_iv_label(client_hts) in
+               let server_hiv_2: key = HKDF_expand_iv_label(server_hts) in
+               let cfk_4: key = HKDF_expand_fin_label(client_hts) in
+               let sfk_2: key = HKDF_expand_fin_label(server_hts) in
+               out(io4[i1], (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2));
+               in(io5[i1], (ServerFinishedIn(certS: certificate, scv: bitstring, m_3: bitstring, log1_2: bitstring), ClientAuth: bool, log2_2: bitstring));
+               let scl_1: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+               let scvl_1: bitstring = ServerCertificateVerifyLogInfo(scl_1, scv) in
+               if defined(corruptedServer) && (certS = pkgen2(kseedS)) then
+               (
+                 if check2(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                 let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                 let masterSecret_6: extracted = HKDF_extract_zero(r_19[u_18]) in
+                 let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                 let ems: key = get3(cs_ats_exp) in
+                 let sats: key = get2_1(cs_ats_exp) in
+                 let cats: key = get1_1(cs_ats_exp) in
+                 let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                 let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                 let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                 if ClientAuth then
+                 (
+                   let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                   new r_28: sign_seed;
+                   let ccv_1: bitstring = sign_r(ccl_1, skC, r_28) in
+                   let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                   let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                   let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                   let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                   let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                   let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                   out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                 )
+                 else
+                   let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                   let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                   let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                   let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                   let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                   out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+               )
+               else
+                 if certS = pkgen2(kseedS) then
+                   yield
+                 else
+                   if verify(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                   let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                   let masterSecret_6: extracted = HKDF_extract_zero(r_19[u_18]) in
+                   let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                   let ems: key = get3(cs_ats_exp) in
+                   let sats: key = get2_1(cs_ats_exp) in
+                   let cats: key = get1_1(cs_ats_exp) in
+                   let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                   let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                   let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                   if ClientAuth then
+                   (
+                     let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                     new r_27: sign_seed;
+                     let ccv_1: bitstring = sign_r(ccl_1, skC, r_27) in
+                     let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                     let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                     let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                     let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                     let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                     let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                     out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                   )
+                   else
+                     let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                     let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                     let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                     let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                     let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                     out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+             )
+             orfind u_17 = ri_17 <= qH suchthat defined(r_20[ri_17], x1_1[ri_17]) && (x1_1[ri_17] = exp'(cgy, x_2)) then
+             (
+               let r_7: two_keys = Derive_Secret_cs_hts(r_20[u_17], sil_2) in
+               let server_hts: key = get2(r_7) in
+               let client_hts: key = get1(r_7) in
+               let client_hk_2: key = HKDF_expand_key_label(client_hts) in
+               let server_hk_2: key = HKDF_expand_key_label(server_hts) in
+               let client_hiv_2: key = HKDF_expand_iv_label(client_hts) in
+               let server_hiv_2: key = HKDF_expand_iv_label(server_hts) in
+               let cfk_4: key = HKDF_expand_fin_label(client_hts) in
+               let sfk_2: key = HKDF_expand_fin_label(server_hts) in
+               out(io4[i1], (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2));
+               in(io5[i1], (ServerFinishedIn(certS: certificate, scv: bitstring, m_3: bitstring, log1_2: bitstring), ClientAuth: bool, log2_2: bitstring));
+               let scl_1: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+               let scvl_1: bitstring = ServerCertificateVerifyLogInfo(scl_1, scv) in
+               if defined(corruptedServer) && (certS = pkgen2(kseedS)) then
+               (
+                 if check2(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                 let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                 let masterSecret_6: extracted = HKDF_extract_zero(r_20[u_17]) in
+                 let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                 let ems: key = get3(cs_ats_exp) in
+                 let sats: key = get2_1(cs_ats_exp) in
+                 let cats: key = get1_1(cs_ats_exp) in
+                 let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                 let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                 let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                 if ClientAuth then
+                 (
+                   let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                   new r_30: sign_seed;
+                   let ccv_1: bitstring = sign_r(ccl_1, skC, r_30) in
+                   let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                   let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                   let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                   let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                   let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                   let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                   out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                 )
+                 else
+                   let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                   let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                   let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                   let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                   let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                   out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+               )
+               else
+                 if certS = pkgen2(kseedS) then
+                   yield
+                 else
+                   if verify(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                   let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                   let masterSecret_6: extracted = HKDF_extract_zero(r_20[u_17]) in
+                   let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                   let ems: key = get3(cs_ats_exp) in
+                   let sats: key = get2_1(cs_ats_exp) in
+                   let cats: key = get1_1(cs_ats_exp) in
+                   let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                   let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                   let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                   if ClientAuth then
+                   (
+                     let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                     new r_29: sign_seed;
+                     let ccv_1: bitstring = sign_r(ccl_1, skC, r_29) in
+                     let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                     let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                     let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                     let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                     let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                     let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                     out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                   )
+                   else
+                     let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                     let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                     let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                     let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                     let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                     out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+             )
+             else
+               new r: extracted;
+               let r_7: two_keys = Derive_Secret_cs_hts(r, sil_2) in
+               let server_hts: key = get2(r_7) in
+               let client_hts: key = get1(r_7) in
+               let client_hk_2: key = HKDF_expand_key_label(client_hts) in
+               let server_hk_2: key = HKDF_expand_key_label(server_hts) in
+               let client_hiv_2: key = HKDF_expand_iv_label(client_hts) in
+               let server_hiv_2: key = HKDF_expand_iv_label(server_hts) in
+               let cfk_4: key = HKDF_expand_fin_label(client_hts) in
+               let sfk_2: key = HKDF_expand_fin_label(server_hts) in
+               out(io4[i1], (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2));
+               in(io5[i1], (ServerFinishedIn(certS: certificate, scv: bitstring, m_3: bitstring, log1_2: bitstring), ClientAuth: bool, log2_2: bitstring));
+               let scl_1: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+               let scvl_1: bitstring = ServerCertificateVerifyLogInfo(scl_1, scv) in
+               if defined(corruptedServer) && (certS = pkgen2(kseedS)) then
+               (
+                 if check2(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                 let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                 let masterSecret_6: extracted = HKDF_extract_zero(r) in
+                 let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                 let ems: key = get3(cs_ats_exp) in
+                 let sats: key = get2_1(cs_ats_exp) in
+                 let cats: key = get1_1(cs_ats_exp) in
+                 let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                 let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                 let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                 if ClientAuth then
+                 (
+                   let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                   new r_22: sign_seed;
+                   let ccv_1: bitstring = sign_r(ccl_1, skC, r_22) in
+                   let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                   let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                   let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                   let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                   let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                   let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                   out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                 )
+                 else
+                   let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                   let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                   let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                   let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                   let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                   event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                   out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+               )
+               else
+                 if certS = pkgen2(kseedS) then
+                   yield
+                 else
+                   if verify(scl_1, certS, scv) && check(scvl_1, sfk_2, m_3) then
+                   let sfl_3: bitstring = ServerFinishedLogInfo(scvl_1, m_3) in
+                   let masterSecret_6: extracted = HKDF_extract_zero(r) in
+                   let cs_ats_exp: three_keys = Derive_Secret_cs_ats_exp(masterSecret_6, sfl_3) in
+                   let ems: key = get3(cs_ats_exp) in
+                   let sats: key = get2_1(cs_ats_exp) in
+                   let cats: key = get1_1(cs_ats_exp) in
+                   let scl_2: bitstring = ServerCertificateLogInfo(sil_2, certS, log1_2) in
+                   let scvl_2: bitstring = ServerCertificateVerifyLogInfo(scl_2, scv) in
+                   let c_sfl: bitstring = ServerFinishedLogInfo(scvl_2, m_3) in
+                   if ClientAuth then
+                   (
+                     let ccl_1: bitstring = ClientCertificateLogInfo(c_sfl, log2_2, pkC) in
+                     new r_21: sign_seed;
+                     let ccv_1: bitstring = sign_r(ccl_1, skC, r_21) in
+                     let ccvl: bitstring = ClientCertificateVerifyLogInfo(ccl_1, ccv_1) in
+                     let cfin_2: bitstring = mac(ccvl, cfk_4) in
+                     let c_cfl: bitstring = ClientFinishedLogInfo(ccvl, cfin_2) in
+                     let resumption_secret_2: key = Derive_Secret_rms(masterSecret_6, c_cfl) in
+                     let final_mess_1: bitstring = (ClientCertificateVerifyOut(ccv_1), ClientFinishedOut(cfin_2)) in
+                     let final_log_1: bitstring = ClientFinishedAuthIn(log2_2, pkC, ccv_1, cfin_2) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_1, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_2));
+                     out(io7[i1], (final_mess_1, (resumption_secret_2, cats, sats, ems)))
+                   )
+                   else
+                     let cfin_3: bitstring = mac(c_sfl, cfk_4) in
+                     let cfl_2: bitstring = ClientFinishedLogInfo(c_sfl, cfin_3) in
+                     let resumption_secret_3: key = Derive_Secret_rms(masterSecret_6, cfl_2) in
+                     let final_mess_2: bitstring = ClientFinishedOut(cfin_3) in
+                     let final_log_2: bitstring = ClientFinishedIn(cfin_3) in
+                     event ClientTerm1((cr_1, gx, sr_1, cgy, log0_1, certS, log1_2, scv, m_3), final_log_2, (client_hk_2, server_hk_2, client_hiv_2, server_hiv_2, cfk_4, sfk_2, cats, sats, ems, resumption_secret_3));
+                     out(io7[i1], (final_mess_2, (resumption_secret_3, cats, sats, ems)))
+         ) | (
+           ! i6 <= N6
+           in(io20[i6], ClientHello(cr_4: nonce, sgx: elt));
+           find j' = j'_1 <= N1 suchthat defined(cr_1[j'_1], gx[j'_1]) && (sgx = gx[j'_1]) then
+           (
+             new y_4: Z;
+             let gy_2: elt = exp'(G, y_4) in
+             new r_19: extracted;
+             new sr_3: nonce;
+             out(io21[i6], ServerHelloOut(sr_3, gy_2));
+             in(io22[i6], log0_2: bitstring);
+             let sil_3: bitstring = ServerHelloLogInfo(cr_4, sgx, sr_3, gy_2, log0_2) in
+             let r_9: two_keys = Derive_Secret_cs_hts(r_19, sil_3) in
+             let server_hts_1: key = get2(r_9) in
+             let client_hts_1: key = get1(r_9) in
+             let client_hk_4: key = HKDF_expand_key_label(client_hts_1) in
+             let server_hk_4: key = HKDF_expand_key_label(server_hts_1) in
+             let client_hiv_4: key = HKDF_expand_iv_label(client_hts_1) in
+             let server_hiv_4: key = HKDF_expand_iv_label(server_hts_1) in
+             let cfk_6: key = HKDF_expand_fin_label(client_hts_1) in
+             let sfk_4: key = HKDF_expand_fin_label(server_hts_1) in
+             let masterSecret_8: extracted = HKDF_extract_zero(r_19) in
+             out(io23[i6], (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4));
+             in(io24[i6], log1_3: bitstring);
+             let scl_3: bitstring = ServerCertificateLogInfo(sil_3, pkgen2(kseedS), log1_3) in
+             new r_10: sign_seed;
+             let scv_1: bitstring = sign_r2(scl_3, skgen2(kseedS), r_10) in
+             let scvl_3: bitstring = ServerCertificateVerifyLogInfo(scl_3, scv_1) in
+             let m_4: bitstring = mac(scvl_3, sfk_4) in
+             let s_sfl: bitstring = ServerFinishedLogInfo(scvl_3, m_4) in
+             let r_11: three_keys = Derive_Secret_cs_ats_exp(masterSecret_8, s_sfl) in
+             let ems_1: key = get3(r_11) in
+             let sats_1: key = get2_1(r_11) in
+             let cats_1: key = get1_1(r_11) in
+             event ServerAccept((cr_4, sgx, sr_3, gy_2, log0_2, log1_3, scv_1, m_4), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1), i6);
+             out(io25[i6], (ServerCertificateVerifyOut(scv_1), ServerFinishedOut(m_4)));
+             in(io26[i6], clientfinished: bitstring);
+             let ClientFinishedAuthIn(log2_3: bitstring, certC_2: certificate, ccv_2: bitstring, cfin_4: bitstring) = clientfinished in
+             (
+               let ccl_2: bitstring = ClientCertificateLogInfo(s_sfl, log2_3, certC_2) in
+               let ccvl_1: bitstring = ClientCertificateVerifyLogInfo(ccl_2, ccv_2) in
+               if defined(corruptedServer) && (certC_2 = pkgen2(kseedS)) then
+               (
+                 if check2(ccl_2, certC_2, ccv_2) && check(ccvl_1, cfk_6, cfin_4) then
+                 let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                 let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                 let s_resumption_secret: key = resumption_secret_5 in
+                 let s_cats: key = cats_1 in
+                 let s_sats: key = sats_1 in
+                 let s_ems: key = ems_1 in
+                 event ServerTerm1((cr_4, sgx, sr_3, gy_2, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                 out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+               )
+               else
+                 find u = ri <= N6 suchthat defined(scl_3[ri], r_10[ri]) && (certC_2 = pkgen2(kseedS)) && (ccl_2 = scl_3[ri]) && check2(ccl_2, certC_2, ccv_2) then
+                 (
+                   if check(ccvl_1, cfk_6, cfin_4) then
+                   let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                   let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                   let s_resumption_secret: key = resumption_secret_5 in
+                   let s_cats: key = cats_1 in
+                   let s_sats: key = sats_1 in
+                   let s_ems: key = ems_1 in
+                   event ServerTerm1((cr_4, sgx, sr_3, gy_2, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                   out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                 )
+                 else
+                   if certC_2 = pkgen2(kseedS) then
+                     yield
+                   else
+                     if verify(ccl_2, certC_2, ccv_2) && check(ccvl_1, cfk_6, cfin_4) then
+                     let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                     let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                     if certC_2 = pkC then
+                     (
+                       if defined(corruptedClient, c_cfl[j'], sr_1[j'], cgy[j'], log0_1[j'], certS[j'], log1_2[j'], scv[j'], m_3[j'], log2_2[j'], ccv_1[j'], cfk_4[j'], ccvl[j']) && check(ccvl[j'], cfk_4[j'], cfin_4) && (ccv_2 = ccv_1[j']) && (log2_3 = log2_2[j']) && check(scvl_3, sfk_4, m_3[j']) && (scv_1 = scv[j']) && (log1_3 = log1_2[j']) && (pkgen2(kseedS) = certS[j']) && (log0_2 = log0_1[j']) && (gy_2 = cgy[j']) && (sr_3 = sr_1[j']) && (cr_4 = cr_1[j']) then
+                       (
+                         let s_resumption_secret: key = resumption_secret_5 in
+                         let s_cats: key = cats_1 in
+                         let s_sats: key = sats_1 in
+                         let s_ems: key = ems_1 in
+                         event ServerTerm1((cr_4, sgx, sr_3, gy_2, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                         event ServerTerm((cr_4, sgx, sr_3, gy_2, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4, clientfinished), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                         out(io27[i6], ())
+                       )
+                       else
+                         if defined(corruptedClient) then
+                         (
+                           let s_resumption_secret: key = resumption_secret_5 in
+                           let s_cats: key = cats_1 in
+                           let s_sats: key = sats_1 in
+                           let s_ems: key = ems_1 in
+                           event ServerTerm1((cr_4, sgx, sr_3, gy_2, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                         )
+                         else
+                           let s_resumption_secret: key = resumption_secret_5 in
+                           let s_cats: key = cats_1 in
+                           let s_sats: key = sats_1 in
+                           let s_ems: key = ems_1 in
+                           event ServerTerm1((cr_4, sgx, sr_3, gy_2, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           event ServerTerm((cr_4, sgx, sr_3, gy_2, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4, clientfinished), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           out(io27[i6], ())
+                     )
+                     else
+                       let s_resumption_secret: key = resumption_secret_5 in
+                       let s_cats: key = cats_1 in
+                       let s_sats: key = sats_1 in
+                       let s_ems: key = ems_1 in
+                       event ServerTerm1((cr_4, sgx, sr_3, gy_2, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                       out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+             )
+             else
+               let ClientFinishedIn(cfin_5: bitstring) = clientfinished in
+               if check(s_sfl, cfk_6, cfin_5) then
+               let cfl_4: bitstring = ClientFinishedLogInfo(s_sfl, cfin_5) in
+               let resumption_secret_6: key = Derive_Secret_rms(masterSecret_8, cfl_4) in
+               let s_resumption_secret: key = resumption_secret_6 in
+               let s_cats: key = cats_1 in
+               let s_sats: key = sats_1 in
+               let s_ems: key = ems_1 in
+               event ServerTerm1((cr_4, sgx, sr_3, gy_2, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_6));
+               event ServerTerm((cr_4, sgx, sr_3, gy_2, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4, clientfinished), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_6));
+               out(io27[i6], ())
+           )
+           else
+             new y_3: Z;
+             let gy_3: elt = exp(G, y_3) in
+             find [unique] u_11 = ri_11 <= N1 suchthat defined(r[ri_11], x_2[ri_11], cgy[ri_11]) && (exp(sgx, y_3) = exp'(cgy[ri_11], x_2[ri_11])) then
+             (
+               new sr_3: nonce;
+               out(io21[i6], ServerHelloOut(sr_3, gy_3));
+               in(io22[i6], log0_2: bitstring);
+               let sil_3: bitstring = ServerHelloLogInfo(cr_4, sgx, sr_3, gy_3, log0_2) in
+               let r_9: two_keys = Derive_Secret_cs_hts(r[u_11], sil_3) in
+               let server_hts_1: key = get2(r_9) in
+               let client_hts_1: key = get1(r_9) in
+               let client_hk_4: key = HKDF_expand_key_label(client_hts_1) in
+               let server_hk_4: key = HKDF_expand_key_label(server_hts_1) in
+               let client_hiv_4: key = HKDF_expand_iv_label(client_hts_1) in
+               let server_hiv_4: key = HKDF_expand_iv_label(server_hts_1) in
+               let cfk_6: key = HKDF_expand_fin_label(client_hts_1) in
+               let sfk_4: key = HKDF_expand_fin_label(server_hts_1) in
+               let masterSecret_8: extracted = HKDF_extract_zero(r[u_11]) in
+               out(io23[i6], (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4));
+               in(io24[i6], log1_3: bitstring);
+               let scl_3: bitstring = ServerCertificateLogInfo(sil_3, pkgen2(kseedS), log1_3) in
+               new r_10: sign_seed;
+               let scv_1: bitstring = sign_r2(scl_3, skgen2(kseedS), r_10) in
+               let scvl_3: bitstring = ServerCertificateVerifyLogInfo(scl_3, scv_1) in
+               let m_4: bitstring = mac(scvl_3, sfk_4) in
+               let s_sfl: bitstring = ServerFinishedLogInfo(scvl_3, m_4) in
+               let r_11: three_keys = Derive_Secret_cs_ats_exp(masterSecret_8, s_sfl) in
+               let ems_1: key = get3(r_11) in
+               let sats_1: key = get2_1(r_11) in
+               let cats_1: key = get1_1(r_11) in
+               event ServerAccept((cr_4, sgx, sr_3, gy_3, log0_2, log1_3, scv_1, m_4), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1), i6);
+               out(io25[i6], (ServerCertificateVerifyOut(scv_1), ServerFinishedOut(m_4)));
+               in(io26[i6], clientfinished: bitstring);
+               let ClientFinishedAuthIn(log2_3: bitstring, certC_2: certificate, ccv_2: bitstring, cfin_4: bitstring) = clientfinished in
+               (
+                 let ccl_2: bitstring = ClientCertificateLogInfo(s_sfl, log2_3, certC_2) in
+                 let ccvl_1: bitstring = ClientCertificateVerifyLogInfo(ccl_2, ccv_2) in
+                 if defined(corruptedServer) && (certC_2 = pkgen2(kseedS)) then
+                 (
+                   if check2(ccl_2, certC_2, ccv_2) && check(ccvl_1, cfk_6, cfin_4) then
+                   let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                   let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                   let s_resumption_secret: key = resumption_secret_5 in
+                   let s_cats: key = cats_1 in
+                   let s_sats: key = sats_1 in
+                   let s_ems: key = ems_1 in
+                   event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                   out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                 )
+                 else
+                   find u = ri <= N6 suchthat defined(scl_3[ri], r_10[ri]) && (certC_2 = pkgen2(kseedS)) && (ccl_2 = scl_3[ri]) && check2(ccl_2, certC_2, ccv_2) then
+                   (
+                     if check(ccvl_1, cfk_6, cfin_4) then
+                     let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                     let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                     let s_resumption_secret: key = resumption_secret_5 in
+                     let s_cats: key = cats_1 in
+                     let s_sats: key = sats_1 in
+                     let s_ems: key = ems_1 in
+                     event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                     out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                   )
+                   else
+                     if certC_2 = pkgen2(kseedS) then
+                       yield
+                     else
+                       if verify(ccl_2, certC_2, ccv_2) && check(ccvl_1, cfk_6, cfin_4) then
+                       let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                       let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                       if certC_2 = pkC then
+                       (
+                         if defined(corruptedClient) then
+                         (
+                           let s_resumption_secret: key = resumption_secret_5 in
+                           let s_cats: key = cats_1 in
+                           let s_sats: key = sats_1 in
+                           let s_ems: key = ems_1 in
+                           event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                         )
+                         else
+                           let s_resumption_secret: key = resumption_secret_5 in
+                           let s_cats: key = cats_1 in
+                           let s_sats: key = sats_1 in
+                           let s_ems: key = ems_1 in
+                           event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           event ServerTerm((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4, clientfinished), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           out(io27[i6], ())
+                       )
+                       else
+                         let s_resumption_secret: key = resumption_secret_5 in
+                         let s_cats: key = cats_1 in
+                         let s_sats: key = sats_1 in
+                         let s_ems: key = ems_1 in
+                         event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                         out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+               )
+               else
+                 let ClientFinishedIn(cfin_5: bitstring) = clientfinished in
+                 if check(s_sfl, cfk_6, cfin_5) then
+                 let cfl_4: bitstring = ClientFinishedLogInfo(s_sfl, cfin_5) in
+                 let resumption_secret_6: key = Derive_Secret_rms(masterSecret_8, cfl_4) in
+                 let s_resumption_secret: key = resumption_secret_6 in
+                 let s_cats: key = cats_1 in
+                 let s_sats: key = sats_1 in
+                 let s_ems: key = ems_1 in
+                 event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_6));
+                 out(io28[i6], (resumption_secret_6, cats_1, sats_1, ems_1))
+             )
+             orfind u_9 = ri_9 <= N6 suchthat defined(r_18[ri_9], y_3[ri_9], sgx[ri_9]) && (exp(sgx, y_3) = exp(sgx[ri_9], y_3[ri_9])) then
+             (
+               new sr_3: nonce;
+               out(io21[i6], ServerHelloOut(sr_3, gy_3));
+               in(io22[i6], log0_2: bitstring);
+               let sil_3: bitstring = ServerHelloLogInfo(cr_4, sgx, sr_3, gy_3, log0_2) in
+               let r_9: two_keys = Derive_Secret_cs_hts(r_18[u_9], sil_3) in
+               let server_hts_1: key = get2(r_9) in
+               let client_hts_1: key = get1(r_9) in
+               let client_hk_4: key = HKDF_expand_key_label(client_hts_1) in
+               let server_hk_4: key = HKDF_expand_key_label(server_hts_1) in
+               let client_hiv_4: key = HKDF_expand_iv_label(client_hts_1) in
+               let server_hiv_4: key = HKDF_expand_iv_label(server_hts_1) in
+               let cfk_6: key = HKDF_expand_fin_label(client_hts_1) in
+               let sfk_4: key = HKDF_expand_fin_label(server_hts_1) in
+               let masterSecret_8: extracted = HKDF_extract_zero(r_18[u_9]) in
+               out(io23[i6], (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4));
+               in(io24[i6], log1_3: bitstring);
+               let scl_3: bitstring = ServerCertificateLogInfo(sil_3, pkgen2(kseedS), log1_3) in
+               new r_10: sign_seed;
+               let scv_1: bitstring = sign_r2(scl_3, skgen2(kseedS), r_10) in
+               let scvl_3: bitstring = ServerCertificateVerifyLogInfo(scl_3, scv_1) in
+               let m_4: bitstring = mac(scvl_3, sfk_4) in
+               let s_sfl: bitstring = ServerFinishedLogInfo(scvl_3, m_4) in
+               let r_11: three_keys = Derive_Secret_cs_ats_exp(masterSecret_8, s_sfl) in
+               let ems_1: key = get3(r_11) in
+               let sats_1: key = get2_1(r_11) in
+               let cats_1: key = get1_1(r_11) in
+               event ServerAccept((cr_4, sgx, sr_3, gy_3, log0_2, log1_3, scv_1, m_4), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1), i6);
+               out(io25[i6], (ServerCertificateVerifyOut(scv_1), ServerFinishedOut(m_4)));
+               in(io26[i6], clientfinished: bitstring);
+               let ClientFinishedAuthIn(log2_3: bitstring, certC_2: certificate, ccv_2: bitstring, cfin_4: bitstring) = clientfinished in
+               (
+                 let ccl_2: bitstring = ClientCertificateLogInfo(s_sfl, log2_3, certC_2) in
+                 let ccvl_1: bitstring = ClientCertificateVerifyLogInfo(ccl_2, ccv_2) in
+                 if defined(corruptedServer) && (certC_2 = pkgen2(kseedS)) then
+                 (
+                   if check2(ccl_2, certC_2, ccv_2) && check(ccvl_1, cfk_6, cfin_4) then
+                   let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                   let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                   let s_resumption_secret: key = resumption_secret_5 in
+                   let s_cats: key = cats_1 in
+                   let s_sats: key = sats_1 in
+                   let s_ems: key = ems_1 in
+                   event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                   out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                 )
+                 else
+                   find u = ri <= N6 suchthat defined(scl_3[ri], r_10[ri]) && (certC_2 = pkgen2(kseedS)) && (ccl_2 = scl_3[ri]) && check2(ccl_2, certC_2, ccv_2) then
+                   (
+                     if check(ccvl_1, cfk_6, cfin_4) then
+                     let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                     let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                     let s_resumption_secret: key = resumption_secret_5 in
+                     let s_cats: key = cats_1 in
+                     let s_sats: key = sats_1 in
+                     let s_ems: key = ems_1 in
+                     event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                     out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                   )
+                   else
+                     if certC_2 = pkgen2(kseedS) then
+                       yield
+                     else
+                       if verify(ccl_2, certC_2, ccv_2) && check(ccvl_1, cfk_6, cfin_4) then
+                       let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                       let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                       if certC_2 = pkC then
+                       (
+                         if defined(corruptedClient) then
+                         (
+                           let s_resumption_secret: key = resumption_secret_5 in
+                           let s_cats: key = cats_1 in
+                           let s_sats: key = sats_1 in
+                           let s_ems: key = ems_1 in
+                           event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                         )
+                         else
+                           let s_resumption_secret: key = resumption_secret_5 in
+                           let s_cats: key = cats_1 in
+                           let s_sats: key = sats_1 in
+                           let s_ems: key = ems_1 in
+                           event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           event ServerTerm((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4, clientfinished), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           out(io27[i6], ())
+                       )
+                       else
+                         let s_resumption_secret: key = resumption_secret_5 in
+                         let s_cats: key = cats_1 in
+                         let s_sats: key = sats_1 in
+                         let s_ems: key = ems_1 in
+                         event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                         out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+               )
+               else
+                 let ClientFinishedIn(cfin_5: bitstring) = clientfinished in
+                 if check(s_sfl, cfk_6, cfin_5) then
+                 let cfl_4: bitstring = ClientFinishedLogInfo(s_sfl, cfin_5) in
+                 let resumption_secret_6: key = Derive_Secret_rms(masterSecret_8, cfl_4) in
+                 let s_resumption_secret: key = resumption_secret_6 in
+                 let s_cats: key = cats_1 in
+                 let s_sats: key = sats_1 in
+                 let s_ems: key = ems_1 in
+                 event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_6));
+                 out(io28[i6], (resumption_secret_6, cats_1, sats_1, ems_1))
+             )
+             orfind u_7 = ri_7 <= qH suchthat defined(r_20[ri_7], x1_1[ri_7]) && (exp(sgx, y_3) = x1_1[ri_7]) then
+             (
+               new sr_3: nonce;
+               out(io21[i6], ServerHelloOut(sr_3, gy_3));
+               in(io22[i6], log0_2: bitstring);
+               let sil_3: bitstring = ServerHelloLogInfo(cr_4, sgx, sr_3, gy_3, log0_2) in
+               let r_9: two_keys = Derive_Secret_cs_hts(r_20[u_7], sil_3) in
+               let server_hts_1: key = get2(r_9) in
+               let client_hts_1: key = get1(r_9) in
+               let client_hk_4: key = HKDF_expand_key_label(client_hts_1) in
+               let server_hk_4: key = HKDF_expand_key_label(server_hts_1) in
+               let client_hiv_4: key = HKDF_expand_iv_label(client_hts_1) in
+               let server_hiv_4: key = HKDF_expand_iv_label(server_hts_1) in
+               let cfk_6: key = HKDF_expand_fin_label(client_hts_1) in
+               let sfk_4: key = HKDF_expand_fin_label(server_hts_1) in
+               let masterSecret_8: extracted = HKDF_extract_zero(r_20[u_7]) in
+               out(io23[i6], (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4));
+               in(io24[i6], log1_3: bitstring);
+               let scl_3: bitstring = ServerCertificateLogInfo(sil_3, pkgen2(kseedS), log1_3) in
+               new r_10: sign_seed;
+               let scv_1: bitstring = sign_r2(scl_3, skgen2(kseedS), r_10) in
+               let scvl_3: bitstring = ServerCertificateVerifyLogInfo(scl_3, scv_1) in
+               let m_4: bitstring = mac(scvl_3, sfk_4) in
+               let s_sfl: bitstring = ServerFinishedLogInfo(scvl_3, m_4) in
+               let r_11: three_keys = Derive_Secret_cs_ats_exp(masterSecret_8, s_sfl) in
+               let ems_1: key = get3(r_11) in
+               let sats_1: key = get2_1(r_11) in
+               let cats_1: key = get1_1(r_11) in
+               event ServerAccept((cr_4, sgx, sr_3, gy_3, log0_2, log1_3, scv_1, m_4), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1), i6);
+               out(io25[i6], (ServerCertificateVerifyOut(scv_1), ServerFinishedOut(m_4)));
+               in(io26[i6], clientfinished: bitstring);
+               let ClientFinishedAuthIn(log2_3: bitstring, certC_2: certificate, ccv_2: bitstring, cfin_4: bitstring) = clientfinished in
+               (
+                 let ccl_2: bitstring = ClientCertificateLogInfo(s_sfl, log2_3, certC_2) in
+                 let ccvl_1: bitstring = ClientCertificateVerifyLogInfo(ccl_2, ccv_2) in
+                 if defined(corruptedServer) && (certC_2 = pkgen2(kseedS)) then
+                 (
+                   if check2(ccl_2, certC_2, ccv_2) && check(ccvl_1, cfk_6, cfin_4) then
+                   let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                   let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                   let s_resumption_secret: key = resumption_secret_5 in
+                   let s_cats: key = cats_1 in
+                   let s_sats: key = sats_1 in
+                   let s_ems: key = ems_1 in
+                   event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                   out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                 )
+                 else
+                   find u = ri <= N6 suchthat defined(scl_3[ri], r_10[ri]) && (certC_2 = pkgen2(kseedS)) && (ccl_2 = scl_3[ri]) && check2(ccl_2, certC_2, ccv_2) then
+                   (
+                     if check(ccvl_1, cfk_6, cfin_4) then
+                     let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                     let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                     let s_resumption_secret: key = resumption_secret_5 in
+                     let s_cats: key = cats_1 in
+                     let s_sats: key = sats_1 in
+                     let s_ems: key = ems_1 in
+                     event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                     out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                   )
+                   else
+                     if certC_2 = pkgen2(kseedS) then
+                       yield
+                     else
+                       if verify(ccl_2, certC_2, ccv_2) && check(ccvl_1, cfk_6, cfin_4) then
+                       let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                       let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                       if certC_2 = pkC then
+                       (
+                         if defined(corruptedClient) then
+                         (
+                           let s_resumption_secret: key = resumption_secret_5 in
+                           let s_cats: key = cats_1 in
+                           let s_sats: key = sats_1 in
+                           let s_ems: key = ems_1 in
+                           event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                         )
+                         else
+                           let s_resumption_secret: key = resumption_secret_5 in
+                           let s_cats: key = cats_1 in
+                           let s_sats: key = sats_1 in
+                           let s_ems: key = ems_1 in
+                           event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           event ServerTerm((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4, clientfinished), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           out(io27[i6], ())
+                       )
+                       else
+                         let s_resumption_secret: key = resumption_secret_5 in
+                         let s_cats: key = cats_1 in
+                         let s_sats: key = sats_1 in
+                         let s_ems: key = ems_1 in
+                         event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                         out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+               )
+               else
+                 let ClientFinishedIn(cfin_5: bitstring) = clientfinished in
+                 if check(s_sfl, cfk_6, cfin_5) then
+                 let cfl_4: bitstring = ClientFinishedLogInfo(s_sfl, cfin_5) in
+                 let resumption_secret_6: key = Derive_Secret_rms(masterSecret_8, cfl_4) in
+                 let s_resumption_secret: key = resumption_secret_6 in
+                 let s_cats: key = cats_1 in
+                 let s_sats: key = sats_1 in
+                 let s_ems: key = ems_1 in
+                 event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_6));
+                 out(io28[i6], (resumption_secret_6, cats_1, sats_1, ems_1))
+             )
+             else
+               new r_18: extracted;
+               new sr_3: nonce;
+               out(io21[i6], ServerHelloOut(sr_3, gy_3));
+               in(io22[i6], log0_2: bitstring);
+               let sil_3: bitstring = ServerHelloLogInfo(cr_4, sgx, sr_3, gy_3, log0_2) in
+               let r_9: two_keys = Derive_Secret_cs_hts(r_18, sil_3) in
+               let server_hts_1: key = get2(r_9) in
+               let client_hts_1: key = get1(r_9) in
+               let client_hk_4: key = HKDF_expand_key_label(client_hts_1) in
+               let server_hk_4: key = HKDF_expand_key_label(server_hts_1) in
+               let client_hiv_4: key = HKDF_expand_iv_label(client_hts_1) in
+               let server_hiv_4: key = HKDF_expand_iv_label(server_hts_1) in
+               let cfk_6: key = HKDF_expand_fin_label(client_hts_1) in
+               let sfk_4: key = HKDF_expand_fin_label(server_hts_1) in
+               let masterSecret_8: extracted = HKDF_extract_zero(r_18) in
+               out(io23[i6], (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4));
+               in(io24[i6], log1_3: bitstring);
+               let scl_3: bitstring = ServerCertificateLogInfo(sil_3, pkgen2(kseedS), log1_3) in
+               new r_10: sign_seed;
+               let scv_1: bitstring = sign_r2(scl_3, skgen2(kseedS), r_10) in
+               let scvl_3: bitstring = ServerCertificateVerifyLogInfo(scl_3, scv_1) in
+               let m_4: bitstring = mac(scvl_3, sfk_4) in
+               let s_sfl: bitstring = ServerFinishedLogInfo(scvl_3, m_4) in
+               let r_11: three_keys = Derive_Secret_cs_ats_exp(masterSecret_8, s_sfl) in
+               let ems_1: key = get3(r_11) in
+               let sats_1: key = get2_1(r_11) in
+               let cats_1: key = get1_1(r_11) in
+               event ServerAccept((cr_4, sgx, sr_3, gy_3, log0_2, log1_3, scv_1, m_4), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1), i6);
+               out(io25[i6], (ServerCertificateVerifyOut(scv_1), ServerFinishedOut(m_4)));
+               in(io26[i6], clientfinished: bitstring);
+               let ClientFinishedAuthIn(log2_3: bitstring, certC_2: certificate, ccv_2: bitstring, cfin_4: bitstring) = clientfinished in
+               (
+                 let ccl_2: bitstring = ClientCertificateLogInfo(s_sfl, log2_3, certC_2) in
+                 let ccvl_1: bitstring = ClientCertificateVerifyLogInfo(ccl_2, ccv_2) in
+                 if defined(corruptedServer) && (certC_2 = pkgen2(kseedS)) then
+                 (
+                   if check2(ccl_2, certC_2, ccv_2) && check(ccvl_1, cfk_6, cfin_4) then
+                   let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                   let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                   let s_resumption_secret: key = resumption_secret_5 in
+                   let s_cats: key = cats_1 in
+                   let s_sats: key = sats_1 in
+                   let s_ems: key = ems_1 in
+                   event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                   out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                 )
+                 else
+                   find u = ri <= N6 suchthat defined(scl_3[ri], r_10[ri]) && (certC_2 = pkgen2(kseedS)) && (ccl_2 = scl_3[ri]) && check2(ccl_2, certC_2, ccv_2) then
+                   (
+                     if check(ccvl_1, cfk_6, cfin_4) then
+                     let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                     let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                     let s_resumption_secret: key = resumption_secret_5 in
+                     let s_cats: key = cats_1 in
+                     let s_sats: key = sats_1 in
+                     let s_ems: key = ems_1 in
+                     event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                     out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                   )
+                   else
+                     if certC_2 = pkgen2(kseedS) then
+                       yield
+                     else
+                       if verify(ccl_2, certC_2, ccv_2) && check(ccvl_1, cfk_6, cfin_4) then
+                       let cfl_3: bitstring = ClientFinishedLogInfo(ccvl_1, cfin_4) in
+                       let resumption_secret_5: key = Derive_Secret_rms(masterSecret_8, cfl_3) in
+                       if certC_2 = pkC then
+                       (
+                         if defined(corruptedClient) then
+                         (
+                           let s_resumption_secret: key = resumption_secret_5 in
+                           let s_cats: key = cats_1 in
+                           let s_sats: key = sats_1 in
+                           let s_ems: key = ems_1 in
+                           event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+                         )
+                         else
+                           let s_resumption_secret: key = resumption_secret_5 in
+                           let s_cats: key = cats_1 in
+                           let s_sats: key = sats_1 in
+                           let s_ems: key = ems_1 in
+                           event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           event ServerTerm((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4, clientfinished), (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                           out(io27[i6], ())
+                       )
+                       else
+                         let s_resumption_secret: key = resumption_secret_5 in
+                         let s_cats: key = cats_1 in
+                         let s_sats: key = sats_1 in
+                         let s_ems: key = ems_1 in
+                         event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_5));
+                         out(io28[i6], (resumption_secret_5, cats_1, sats_1, ems_1))
+               )
+               else
+                 let ClientFinishedIn(cfin_5: bitstring) = clientfinished in
+                 if check(s_sfl, cfk_6, cfin_5) then
+                 let cfl_4: bitstring = ClientFinishedLogInfo(s_sfl, cfin_5) in
+                 let resumption_secret_6: key = Derive_Secret_rms(masterSecret_8, cfl_4) in
+                 let s_resumption_secret: key = resumption_secret_6 in
+                 let s_cats: key = cats_1 in
+                 let s_sats: key = sats_1 in
+                 let s_ems: key = ems_1 in
+                 event ServerTerm1((cr_4, sgx, sr_3, gy_3, log0_2, pkgen2(kseedS), log1_3, scv_1, m_4), clientfinished, (client_hk_4, server_hk_4, client_hiv_4, server_hiv_4, cfk_6, sfk_4, cats_1, sats_1, ems_1, resumption_secret_6));
+                 out(io28[i6], (resumption_secret_6, cats_1, sats_1, ems_1))
+         ) | (
+           in(cCorruptS1, ());
+           let corruptedServer: bool = cst_bool in
+           out(cCorruptS2, skgen(kseedS))
+         ) | (
+           in(cCorruptC1, ());
+           let corruptedClient: bool = cst_bool in
+           out(cCorruptC2, skC)
+         ) | (
+           ! iH <= qH
+           in(ch1_1[iH], x1_1: elt);
+           find [unique] u_6 = ri_6 <= N1 suchthat defined(r[ri_6], x_2[ri_6], cgy[ri_6]) && (x1_1 = exp'(cgy[ri_6], x_2[ri_6])) then
+             out(ch2_1[iH], r[u_6])
+           orfind u_4 = ri_4 <= N6 suchthat defined(r_18[ri_4], y_3[ri_4], sgx[ri_4]) && (x1_1 = exp(sgx[ri_4], y_3[ri_4])) then
+             out(ch2_1[iH], r_18[u_4])
+           orfind u_2 = ri_2 <= qH suchthat defined(r_20[ri_2], x1_1[ri_2]) && (x1_1 = x1_1[ri_2]) then
+             out(ch2_1[iH], r_20[u_2])
+           else
+             new r_20: extracted;
+             out(ch2_1[iH], r_20)
+         ))
+       ) | (
+         ! i <= qH1
+         in(ch3[i], x_4: key);
+         out(ch4[i], HKDF_extract_zero_salt(hk1_1, x_4))
+       ))
+

@@ -1,0 +1,433 @@
+   {1}in(ch1, ());
+   {2}new hk1_1: hashkey;
+   {3}out(ch2, {4}());
+   {5}((
+   {6}  in(io33, ());
+   {7}  new hk_2: hashkey;
+   {8}  new kseedS: keyseed;
+   {9}  new kseedC: keyseed;
+  {10}  let skC: skey = {11}skgen({12}kseedC) in
+  {13}  let pkC: certificate = {14}pkcert({15}kseedC) in
+  {16}  out(io34, {17}({18}pkgen2({19}kseedS), {20}pkC));
+  {21}  ((
+  {25}    ! i1 <= N1
+  {26}    in(io1[{27}i1], ());
+  {28}    new cr_1: nonce;
+  {29}    new x_2: Z;
+  {30}    let gx: elt = {31}exp({32}G, {33}x_2) in
+  {35}    out(io2[{36}i1], {37}ClientHello({38}cr_1, {40}gx));
+  {42}    in(io3[{43}i1], ServerHelloIn(sr_1: nonce, cgy: elt, log0_1: bitstring));
+  {44}    let sil_2: bitstring = {45}ServerHelloLogInfo({46}cr_1, {48}gx, {50}sr_1, {52}cgy, {54}log0_1) in
+  {56}    let s_1: elt = {57}exp({58}cgy, {60}x_2) in
+  {62}    let handshakeSecret_1: extracted = {63}HKDF_extract_ES({64}hk_2, {65}s_1) in
+  {67}    let r_7: two_keys = {68}Derive_Secret_cs_hts({69}handshakeSecret_1, {71}sil_2) in
+  {73}    let server_hts: key = {74}get2({75}r_7) in
+  {77}    let client_hts: key = {78}get1({79}r_7) in
+  {81}    let client_hk_2: key = {82}HKDF_expand_key_label({83}client_hts) in
+  {85}    let server_hk_2: key = {86}HKDF_expand_key_label({87}server_hts) in
+  {89}    let client_hiv_2: key = {90}HKDF_expand_iv_label({91}client_hts) in
+  {93}    let server_hiv_2: key = {94}HKDF_expand_iv_label({95}server_hts) in
+  {97}    let cfk_4: key = {98}HKDF_expand_fin_label({99}client_hts) in
+ {101}    let sfk_2: key = {102}HKDF_expand_fin_label({103}server_hts) in
+ {105}    out(io4[{106}i1], {107}({108}client_hk_2, {110}server_hk_2, {112}client_hiv_2, {114}server_hiv_2));
+ {116}    in(io5[{117}i1], (ServerFinishedIn(certS: certificate, scv: bitstring, m_3: bitstring, log1_2: bitstring), ClientAuth: bool, log2_2: bitstring));
+ {118}    let scl_1: bitstring = {119}ServerCertificateLogInfo({120}sil_2, {122}certS, {124}log1_2) in
+ {126}    let scvl_1: bitstring = {127}ServerCertificateVerifyLogInfo({128}scl_1, {130}scv) in
+ {132}    if defined(corruptedServer) && {133}({134}certS = {136}pkgen2({137}kseedS)) then
+          (
+ {138}      if {139}({140}check2({141}scl_1, {143}certS, {145}scv) && {147}check({148}scvl_1, {150}sfk_2, {152}m_3)) then
+ {154}      let sfl_3: bitstring = {155}ServerFinishedLogInfo({156}scvl_1, {158}m_3) in
+ {160}      let masterSecret_6: extracted = {161}HKDF_extract_zero({162}handshakeSecret_1) in
+ {164}      let cs_ats_exp: three_keys = {165}Derive_Secret_cs_ats_exp({166}masterSecret_6, {168}sfl_3) in
+ {170}      let ems: key = {171}get3({172}cs_ats_exp) in
+ {174}      let sats: key = {175}get2_1({176}cs_ats_exp) in
+ {178}      let cats: key = {179}get1_1({180}cs_ats_exp) in
+ {182}      let scl_2: bitstring = {183}ServerCertificateLogInfo({184}sil_2, {186}certS, {188}log1_2) in
+ {190}      let scvl_2: bitstring = {191}ServerCertificateVerifyLogInfo({192}scl_2, {194}scv) in
+ {196}      let c_sfl: bitstring = {197}ServerFinishedLogInfo({198}scvl_2, {200}m_3) in
+ {202}      if {203}ClientAuth then
+            (
+ {205}        let ccl_1: bitstring = {206}ClientCertificateLogInfo({207}c_sfl, {209}log2_2, {211}pkC) in
+ {212}        new r_14: sign_seed;
+ {213}        let ccv_1: bitstring = {214}sign_r({215}ccl_1, {217}skC, {218}r_14) in
+ {220}        let ccvl: bitstring = {221}ClientCertificateVerifyLogInfo({222}ccl_1, {224}ccv_1) in
+ {226}        let cfin_2: bitstring = {227}mac({228}ccvl, {230}cfk_4) in
+ {232}        let c_cfl: bitstring = {233}ClientFinishedLogInfo({234}ccvl, {236}cfin_2) in
+ {238}        let resumption_secret_2: key = {239}Derive_Secret_rms({240}masterSecret_6, {242}c_cfl) in
+ {244}        let final_mess_1: bitstring = {245}({246}ClientCertificateVerifyOut({247}ccv_1), {249}ClientFinishedOut({250}cfin_2)) in
+ {252}        let final_log_1: bitstring = {253}ClientFinishedAuthIn({254}log2_2, {256}pkC, {257}ccv_1, {259}cfin_2) in
+ {261}        find j2_1 = j2 <= N6 suchthat defined(s_sfl[{262}j2], cr_4[{263}j2], j'[{264}j2], sr_3[{265}j2], gy_2[{266}j2], log0_2[{267}j2], log1_3[{268}j2], scv_1[{269}j2], sfk_4[{270}j2], scvl_3[{271}j2]) && {272}({273}check({274}scvl_3[{275}j2], {276}sfk_4[{277}j2], {278}m_3) && {280}({281}({282}scv = {284}scv_1[{285}j2]) && {286}({287}({288}log1_2 = {290}log1_3[{291}j2]) && {292}({293}({294}log0_1 = {296}log0_2[{297}j2]) && {298}({299}({300}cgy = {302}gy_2[{303}j2]) && {304}({305}({306}sr_1 = {308}sr_3[{309}j2]) && {310}({311}({312}i1 = {313}j'[{314}j2]) && {315}({316}cr_1 = {318}cr_4[{319}j2])))))))) then
+              (
+ {320}          event {321}ClientTerm1({324}({325}cr_1, {327}gx, {329}sr_1, {331}cgy, {333}log0_1, {335}certS, {337}log1_2, {339}scv, {341}m_3), {343}final_log_1, {345}({346}client_hk_2, {348}server_hk_2, {350}client_hiv_2, {352}server_hiv_2, {354}cfk_4, {356}sfk_2, {358}cats, {360}sats, {362}ems, {364}resumption_secret_2));
+ {366}          event {367}ClientTerm({370}({371}cr_1, {373}gx, {375}sr_1, {377}cgy, {379}log0_1, {381}log1_2, {383}scv, {385}m_3), {387}({388}client_hk_2, {390}server_hk_2, {392}client_hiv_2, {394}server_hiv_2, {396}cfk_4, {398}sfk_2, {400}cats, {402}sats, {404}ems));
+ {406}          event {407}ClientAccept({410}({411}cr_1, {413}gx, {415}sr_1, {417}cgy, {419}log0_1, {421}certS, {423}log1_2, {425}scv, {427}m_3, {429}final_log_1), {431}({432}client_hk_2, {434}server_hk_2, {436}client_hiv_2, {438}server_hiv_2, {440}cfk_4, {442}sfk_2, {444}cats, {446}sats, {448}ems, {450}resumption_secret_2), {452}i1);
+ {453}          let c_cats: key = {454}cats in
+ {456}          let c_sats: key = {457}sats in
+ {459}          let c_ems: key = {460}ems in
+ {462}          let c_resumption_secret: key = {463}resumption_secret_2 in
+ {465}          out(io6[{466}i1], {467}final_mess_1)
+              )
+              else
+ {474}          event {475}ClientTerm1({478}({479}cr_1, {481}gx, {483}sr_1, {485}cgy, {487}log0_1, {489}certS, {491}log1_2, {493}scv, {495}m_3), {497}final_log_1, {499}({500}client_hk_2, {502}server_hk_2, {504}client_hiv_2, {506}server_hiv_2, {508}cfk_4, {510}sfk_2, {512}cats, {514}sats, {516}ems, {518}resumption_secret_2));
+ {520}          out(io7[{521}i1], {522}({523}final_mess_1, {525}({526}resumption_secret_2, {528}cats, {530}sats, {532}ems)))
+            )
+            else
+ {543}        let cfin_3: bitstring = {544}mac({545}c_sfl, {547}cfk_4) in
+ {549}        let cfl_2: bitstring = {550}ClientFinishedLogInfo({551}c_sfl, {553}cfin_3) in
+ {555}        let resumption_secret_3: key = {556}Derive_Secret_rms({557}masterSecret_6, {559}cfl_2) in
+ {561}        let final_mess_2: bitstring = {562}ClientFinishedOut({563}cfin_3) in
+ {565}        let final_log_2: bitstring = {566}ClientFinishedIn({567}cfin_3) in
+ {569}        find j2_1 = j2 <= N6 suchthat defined(s_sfl[{570}j2], cr_4[{571}j2], j'[{572}j2], sr_3[{573}j2], gy_2[{574}j2], log0_2[{575}j2], log1_3[{576}j2], scv_1[{577}j2], sfk_4[{578}j2], scvl_3[{579}j2]) && {580}({581}check({582}scvl_3[{583}j2], {584}sfk_4[{585}j2], {586}m_3) && {588}({589}({590}scv = {592}scv_1[{593}j2]) && {594}({595}({596}log1_2 = {598}log1_3[{599}j2]) && {600}({601}({602}log0_1 = {604}log0_2[{605}j2]) && {606}({607}({608}cgy = {610}gy_2[{611}j2]) && {612}({613}({614}sr_1 = {616}sr_3[{617}j2]) && {618}({619}({620}i1 = {621}j'[{622}j2]) && {623}({624}cr_1 = {626}cr_4[{627}j2])))))))) then
+              (
+ {628}          event {629}ClientTerm1({632}({633}cr_1, {635}gx, {637}sr_1, {639}cgy, {641}log0_1, {643}certS, {645}log1_2, {647}scv, {649}m_3), {651}final_log_2, {653}({654}client_hk_2, {656}server_hk_2, {658}client_hiv_2, {660}server_hiv_2, {662}cfk_4, {664}sfk_2, {666}cats, {668}sats, {670}ems, {672}resumption_secret_3));
+ {674}          event {675}ClientTerm({678}({679}cr_1, {681}gx, {683}sr_1, {685}cgy, {687}log0_1, {689}log1_2, {691}scv, {693}m_3), {695}({696}client_hk_2, {698}server_hk_2, {700}client_hiv_2, {702}server_hiv_2, {704}cfk_4, {706}sfk_2, {708}cats, {710}sats, {712}ems));
+ {714}          event {715}ClientAccept({718}({719}cr_1, {721}gx, {723}sr_1, {725}cgy, {727}log0_1, {729}certS, {731}log1_2, {733}scv, {735}m_3, {737}final_log_2), {739}({740}client_hk_2, {742}server_hk_2, {744}client_hiv_2, {746}server_hiv_2, {748}cfk_4, {750}sfk_2, {752}cats, {754}sats, {756}ems, {758}resumption_secret_3), {760}i1);
+ {761}          let c_cats: key = {762}cats in
+ {764}          let c_sats: key = {765}sats in
+ {767}          let c_ems: key = {768}ems in
+ {770}          let c_resumption_secret: key = {771}resumption_secret_3 in
+ {773}          out(io6[{774}i1], {775}final_mess_2)
+              )
+              else
+ {782}          event {783}ClientTerm1({786}({787}cr_1, {789}gx, {791}sr_1, {793}cgy, {795}log0_1, {797}certS, {799}log1_2, {801}scv, {803}m_3), {805}final_log_2, {807}({808}client_hk_2, {810}server_hk_2, {812}client_hiv_2, {814}server_hiv_2, {816}cfk_4, {818}sfk_2, {820}cats, {822}sats, {824}ems, {826}resumption_secret_3));
+ {828}          out(io7[{829}i1], {830}({831}final_mess_2, {833}({834}resumption_secret_3, {836}cats, {838}sats, {840}ems)))
+          )
+          else
+ {858}      find u_1 = ri_1 <= N6 suchthat defined(r_10[{859}ri_1], cr_4[{860}ri_1], j'[{861}ri_1], sr_3[{862}ri_1], gy_2[{863}ri_1], log0_2[{864}ri_1], log1_3[{865}ri_1]) && {866}({867}({868}certS = {870}pkgen2({871}kseedS)) && {872}({873}({874}log1_2 = {876}log1_3[{877}ri_1]) && {878}({879}({880}log0_1 = {882}log0_2[{883}ri_1]) && {884}({885}({886}cgy = {888}gy_2[{889}ri_1]) && {890}({891}({892}sr_1 = {894}sr_3[{895}ri_1]) && {896}({897}({898}i1 = {899}j'[{900}ri_1]) && {901}({902}({903}cr_1 = {905}cr_4[{906}ri_1]) && {907}check2({908}scl_1, {910}certS, {912}scv)))))))) then
+            (
+ {914}        if {915}check({916}scvl_1, {918}sfk_2, {920}m_3) then
+ {922}        let sfl_3: bitstring = {923}ServerFinishedLogInfo({924}scvl_1, {926}m_3) in
+ {928}        let masterSecret_6: extracted = {929}HKDF_extract_zero({930}handshakeSecret_1) in
+ {932}        let cs_ats_exp: three_keys = {933}Derive_Secret_cs_ats_exp({934}masterSecret_6, {936}sfl_3) in
+ {938}        let ems: key = {939}get3({940}cs_ats_exp) in
+ {942}        let sats: key = {943}get2_1({944}cs_ats_exp) in
+ {946}        let cats: key = {947}get1_1({948}cs_ats_exp) in
+ {950}        let scl_2: bitstring = {951}ServerCertificateLogInfo({952}sil_2, {954}certS, {956}log1_2) in
+ {958}        let scvl_2: bitstring = {959}ServerCertificateVerifyLogInfo({960}scl_2, {962}scv) in
+ {964}        let c_sfl: bitstring = {965}ServerFinishedLogInfo({966}scvl_2, {968}m_3) in
+ {970}        if {971}ClientAuth then
+              (
+ {973}          let ccl_1: bitstring = {974}ClientCertificateLogInfo({975}c_sfl, {977}log2_2, {979}pkC) in
+ {980}          new r_15: sign_seed;
+ {981}          let ccv_1: bitstring = {982}sign_r({983}ccl_1, {985}skC, {986}r_15) in
+ {988}          let ccvl: bitstring = {989}ClientCertificateVerifyLogInfo({990}ccl_1, {992}ccv_1) in
+ {994}          let cfin_2: bitstring = {995}mac({996}ccvl, {998}cfk_4) in
+{1000}          let c_cfl: bitstring = {1001}ClientFinishedLogInfo({1002}ccvl, {1004}cfin_2) in
+{1006}          let resumption_secret_2: key = {1007}Derive_Secret_rms({1008}masterSecret_6, {1010}c_cfl) in
+{1012}          let final_mess_1: bitstring = {1013}({1014}ClientCertificateVerifyOut({1015}ccv_1), {1017}ClientFinishedOut({1018}cfin_2)) in
+{1020}          let final_log_1: bitstring = {1021}ClientFinishedAuthIn({1022}log2_2, {1024}pkC, {1025}ccv_1, {1027}cfin_2) in
+{1029}          event {1030}ClientTerm1({1033}({1034}cr_1, {1036}gx, {1038}sr_1, {1040}cgy, {1042}log0_1, {1044}certS, {1046}log1_2, {1048}scv, {1050}m_3), {1052}final_log_1, {1054}({1055}client_hk_2, {1057}server_hk_2, {1059}client_hiv_2, {1061}server_hiv_2, {1063}cfk_4, {1065}sfk_2, {1067}cats, {1069}sats, {1071}ems, {1073}resumption_secret_2));
+{1075}          event {1076}ClientTerm({1079}({1080}cr_1, {1082}gx, {1084}sr_1, {1086}cgy, {1088}log0_1, {1090}log1_2, {1092}scv, {1094}m_3), {1096}({1097}client_hk_2, {1099}server_hk_2, {1101}client_hiv_2, {1103}server_hiv_2, {1105}cfk_4, {1107}sfk_2, {1109}cats, {1111}sats, {1113}ems));
+{1115}          event {1116}ClientAccept({1119}({1120}cr_1, {1122}gx, {1124}sr_1, {1126}cgy, {1128}log0_1, {1130}certS, {1132}log1_2, {1134}scv, {1136}m_3, {1138}final_log_1), {1140}({1141}client_hk_2, {1143}server_hk_2, {1145}client_hiv_2, {1147}server_hiv_2, {1149}cfk_4, {1151}sfk_2, {1153}cats, {1155}sats, {1157}ems, {1159}resumption_secret_2), {1161}i1);
+{1162}          let c_cats: key = {1163}cats in
+{1165}          let c_sats: key = {1166}sats in
+{1168}          let c_ems: key = {1169}ems in
+{1171}          let c_resumption_secret: key = {1172}resumption_secret_2 in
+{1174}          out(io6[{1175}i1], {1176}final_mess_1)
+              )
+              else
+{1191}          let cfin_3: bitstring = {1192}mac({1193}c_sfl, {1195}cfk_4) in
+{1197}          let cfl_2: bitstring = {1198}ClientFinishedLogInfo({1199}c_sfl, {1201}cfin_3) in
+{1203}          let resumption_secret_3: key = {1204}Derive_Secret_rms({1205}masterSecret_6, {1207}cfl_2) in
+{1209}          let final_mess_2: bitstring = {1210}ClientFinishedOut({1211}cfin_3) in
+{1213}          let final_log_2: bitstring = {1214}ClientFinishedIn({1215}cfin_3) in
+{1217}          event {1218}ClientTerm1({1221}({1222}cr_1, {1224}gx, {1226}sr_1, {1228}cgy, {1230}log0_1, {1232}certS, {1234}log1_2, {1236}scv, {1238}m_3), {1240}final_log_2, {1242}({1243}client_hk_2, {1245}server_hk_2, {1247}client_hiv_2, {1249}server_hiv_2, {1251}cfk_4, {1253}sfk_2, {1255}cats, {1257}sats, {1259}ems, {1261}resumption_secret_3));
+{1263}          event {1264}ClientTerm({1267}({1268}cr_1, {1270}gx, {1272}sr_1, {1274}cgy, {1276}log0_1, {1278}log1_2, {1280}scv, {1282}m_3), {1284}({1285}client_hk_2, {1287}server_hk_2, {1289}client_hiv_2, {1291}server_hiv_2, {1293}cfk_4, {1295}sfk_2, {1297}cats, {1299}sats, {1301}ems));
+{1303}          event {1304}ClientAccept({1307}({1308}cr_1, {1310}gx, {1312}sr_1, {1314}cgy, {1316}log0_1, {1318}certS, {1320}log1_2, {1322}scv, {1324}m_3, {1326}final_log_2), {1328}({1329}client_hk_2, {1331}server_hk_2, {1333}client_hiv_2, {1335}server_hiv_2, {1337}cfk_4, {1339}sfk_2, {1341}cats, {1343}sats, {1345}ems, {1347}resumption_secret_3), {1349}i1);
+{1350}          let c_cats: key = {1351}cats in
+{1353}          let c_sats: key = {1354}sats in
+{1356}          let c_ems: key = {1357}ems in
+{1359}          let c_resumption_secret: key = {1360}resumption_secret_3 in
+{1362}          out(io6[{1363}i1], {1364}final_mess_2)
+            )
+            else
+{1386}        if {1387}({1388}certS = {1390}pkgen2({1391}kseedS)) then
+{1392}          yield
+              else
+{1393}          if {1394}({1395}verify({1396}scl_1, {1398}certS, {1400}scv) && {1402}check({1403}scvl_1, {1405}sfk_2, {1407}m_3)) then
+{1409}          let sfl_3: bitstring = {1410}ServerFinishedLogInfo({1411}scvl_1, {1413}m_3) in
+{1415}          let masterSecret_6: extracted = {1416}HKDF_extract_zero({1417}handshakeSecret_1) in
+{1419}          let cs_ats_exp: three_keys = {1420}Derive_Secret_cs_ats_exp({1421}masterSecret_6, {1423}sfl_3) in
+{1425}          let ems: key = {1426}get3({1427}cs_ats_exp) in
+{1429}          let sats: key = {1430}get2_1({1431}cs_ats_exp) in
+{1433}          let cats: key = {1434}get1_1({1435}cs_ats_exp) in
+{1437}          let scl_2: bitstring = {1438}ServerCertificateLogInfo({1439}sil_2, {1441}certS, {1443}log1_2) in
+{1445}          let scvl_2: bitstring = {1446}ServerCertificateVerifyLogInfo({1447}scl_2, {1449}scv) in
+{1451}          let c_sfl: bitstring = {1452}ServerFinishedLogInfo({1453}scvl_2, {1455}m_3) in
+{1457}          if {1458}ClientAuth then
+                (
+{1460}            let ccl_1: bitstring = {1461}ClientCertificateLogInfo({1462}c_sfl, {1464}log2_2, {1466}pkC) in
+{1467}            new r_12: sign_seed;
+{1468}            let ccv_1: bitstring = {1469}sign_r({1470}ccl_1, {1472}skC, {1473}r_12) in
+{1475}            let ccvl: bitstring = {1476}ClientCertificateVerifyLogInfo({1477}ccl_1, {1479}ccv_1) in
+{1481}            let cfin_2: bitstring = {1482}mac({1483}ccvl, {1485}cfk_4) in
+{1487}            let c_cfl: bitstring = {1488}ClientFinishedLogInfo({1489}ccvl, {1491}cfin_2) in
+{1493}            let resumption_secret_2: key = {1494}Derive_Secret_rms({1495}masterSecret_6, {1497}c_cfl) in
+{1499}            let final_mess_1: bitstring = {1500}({1501}ClientCertificateVerifyOut({1502}ccv_1), {1504}ClientFinishedOut({1505}cfin_2)) in
+{1507}            let final_log_1: bitstring = {1508}ClientFinishedAuthIn({1509}log2_2, {1511}pkC, {1512}ccv_1, {1514}cfin_2) in
+{1516}            event {1517}ClientTerm1({1520}({1521}cr_1, {1523}gx, {1525}sr_1, {1527}cgy, {1529}log0_1, {1531}certS, {1533}log1_2, {1535}scv, {1537}m_3), {1539}final_log_1, {1541}({1542}client_hk_2, {1544}server_hk_2, {1546}client_hiv_2, {1548}server_hiv_2, {1550}cfk_4, {1552}sfk_2, {1554}cats, {1556}sats, {1558}ems, {1560}resumption_secret_2));
+{1562}            out(io7[{1563}i1], {1564}({1565}final_mess_1, {1567}({1568}resumption_secret_2, {1570}cats, {1572}sats, {1574}ems)))
+                )
+                else
+{1585}            let cfin_3: bitstring = {1586}mac({1587}c_sfl, {1589}cfk_4) in
+{1591}            let cfl_2: bitstring = {1592}ClientFinishedLogInfo({1593}c_sfl, {1595}cfin_3) in
+{1597}            let resumption_secret_3: key = {1598}Derive_Secret_rms({1599}masterSecret_6, {1601}cfl_2) in
+{1603}            let final_mess_2: bitstring = {1604}ClientFinishedOut({1605}cfin_3) in
+{1607}            let final_log_2: bitstring = {1608}ClientFinishedIn({1609}cfin_3) in
+{1611}            event {1612}ClientTerm1({1615}({1616}cr_1, {1618}gx, {1620}sr_1, {1622}cgy, {1624}log0_1, {1626}certS, {1628}log1_2, {1630}scv, {1632}m_3), {1634}final_log_2, {1636}({1637}client_hk_2, {1639}server_hk_2, {1641}client_hiv_2, {1643}server_hiv_2, {1645}cfk_4, {1647}sfk_2, {1649}cats, {1651}sats, {1653}ems, {1655}resumption_secret_3));
+{1657}            out(io7[{1658}i1], {1659}({1660}final_mess_2, {1662}({1663}resumption_secret_3, {1665}cats, {1667}sats, {1669}ems)))
+        ) | (
+{1702}    ! i6 <= N6
+{1703}    in(io20[{1704}i6], ClientHello(cr_4: nonce, sgx: elt));
+{1705}    new sr_3: nonce;
+{1706}    find j' = j'_1 <= N1 suchthat defined(cr_1[{1707}j'_1], x_2[{1708}j'_1], gx[{1709}j'_1]) && {1710}({1711}sgx = {1713}gx[{1714}j'_1]) then
+          (
+{1715}      new y_4: Z;
+{1716}      let gy_2: elt = {1717}exp({1718}G, {1719}y_4) in
+{1721}      let s_2: elt = {1722}exp({1723}G, {1724}mult({1725}x_2[{1726}j'], {1728}y_4)) in
+{1730}      let handshakeSecret_2: extracted = {1731}HKDF_extract_ES({1732}hk_2, {1733}s_2) in
+{1735}      out(io21[{1736}i6], {1737}ServerHelloOut({1738}sr_3, {1740}gy_2));
+{1742}      in(io22[{1743}i6], log0_2: bitstring);
+{1744}      let sil_3: bitstring = {1745}ServerHelloLogInfo({1746}cr_4, {1748}sgx, {1750}sr_3, {1752}gy_2, {1754}log0_2) in
+{1756}      let r_9: two_keys = {1757}Derive_Secret_cs_hts({1758}handshakeSecret_2, {1760}sil_3) in
+{1762}      let server_hts_1: key = {1763}get2({1764}r_9) in
+{1766}      let client_hts_1: key = {1767}get1({1768}r_9) in
+{1770}      let client_hk_4: key = {1771}HKDF_expand_key_label({1772}client_hts_1) in
+{1774}      let server_hk_4: key = {1775}HKDF_expand_key_label({1776}server_hts_1) in
+{1778}      let client_hiv_4: key = {1779}HKDF_expand_iv_label({1780}client_hts_1) in
+{1782}      let server_hiv_4: key = {1783}HKDF_expand_iv_label({1784}server_hts_1) in
+{1786}      let cfk_6: key = {1787}HKDF_expand_fin_label({1788}client_hts_1) in
+{1790}      let sfk_4: key = {1791}HKDF_expand_fin_label({1792}server_hts_1) in
+{1794}      let masterSecret_8: extracted = {1795}HKDF_extract_zero({1796}handshakeSecret_2) in
+{1798}      out(io23[{1799}i6], {1800}({1801}client_hk_4, {1803}server_hk_4, {1805}client_hiv_4, {1807}server_hiv_4));
+{1809}      in(io24[{1810}i6], log1_3: bitstring);
+{1811}      let scl_3: bitstring = {1812}ServerCertificateLogInfo({1813}sil_3, {1815}pkgen2({1816}kseedS), {1817}log1_3) in
+{1819}      new r_10: sign_seed;
+{1820}      let scv_1: bitstring = {1821}sign_r2({1822}scl_3, {1824}skgen2({1825}kseedS), {1826}r_10) in
+{1828}      let scvl_3: bitstring = {1829}ServerCertificateVerifyLogInfo({1830}scl_3, {1832}scv_1) in
+{1834}      let m_4: bitstring = {1835}mac({1836}scvl_3, {1838}sfk_4) in
+{1840}      let s_sfl: bitstring = {1841}ServerFinishedLogInfo({1842}scvl_3, {1844}m_4) in
+{1846}      let r_11: three_keys = {1847}Derive_Secret_cs_ats_exp({1848}masterSecret_8, {1850}s_sfl) in
+{1852}      let ems_1: key = {1853}get3({1854}r_11) in
+{1856}      let sats_1: key = {1857}get2_1({1858}r_11) in
+{1860}      let cats_1: key = {1861}get1_1({1862}r_11) in
+{1864}      event {1865}ServerAccept({1868}({1869}cr_4, {1871}sgx, {1873}sr_3, {1875}gy_2, {1877}log0_2, {1879}log1_3, {1881}scv_1, {1883}m_4), {1885}({1886}client_hk_4, {1888}server_hk_4, {1890}client_hiv_4, {1892}server_hiv_4, {1894}cfk_6, {1896}sfk_4, {1898}cats_1, {1900}sats_1, {1902}ems_1), {1904}i6);
+{1905}      out(io25[{1906}i6], {1907}({1908}ServerCertificateVerifyOut({1909}scv_1), {1911}ServerFinishedOut({1912}m_4)));
+{1914}      in(io26[{1915}i6], clientfinished: bitstring);
+{1916}      let ClientFinishedAuthIn(log2_3: bitstring, certC_2: certificate, ccv_2: bitstring, cfin_4: bitstring) = {1917}clientfinished in
+            (
+{1919}        let ccl_2: bitstring = {1920}ClientCertificateLogInfo({1921}s_sfl, {1923}log2_3, {1925}certC_2) in
+{1927}        let ccvl_1: bitstring = {1928}ClientCertificateVerifyLogInfo({1929}ccl_2, {1931}ccv_2) in
+{1933}        if defined(corruptedServer) && {1934}({1935}certC_2 = {1937}pkgen2({1938}kseedS)) then
+              (
+{1939}          if {1940}({1941}check2({1942}ccl_2, {1944}certC_2, {1946}ccv_2) && {1948}check({1949}ccvl_1, {1951}cfk_6, {1953}cfin_4)) then
+{1955}          let cfl_3: bitstring = {1956}ClientFinishedLogInfo({1957}ccvl_1, {1959}cfin_4) in
+{1961}          let resumption_secret_5: key = {1962}Derive_Secret_rms({1963}masterSecret_8, {1965}cfl_3) in
+{1967}          let s_resumption_secret: key = {1968}resumption_secret_5 in
+{1970}          let s_cats: key = {1971}cats_1 in
+{1973}          let s_sats: key = {1974}sats_1 in
+{1976}          let s_ems: key = {1977}ems_1 in
+{1979}          event {1980}ServerTerm1({1983}({1984}cr_4, {1986}sgx, {1988}sr_3, {1990}gy_2, {1992}log0_2, {1994}pkgen2({1995}kseedS), {1996}log1_3, {1998}scv_1, {2000}m_4), {2002}clientfinished, {2004}({2005}client_hk_4, {2007}server_hk_4, {2009}client_hiv_4, {2011}server_hiv_4, {2013}cfk_6, {2015}sfk_4, {2017}cats_1, {2019}sats_1, {2021}ems_1, {2023}resumption_secret_5));
+{2025}          out(io28[{2026}i6], {2027}({2028}resumption_secret_5, {2030}cats_1, {2032}sats_1, {2034}ems_1))
+              )
+              else
+{2044}          find u = ri <= N6 suchthat defined(scl_3[{2045}ri], r_10[{2046}ri]) && {2047}({2048}({2049}certC_2 = {2051}pkgen2({2052}kseedS)) && {2053}({2054}({2055}ccl_2 = {2057}scl_3[{2058}ri]) && {2059}check2({2060}ccl_2, {2062}certC_2, {2064}ccv_2))) then
+                (
+{2066}            if {2067}check({2068}ccvl_1, {2070}cfk_6, {2072}cfin_4) then
+{2074}            let cfl_3: bitstring = {2075}ClientFinishedLogInfo({2076}ccvl_1, {2078}cfin_4) in
+{2080}            let resumption_secret_5: key = {2081}Derive_Secret_rms({2082}masterSecret_8, {2084}cfl_3) in
+{2086}            let s_resumption_secret: key = {2087}resumption_secret_5 in
+{2089}            let s_cats: key = {2090}cats_1 in
+{2092}            let s_sats: key = {2093}sats_1 in
+{2095}            let s_ems: key = {2096}ems_1 in
+{2098}            event {2099}ServerTerm1({2102}({2103}cr_4, {2105}sgx, {2107}sr_3, {2109}gy_2, {2111}log0_2, {2113}pkgen2({2114}kseedS), {2115}log1_3, {2117}scv_1, {2119}m_4), {2121}clientfinished, {2123}({2124}client_hk_4, {2126}server_hk_4, {2128}client_hiv_4, {2130}server_hiv_4, {2132}cfk_6, {2134}sfk_4, {2136}cats_1, {2138}sats_1, {2140}ems_1, {2142}resumption_secret_5));
+{2144}            out(io28[{2145}i6], {2146}({2147}resumption_secret_5, {2149}cats_1, {2151}sats_1, {2153}ems_1))
+                )
+                else
+{2163}            if {2164}({2165}certC_2 = {2167}pkgen2({2168}kseedS)) then
+{2169}              yield
+                  else
+{2170}              if {2171}({2172}verify({2173}ccl_2, {2175}certC_2, {2177}ccv_2) && {2179}check({2180}ccvl_1, {2182}cfk_6, {2184}cfin_4)) then
+{2186}              let cfl_3: bitstring = {2187}ClientFinishedLogInfo({2188}ccvl_1, {2190}cfin_4) in
+{2192}              let resumption_secret_5: key = {2193}Derive_Secret_rms({2194}masterSecret_8, {2196}cfl_3) in
+{2198}              if {2199}({2200}certC_2 = {2202}pkC) then
+                    (
+{2203}                if defined(corruptedClient, c_cfl[{2204}j'], sr_1[{2206}j'], cgy[{2208}j'], log0_1[{2210}j'], certS[{2212}j'], log1_2[{2214}j'], scv[{2216}j'], m_3[{2218}j'], log2_2[{2220}j'], ccv_1[{2222}j'], cfk_4[{2224}j'], ccvl[{2226}j']) && {2228}({2229}check({2230}ccvl[{2231}j'], {2233}cfk_4[{2234}j'], {2236}cfin_4) && {2238}({2239}({2240}ccv_2 = {2242}ccv_1[{2243}j']) && {2245}({2246}({2247}log2_3 = {2249}log2_2[{2250}j']) && {2252}({2253}check({2254}scvl_3, {2256}sfk_4, {2258}m_3[{2259}j']) && {2261}({2262}({2263}scv_1 = {2265}scv[{2266}j']) && {2268}({2269}({2270}log1_3 = {2272}log1_2[{2273}j']) && {2275}({2276}({2277}pkgen2({2278}kseedS) = {2279}certS[{2280}j']) && {2282}({2283}({2284}log0_2 = {2286}log0_1[{2287}j']) && {2289}({2290}({2291}gy_2 = {2293}cgy[{2294}j']) && {2296}({2297}({2298}sr_3 = {2300}sr_1[{2301}j']) && {2303}({2304}({2305}j' = {2307}j') && {2309}({2310}cr_4 = {2312}cr_1[{2313}j'])))))))))))) then
+                      (
+{2315}                  let j_1 <= N1 = {2316}j' in
+{2318}                  let s_resumption_secret: key = {2319}resumption_secret_5 in
+{2321}                  let s_cats: key = {2322}cats_1 in
+{2324}                  let s_sats: key = {2325}sats_1 in
+{2327}                  let s_ems: key = {2328}ems_1 in
+{2330}                  event {2331}ServerTerm1({2334}({2335}cr_4, {2337}sgx, {2339}sr_3, {2341}gy_2, {2343}log0_2, {2345}pkgen2({2346}kseedS), {2347}log1_3, {2349}scv_1, {2351}m_4), {2353}clientfinished, {2355}({2356}client_hk_4, {2358}server_hk_4, {2360}client_hiv_4, {2362}server_hiv_4, {2364}cfk_6, {2366}sfk_4, {2368}cats_1, {2370}sats_1, {2372}ems_1, {2374}resumption_secret_5));
+{2376}                  event {2377}ServerTerm({2380}({2381}cr_4, {2383}sgx, {2385}sr_3, {2387}gy_2, {2389}log0_2, {2391}pkgen2({2392}kseedS), {2393}log1_3, {2395}scv_1, {2397}m_4, {2399}clientfinished), {2401}({2402}client_hk_4, {2404}server_hk_4, {2406}client_hiv_4, {2408}server_hiv_4, {2410}cfk_6, {2412}sfk_4, {2414}cats_1, {2416}sats_1, {2418}ems_1, {2420}resumption_secret_5));
+{2422}                  out(io27[{2423}i6], {2424}())
+                      )
+                      else
+{2431}                  if defined(corruptedClient) then
+                        (
+{2433}                    let s_resumption_secret: key = {2434}resumption_secret_5 in
+{2436}                    let s_cats: key = {2437}cats_1 in
+{2439}                    let s_sats: key = {2440}sats_1 in
+{2442}                    let s_ems: key = {2443}ems_1 in
+{2445}                    event {2446}ServerTerm1({2449}({2450}cr_4, {2452}sgx, {2454}sr_3, {2456}gy_2, {2458}log0_2, {2460}pkgen2({2461}kseedS), {2462}log1_3, {2464}scv_1, {2466}m_4), {2468}clientfinished, {2470}({2471}client_hk_4, {2473}server_hk_4, {2475}client_hiv_4, {2477}server_hiv_4, {2479}cfk_6, {2481}sfk_4, {2483}cats_1, {2485}sats_1, {2487}ems_1, {2489}resumption_secret_5));
+{2491}                    out(io28[{2492}i6], {2493}({2494}resumption_secret_5, {2496}cats_1, {2498}sats_1, {2500}ems_1))
+                        )
+                        else
+{2507}                    let s_resumption_secret: key = {2508}resumption_secret_5 in
+{2510}                    let s_cats: key = {2511}cats_1 in
+{2513}                    let s_sats: key = {2514}sats_1 in
+{2516}                    let s_ems: key = {2517}ems_1 in
+{2519}                    event {2520}ServerTerm1({2523}({2524}cr_4, {2526}sgx, {2528}sr_3, {2530}gy_2, {2532}log0_2, {2534}pkgen2({2535}kseedS), {2536}log1_3, {2538}scv_1, {2540}m_4), {2542}clientfinished, {2544}({2545}client_hk_4, {2547}server_hk_4, {2549}client_hiv_4, {2551}server_hiv_4, {2553}cfk_6, {2555}sfk_4, {2557}cats_1, {2559}sats_1, {2561}ems_1, {2563}resumption_secret_5));
+{2565}                    event {2566}ServerTerm({2569}({2570}cr_4, {2572}sgx, {2574}sr_3, {2576}gy_2, {2578}log0_2, {2580}pkgen2({2581}kseedS), {2582}log1_3, {2584}scv_1, {2586}m_4, {2588}clientfinished), {2590}({2591}client_hk_4, {2593}server_hk_4, {2595}client_hiv_4, {2597}server_hiv_4, {2599}cfk_6, {2601}sfk_4, {2603}cats_1, {2605}sats_1, {2607}ems_1, {2609}resumption_secret_5));
+{2611}                    out(io27[{2612}i6], {2613}())
+                    )
+                    else
+{2619}                let s_resumption_secret: key = {2620}resumption_secret_5 in
+{2622}                let s_cats: key = {2623}cats_1 in
+{2625}                let s_sats: key = {2626}sats_1 in
+{2628}                let s_ems: key = {2629}ems_1 in
+{2631}                event {2632}ServerTerm1({2635}({2636}cr_4, {2638}sgx, {2640}sr_3, {2642}gy_2, {2644}log0_2, {2646}pkgen2({2647}kseedS), {2648}log1_3, {2650}scv_1, {2652}m_4), {2654}clientfinished, {2656}({2657}client_hk_4, {2659}server_hk_4, {2661}client_hiv_4, {2663}server_hiv_4, {2665}cfk_6, {2667}sfk_4, {2669}cats_1, {2671}sats_1, {2673}ems_1, {2675}resumption_secret_5));
+{2677}                out(io28[{2678}i6], {2679}({2680}resumption_secret_5, {2682}cats_1, {2684}sats_1, {2686}ems_1))
+            )
+            else
+{2698}        let ClientFinishedIn(cfin_5: bitstring) = {2699}clientfinished in
+{2701}        if {2702}check({2703}s_sfl, {2705}cfk_6, {2707}cfin_5) then
+{2709}        let cfl_4: bitstring = {2710}ClientFinishedLogInfo({2711}s_sfl, {2713}cfin_5) in
+{2715}        let resumption_secret_6: key = {2716}Derive_Secret_rms({2717}masterSecret_8, {2719}cfl_4) in
+{2721}        let j_1 <= N1 = {2722}j' in
+{2724}        let s_resumption_secret: key = {2725}resumption_secret_6 in
+{2727}        let s_cats: key = {2728}cats_1 in
+{2730}        let s_sats: key = {2731}sats_1 in
+{2733}        let s_ems: key = {2734}ems_1 in
+{2736}        event {2737}ServerTerm1({2740}({2741}cr_4, {2743}sgx, {2745}sr_3, {2747}gy_2, {2749}log0_2, {2751}pkgen2({2752}kseedS), {2753}log1_3, {2755}scv_1, {2757}m_4), {2759}clientfinished, {2761}({2762}client_hk_4, {2764}server_hk_4, {2766}client_hiv_4, {2768}server_hiv_4, {2770}cfk_6, {2772}sfk_4, {2774}cats_1, {2776}sats_1, {2778}ems_1, {2780}resumption_secret_6));
+{2782}        event {2783}ServerTerm({2786}({2787}cr_4, {2789}sgx, {2791}sr_3, {2793}gy_2, {2795}log0_2, {2797}pkgen2({2798}kseedS), {2799}log1_3, {2801}scv_1, {2803}m_4, {2805}clientfinished), {2807}({2808}client_hk_4, {2810}server_hk_4, {2812}client_hiv_4, {2814}server_hiv_4, {2816}cfk_6, {2818}sfk_4, {2820}cats_1, {2822}sats_1, {2824}ems_1, {2826}resumption_secret_6));
+{2828}        out(io27[{2829}i6], {2830}())
+          )
+          else
+{2864}      new y_3: Z;
+{2865}      let gy_3: elt = {2866}exp({2867}G, {2868}y_3) in
+{2870}      let s_2: elt = {2871}exp({2872}sgx, {2874}y_3) in
+{2876}      let handshakeSecret_2: extracted = {2877}HKDF_extract_ES({2878}hk_2, {2879}s_2) in
+{2881}      out(io21[{2882}i6], {2883}ServerHelloOut({2884}sr_3, {2886}gy_3));
+{2888}      in(io22[{2889}i6], log0_2: bitstring);
+{2890}      let sil_3: bitstring = {2891}ServerHelloLogInfo({2892}cr_4, {2894}sgx, {2896}sr_3, {2898}gy_3, {2900}log0_2) in
+{2902}      let r_9: two_keys = {2903}Derive_Secret_cs_hts({2904}handshakeSecret_2, {2906}sil_3) in
+{2908}      let server_hts_1: key = {2909}get2({2910}r_9) in
+{2912}      let client_hts_1: key = {2913}get1({2914}r_9) in
+{2916}      let client_hk_4: key = {2917}HKDF_expand_key_label({2918}client_hts_1) in
+{2920}      let server_hk_4: key = {2921}HKDF_expand_key_label({2922}server_hts_1) in
+{2924}      let client_hiv_4: key = {2925}HKDF_expand_iv_label({2926}client_hts_1) in
+{2928}      let server_hiv_4: key = {2929}HKDF_expand_iv_label({2930}server_hts_1) in
+{2932}      let cfk_6: key = {2933}HKDF_expand_fin_label({2934}client_hts_1) in
+{2936}      let sfk_4: key = {2937}HKDF_expand_fin_label({2938}server_hts_1) in
+{2940}      let masterSecret_8: extracted = {2941}HKDF_extract_zero({2942}handshakeSecret_2) in
+{2944}      out(io23[{2945}i6], {2946}({2947}client_hk_4, {2949}server_hk_4, {2951}client_hiv_4, {2953}server_hiv_4));
+{2955}      in(io24[{2956}i6], log1_3: bitstring);
+{2957}      let scl_3: bitstring = {2958}ServerCertificateLogInfo({2959}sil_3, {2961}pkgen2({2962}kseedS), {2963}log1_3) in
+{2965}      new r_10: sign_seed;
+{2966}      let scv_1: bitstring = {2967}sign_r2({2968}scl_3, {2970}skgen2({2971}kseedS), {2972}r_10) in
+{2974}      let scvl_3: bitstring = {2975}ServerCertificateVerifyLogInfo({2976}scl_3, {2978}scv_1) in
+{2980}      let m_4: bitstring = {2981}mac({2982}scvl_3, {2984}sfk_4) in
+{2986}      let s_sfl: bitstring = {2987}ServerFinishedLogInfo({2988}scvl_3, {2990}m_4) in
+{2992}      let r_11: three_keys = {2993}Derive_Secret_cs_ats_exp({2994}masterSecret_8, {2996}s_sfl) in
+{2998}      let ems_1: key = {2999}get3({3000}r_11) in
+{3002}      let sats_1: key = {3003}get2_1({3004}r_11) in
+{3006}      let cats_1: key = {3007}get1_1({3008}r_11) in
+{3010}      event {3011}ServerAccept({3014}({3015}cr_4, {3017}sgx, {3019}sr_3, {3021}gy_3, {3023}log0_2, {3025}log1_3, {3027}scv_1, {3029}m_4), {3031}({3032}client_hk_4, {3034}server_hk_4, {3036}client_hiv_4, {3038}server_hiv_4, {3040}cfk_6, {3042}sfk_4, {3044}cats_1, {3046}sats_1, {3048}ems_1), {3050}i6);
+{3051}      out(io25[{3052}i6], {3053}({3054}ServerCertificateVerifyOut({3055}scv_1), {3057}ServerFinishedOut({3058}m_4)));
+{3060}      in(io26[{3061}i6], clientfinished: bitstring);
+{3062}      let ClientFinishedAuthIn(log2_3: bitstring, certC_2: certificate, ccv_2: bitstring, cfin_4: bitstring) = {3063}clientfinished in
+            (
+{3065}        let ccl_2: bitstring = {3066}ClientCertificateLogInfo({3067}s_sfl, {3069}log2_3, {3071}certC_2) in
+{3073}        let ccvl_1: bitstring = {3074}ClientCertificateVerifyLogInfo({3075}ccl_2, {3077}ccv_2) in
+{3079}        if defined(corruptedServer) && {3080}({3081}certC_2 = {3083}pkgen2({3084}kseedS)) then
+              (
+{3085}          if {3086}({3087}check2({3088}ccl_2, {3090}certC_2, {3092}ccv_2) && {3094}check({3095}ccvl_1, {3097}cfk_6, {3099}cfin_4)) then
+{3101}          let cfl_3: bitstring = {3102}ClientFinishedLogInfo({3103}ccvl_1, {3105}cfin_4) in
+{3107}          let resumption_secret_5: key = {3108}Derive_Secret_rms({3109}masterSecret_8, {3111}cfl_3) in
+{3113}          let s_resumption_secret: key = {3114}resumption_secret_5 in
+{3116}          let s_cats: key = {3117}cats_1 in
+{3119}          let s_sats: key = {3120}sats_1 in
+{3122}          let s_ems: key = {3123}ems_1 in
+{3125}          event {3126}ServerTerm1({3129}({3130}cr_4, {3132}sgx, {3134}sr_3, {3136}gy_3, {3138}log0_2, {3140}pkgen2({3141}kseedS), {3142}log1_3, {3144}scv_1, {3146}m_4), {3148}clientfinished, {3150}({3151}client_hk_4, {3153}server_hk_4, {3155}client_hiv_4, {3157}server_hiv_4, {3159}cfk_6, {3161}sfk_4, {3163}cats_1, {3165}sats_1, {3167}ems_1, {3169}resumption_secret_5));
+{3171}          out(io28[{3172}i6], {3173}({3174}resumption_secret_5, {3176}cats_1, {3178}sats_1, {3180}ems_1))
+              )
+              else
+{3190}          find u = ri <= N6 suchthat defined(scl_3[{3191}ri], r_10[{3192}ri]) && {3193}({3194}({3195}certC_2 = {3197}pkgen2({3198}kseedS)) && {3199}({3200}({3201}ccl_2 = {3203}scl_3[{3204}ri]) && {3205}check2({3206}ccl_2, {3208}certC_2, {3210}ccv_2))) then
+                (
+{3212}            if {3213}check({3214}ccvl_1, {3216}cfk_6, {3218}cfin_4) then
+{3220}            let cfl_3: bitstring = {3221}ClientFinishedLogInfo({3222}ccvl_1, {3224}cfin_4) in
+{3226}            let resumption_secret_5: key = {3227}Derive_Secret_rms({3228}masterSecret_8, {3230}cfl_3) in
+{3232}            let s_resumption_secret: key = {3233}resumption_secret_5 in
+{3235}            let s_cats: key = {3236}cats_1 in
+{3238}            let s_sats: key = {3239}sats_1 in
+{3241}            let s_ems: key = {3242}ems_1 in
+{3244}            event {3245}ServerTerm1({3248}({3249}cr_4, {3251}sgx, {3253}sr_3, {3255}gy_3, {3257}log0_2, {3259}pkgen2({3260}kseedS), {3261}log1_3, {3263}scv_1, {3265}m_4), {3267}clientfinished, {3269}({3270}client_hk_4, {3272}server_hk_4, {3274}client_hiv_4, {3276}server_hiv_4, {3278}cfk_6, {3280}sfk_4, {3282}cats_1, {3284}sats_1, {3286}ems_1, {3288}resumption_secret_5));
+{3290}            out(io28[{3291}i6], {3292}({3293}resumption_secret_5, {3295}cats_1, {3297}sats_1, {3299}ems_1))
+                )
+                else
+{3309}            if {3310}({3311}certC_2 = {3313}pkgen2({3314}kseedS)) then
+{3315}              yield
+                  else
+{3316}              if {3317}({3318}verify({3319}ccl_2, {3321}certC_2, {3323}ccv_2) && {3325}check({3326}ccvl_1, {3328}cfk_6, {3330}cfin_4)) then
+{3332}              let cfl_3: bitstring = {3333}ClientFinishedLogInfo({3334}ccvl_1, {3336}cfin_4) in
+{3338}              let resumption_secret_5: key = {3339}Derive_Secret_rms({3340}masterSecret_8, {3342}cfl_3) in
+{3344}              if {3345}({3346}certC_2 = {3348}pkC) then
+                    (
+{3349}                if defined(corruptedClient) then
+                      (
+{3351}                  let s_resumption_secret: key = {3352}resumption_secret_5 in
+{3354}                  let s_cats: key = {3355}cats_1 in
+{3357}                  let s_sats: key = {3358}sats_1 in
+{3360}                  let s_ems: key = {3361}ems_1 in
+{3363}                  event {3364}ServerTerm1({3367}({3368}cr_4, {3370}sgx, {3372}sr_3, {3374}gy_3, {3376}log0_2, {3378}pkgen2({3379}kseedS), {3380}log1_3, {3382}scv_1, {3384}m_4), {3386}clientfinished, {3388}({3389}client_hk_4, {3391}server_hk_4, {3393}client_hiv_4, {3395}server_hiv_4, {3397}cfk_6, {3399}sfk_4, {3401}cats_1, {3403}sats_1, {3405}ems_1, {3407}resumption_secret_5));
+{3409}                  out(io28[{3410}i6], {3411}({3412}resumption_secret_5, {3414}cats_1, {3416}sats_1, {3418}ems_1))
+                      )
+                      else
+{3425}                  let s_resumption_secret: key = {3426}resumption_secret_5 in
+{3428}                  let s_cats: key = {3429}cats_1 in
+{3431}                  let s_sats: key = {3432}sats_1 in
+{3434}                  let s_ems: key = {3435}ems_1 in
+{3437}                  event {3438}ServerTerm1({3441}({3442}cr_4, {3444}sgx, {3446}sr_3, {3448}gy_3, {3450}log0_2, {3452}pkgen2({3453}kseedS), {3454}log1_3, {3456}scv_1, {3458}m_4), {3460}clientfinished, {3462}({3463}client_hk_4, {3465}server_hk_4, {3467}client_hiv_4, {3469}server_hiv_4, {3471}cfk_6, {3473}sfk_4, {3475}cats_1, {3477}sats_1, {3479}ems_1, {3481}resumption_secret_5));
+{3483}                  event {3484}ServerTerm({3487}({3488}cr_4, {3490}sgx, {3492}sr_3, {3494}gy_3, {3496}log0_2, {3498}pkgen2({3499}kseedS), {3500}log1_3, {3502}scv_1, {3504}m_4, {3506}clientfinished), {3508}({3509}client_hk_4, {3511}server_hk_4, {3513}client_hiv_4, {3515}server_hiv_4, {3517}cfk_6, {3519}sfk_4, {3521}cats_1, {3523}sats_1, {3525}ems_1, {3527}resumption_secret_5));
+{3529}                  out(io27[{3530}i6], {3531}())
+                    )
+                    else
+{3537}                let s_resumption_secret: key = {3538}resumption_secret_5 in
+{3540}                let s_cats: key = {3541}cats_1 in
+{3543}                let s_sats: key = {3544}sats_1 in
+{3546}                let s_ems: key = {3547}ems_1 in
+{3549}                event {3550}ServerTerm1({3553}({3554}cr_4, {3556}sgx, {3558}sr_3, {3560}gy_3, {3562}log0_2, {3564}pkgen2({3565}kseedS), {3566}log1_3, {3568}scv_1, {3570}m_4), {3572}clientfinished, {3574}({3575}client_hk_4, {3577}server_hk_4, {3579}client_hiv_4, {3581}server_hiv_4, {3583}cfk_6, {3585}sfk_4, {3587}cats_1, {3589}sats_1, {3591}ems_1, {3593}resumption_secret_5));
+{3595}                out(io28[{3596}i6], {3597}({3598}resumption_secret_5, {3600}cats_1, {3602}sats_1, {3604}ems_1))
+            )
+            else
+{3616}        let ClientFinishedIn(cfin_5: bitstring) = {3617}clientfinished in
+{3619}        if {3620}check({3621}s_sfl, {3623}cfk_6, {3625}cfin_5) then
+{3627}        let cfl_4: bitstring = {3628}ClientFinishedLogInfo({3629}s_sfl, {3631}cfin_5) in
+{3633}        let resumption_secret_6: key = {3634}Derive_Secret_rms({3635}masterSecret_8, {3637}cfl_4) in
+{3639}        let s_resumption_secret: key = {3640}resumption_secret_6 in
+{3642}        let s_cats: key = {3643}cats_1 in
+{3645}        let s_sats: key = {3646}sats_1 in
+{3648}        let s_ems: key = {3649}ems_1 in
+{3651}        event {3652}ServerTerm1({3655}({3656}cr_4, {3658}sgx, {3660}sr_3, {3662}gy_3, {3664}log0_2, {3666}pkgen2({3667}kseedS), {3668}log1_3, {3670}scv_1, {3672}m_4), {3674}clientfinished, {3676}({3677}client_hk_4, {3679}server_hk_4, {3681}client_hiv_4, {3683}server_hiv_4, {3685}cfk_6, {3687}sfk_4, {3689}cats_1, {3691}sats_1, {3693}ems_1, {3695}resumption_secret_6));
+{3697}        out(io28[{3698}i6], {3699}({3700}resumption_secret_6, {3702}cats_1, {3704}sats_1, {3706}ems_1))
+        ) | (
+{3740}    in(cCorruptS1, ());
+{3741}    let corruptedServer: bool = {3742}cst_bool in
+{3743}    out(cCorruptS2, {3744}skgen({3745}kseedS))
+        ) | (
+{3748}    in(cCorruptC1, ());
+{3749}    let corruptedClient: bool = {3750}cst_bool in
+{3751}    out(cCorruptC2, {3752}skC)
+        ) | (
+{3755}    ! iH <= qH
+{3756}    in(ch1_1[{3757}iH], x1_1: elt);
+{3758}    out(ch2_1[{3759}iH], {3760}HKDF_extract_ES({3761}hk_2, {3762}x1_1))
+        ))
+      ) | (
+{3767}  ! i <= qH1
+{3768}  in(ch3[{3769}i], x_4: key);
+{3770}  out(ch4[{3771}i], {3772}HKDF_extract_zero_salt({3773}hk1_1, {3774}x_4))
+      ))
+
