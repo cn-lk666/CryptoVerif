@@ -14,6 +14,8 @@ ROM: random oracle model 随机预言机
 PRP: pseudo-random permutation
 PRF: pseudo-random function
 RTT: round-trip time
+AKE: Authenticated Key Exchange
+
 
 Bounded:
     means that the type is a set of bitstrings of bounded length or perhaps ⊥. 

@@ -1,0 +1,53 @@
+111
+Secrecy: If an application data message m is sent over a session cid between an honest client
+        C and honest server S, then this message is kept confidential from an attacker who cannot
+        break the cryptographic constructions used in the session cid .
+Forward Secrecy: Secrecy (above) holds even if the long-term keys of the client and server
+        (sk C,pk C,psk ) are given to the adversary after the session cid has been completed and the
+        session keys kc,ks are deleted by C and S.
+Authentication: If an application data message m is received over a session cid from an honest
+        and authenticated peer, then the peer must have sent the same application data m in a
+        matching session (with the same parameters cid ,offer C,modeS,pk C,pk S,psk ,kc,ks,psk ′).
+Replay Prevention: Any application data m sent over a session cid may be accepted at most
+        once by the peer.
+Unique Channel Identifier: If a client session and a server session have the same identifier
+        cid , then all other parameters in these sessions must match (same cid ,offer C,modeS,pk C,
+        pk S,psk ,kc,ks,psk ′)
+
+Authentication goals in both ProVerif and CryptoVerif are written as correspondences between events
+Secrecy is treated differently in the two tools; in ProVerif, 
+    we typically ask whether the attacker can compute a secret, whereas in CryptoVerif, we ask whether
+    it can distinguish a secret from a random bitstring
+
+A Realistic Threat Model for TLS.:
+    Network Adversary
+    Compromised Principals
+    Weak Long-term Keys
+    RSA Decryption Oracles:
+    Weak Diffie-Hellman Groups
+    Weak Hash Functions:
+    Weak Authenticated Encryption
+    
+
+overview:
+Client:
+        in(io1,());
+        send_client_hello_succ: send_client_hello_res_t [data]
+        out(ClientHello(cr,cgx))
+        in(ServerHelloIn(sr,cgy,log0));
+
+
+Server:
+        in(io20,ClientHello(cr,sgx));
+        recv_client_hello_succ: recv_client_hello_res_t
+        out(io21,ServerHelloOut(sr,sgy));
+        in(io22,log0:bitstring);
+        ServerHelloLogInfo(nonce,elt,nonce,elt,bitstring): bitstring [data].
+        keys_succ(extracted, key, key, key, key, key, key): keys_res_t [data]
+                onertt_hs_keys(sil,handshakeSecret)
+
+
+Reference:
+1. full comparison between Symbolic vs. Computational Models
+        B. Blanchet. Security protocol verification: Symbolic and computational models. In Prin-
+        ciples of Security and Trust (POST), pages 3–29, 2012.

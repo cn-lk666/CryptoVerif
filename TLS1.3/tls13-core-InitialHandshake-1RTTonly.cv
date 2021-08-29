@@ -149,6 +149,7 @@ let hashoracle1(hk1: hashkey) = ! qH1 in(ch3, x:key); out(ch4, HKDF_extract_zero
 (* HKDF_extract_ES, that is, HKDF_extract with salt argument 
    Early_secret = HKDF_extract(0,0), is a random oracle. *)
 
+(*ROM_hash_large(key ,hashinput ,hashoutput ,hash,hashoracle,qH )*)
 expand ROM_hash_large(hashkey, elt, extracted, HKDF_extract_ES, hashoracle, qH).
 
 (* We use the lemma proved in KeySchedule2.cv *)
@@ -170,6 +171,7 @@ equiv(prf2)
 	    O2() := new r': extracted; return(r')).
 
 type tuple2keys_t.
+(*random_split_N(input _t ,part1 _t ,...,partN _t ,tuple_t ,tuple,split ) *)
 expand random_split_2(two_keys, key, key, tuple2keys_t, tuple2keys, split2).
 
 (* We use the lemma proved in KeySchedule3.cv *)
@@ -193,7 +195,6 @@ equiv(prf3)
 
 type tuple3keys_t.
 expand random_split_3(three_keys, key, key, key, tuple3keys_t, tuple3keys, split3).
-
 (* We use the lemma proved in HKDFexpand.cv *)
 
 fun HKDF_expand_fin_label(key): key.
