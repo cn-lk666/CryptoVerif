@@ -1,0 +1,159 @@
+(*************************************************************
+ *                                                           *
+ *       Cryptographic protocol verifier                     *
+ *                                                           *
+ *       Bruno Blanchet and David Cadé                       *
+ *                                                           *
+ *       Copyright (C) ENS, CNRS, INRIA, 2005-2020           *
+ *                                                           *
+ *************************************************************)
+
+(*
+
+    Copyright ENS, CNRS, INRIA 
+    contributors: Bruno Blanchet, Bruno.Blanchet@inria.fr
+                  David Cadé
+
+This software is a computer program whose purpose is to verify 
+cryptographic protocols in the computational model.
+
+This software is governed by the CeCILL-B license under French law and
+abiding by the rules of distribution of free software.  You can  use, 
+modify and/ or redistribute the software under the terms of the CeCILL-B
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info". 
+
+As a counterpart to the access to the source code and  rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty  and the software's author,  the holder of the
+economic rights,  and the successive licensors  have only  limited
+liability. 
+
+In this respect, the user's attention is drawn to the risks associated
+with loading,  using,  modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean  that it is complicated to manipulate,  and  that  also
+therefore means  that it is reserved for developers  and  experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or 
+data to be ensured and,  more generally, to use and operate it in the 
+same conditions as regards security. 
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL-B license and that you accept its terms.
+
+*)
+(* This file proves that, when the handshake secret hs is a fresh random value,
+log_1 -> derive-secret(hs, client_hts, log_1)
+      || derive-secret(hs, server_hts, log_1)
+is indistinguishable from a random function and 
+\hkdfextract(hs, 0) is indistinguishable from a fresh random value 
+independent from this random function. *)
+
+(* Proof indications *)
+
+proof {
+      auto;
+      show_game;
+      SArename r_2;
+      auto
+      }
+
+
+type extracted [large, fixed].
+type key [large, fixed].
+type two_keys [large, fixed].
+type label.
+
+param N, N3.
+
+(* HMAC is a PRF *)
+
+proba Pprf.
+expand PRF(extracted, bitstring, key, HMAC, Pprf).
+
+(* Hash is a collision resistant hash function *)
+
+type hashkey [large,fixed].
+type hash [fixed].
+proba Phash.
+expand CollisionResistant_hash(hashkey, bitstring, hash, Hash, Hash_oracle, Phash).
+
+(* Derive_secret(Secret, Label, Messages) =
+   HKDF_expand_label(Secret, Label, Hash(Messages), Hash.length) =
+   HKDF_expand(Secret, [Hash.length, "TLS 1.3, " + Label, Hash(Messages)], Hash.length) =
+   HMAC(Secret, [Hash.length, "TLS 1.3, " + Label, Hash(Messages), 0x00])
+
+We define build_arg(Label, Hash) = [Length, "TLS 1.3, " + Label, Hash, 0x00].
+*)
+
+fun build_arg(label, hash): bitstring [data].
+
+letfun HKDF_expand_label(Secret: extracted, Label: label, HashValue: hash) =
+       HMAC(Secret, build_arg(Label, HashValue)).
+
+letfun Derive_secret(hk: hashkey, Secret: extracted, Label: label, Messages: bitstring) = 
+       HKDF_expand_label(Secret, Label, Hash(hk, Messages)).
+
+letfun HKDF_extract(Salt: extracted, Ikm: bitstring) =
+       HMAC(Salt, Ikm).
+
+fun concat(key, key): two_keys [data].
+
+equiv(concat)
+      !N new r1: key; new r2: key; O() := return(concat(r1, r2))
+      <=(0)=>
+      !N new r: two_keys; O() := return(r).
+
+(* Labels *)
+
+const client_hts : label. (* hts = handshake traffic secret *)
+const server_hts : label.
+
+(* Concatenation of client_handshake_traffic_secret and server_handshake_traffic_secret *)
+
+letfun Derive_Secret_cs_hts(hk: hashkey, HandshakeSecret: extracted, log: bitstring) =
+       concat(Derive_secret(hk, HandshakeSecret, client_hts, log),
+              Derive_secret(hk, HandshakeSecret, server_hts, log)).
+
+(* Master Secret *)
+
+const zero: bitstring.
+
+letfun HKDF_extract_zero(HandshakeSecret: extracted) =
+       HKDF_extract(HandshakeSecret, zero).
+
+equation forall l: label, h: hash; build_arg(l, h) <> zero.
+
+(* Prove equivalence between processLeft and processRight *)
+
+channel start, c1, c2, c3.
+
+let processLeft(hk: hashkey) =
+    !N3 in(c1, ()); new hs: extracted; out(c1, ());
+    ((!N in(c2, log0: bitstring); out(c2, Derive_Secret_cs_hts(hk, hs, log0))) |
+     in(c3, ()); out(c3, HKDF_extract_zero(hs))).
+
+let processRight =
+    !N3 in(c1, ()); out(c1, ());
+    ((!N in(c2, log1: bitstring);
+    	 find[unique] j <= N suchthat defined(log1[j], r[j]) && log1 = log1[j] then
+	      out(c2, r[j])
+	 else
+	      new r: two_keys; out(c2, r)) |
+     (in(c3, ()); new r': key; out(c3, r'))).
+
+equivalence
+	in(start, ());
+	new hk: hashkey; (* This key models the choice of the collision resistant hash function *)
+	out(start, ()); (processLeft(hk) | Hash_oracle(hk))
+
+	in(start, ());
+	new hk: hashkey; (* This key models the choice of the collision resistant hash function *)
+	out(start, ()); (processRight | Hash_oracle(hk))
+	     
+(* EXPECTED
+All queries proved.
+0.084s (user 0.080s + system 0.004s), max rss 17316K
+END *)
