@@ -23,7 +23,7 @@
 *)
 
 (*replication numbers*)
-param N1, N2, N3, N4, N5,qH
+param qChallenger, qTD, qTDXM, qCPU, qQE, qVMM.
 
 (*
     bounded means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other
@@ -39,22 +39,22 @@ type skey [bounded].
 type pkey [bounded].
 
 (*channel name*)
-channel c0, c1, c2, c3, c4, c5, start
+channel c0, c1, c2, c3, c4, c5, start.
 
-(*qH is the number of queries to the hash oracle*)
 type key [large,fixed].
 expand ROM_hash_large(
     key,                 (**)
     bitstring,         (*hashinput is the type of the input of the hash function.*)
-    ???bitstring,        (*hashoutput is the type of the output of the hash function, 
-                                    must be bounded or nonuniform (typically fixed)*)如果这里这里说了fixed，那么我们还可以用bitstring吗还是定义一个type
+    bitstring,        (*hashoutput is the type of the output of the hash function, 
+                                    must be bounded or nonuniform (typically fixed)*)
+                                (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
     hash,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
     hashoracle,  (*hashoracle is a process that allows the adversary to call the hash function*)
-    qH 
+    qH                      (*qH is the number of queries to the hash oracle*)
 ).
 
 (* MAC *)
-type key [large, fixed].
+proba Pmac.
 expand SUF_CMA_det_mac(
     key,            (*mkey is the type of keys, must be bounded*)
     bitstring , (*macinput is the type of inputs of MACs*)
@@ -71,7 +71,7 @@ proba Psign.
 proba Psigncoll.
 expand UF_CMA_det_signature(
         keyseed,
-        pkey,                  (*pkey is the type of public keys, must be bounded.*),
+        pkey,                  (*pkey is the type of public keys, must be bounded.*)
         skey,                  (*skey is the type of secret keys, must be bounded.*)
         bitstring,            (*signinput*)
         bitstring,            (*signature*)
@@ -106,6 +106,78 @@ expand IND_CCA2_public_key_enc(
                                                 (indistinguishable under adaptive chosen ciphertext attacks)
                                                 in time t for one key and N decryption queries.*)
         Penccoll                    (*Penccoll is the probability of collision between independently generated keys.*)
-)
+).
+
+(*
+    random_split_N(input _t ,part1 _t ,...,partN _t ,tuple_t ,tuple,split )
+    input _t : type of the input value
+    part1 _t ,...,partN _t : types of the output parts.
+    tuple_t : type of a tuple of the output parts
+    tuple(part1 _t ,...,partN _t ) : tuple_t : builds a tuple from N parts.
+    split (input _t ) : tuple_t splits the input into N parts and returns a tuple of these parts
+        let tuple(x1,...,xN) = split (y) in...
+*)
+type tuple_key_bitstring_t.
+type rdata [large,fixed].
+expand random_split_2(rdata, pkey , bitstring, tuple_key_bitstring_t, tuple_key_bitstring, split2).
+
+let Challenger(spk: pkey) =
+	! qChallenger
+	in(c1, ());
+    (*step 1*)
+	out(c2, ()).
+
+type rdata_other_t[fixed].
+let TD() =
+	! qTD
+	in(c3, ());
+    new tk:keyseed;
+    let pk=pkgen(tk) in
+    let sk=skgen(tk) in
+    new rdata_other:rdata_other_t;
+    let rdata=tuple_key_bitstring(pk, rdata_other) in
+	out(c4, (rdata)).
+
+let TDXM() =
+	! qS
+	in(c1, ());
+	(*这里可以理解为用私钥签名*)
+	out(c2, ()).
+
+let CPU() =
+	! qS
+	in(c1, ());
+	(*这里可以理解为用私钥签名*)
+	out(c2, ()).
+
+let QE(ssk:skey) =
+	! qS
+	in(c1, ());
+	(*这里可以理解为用私钥签名*)
+	out(c2, ()).
+
+let VMM() =
+	! qS
+	in(c1, ());
+	(*这里可以理解为用私钥签名*)
+	out(c2, ()).
 
 
+process
+	in(start, ());
+	new hk: key;
+    new r:keyseed;
+    (*skey for signature in the step 16*)
+	let ssk = sskgen(r) in
+    (*pkey for verification in the step 19*)
+	let spk = spkgen(r) in
+	out(c0, ());
+	(
+        hashoracle(hk) | 
+        Challenger(spk) | 
+        TD() |
+        TDXM() |
+        CPU() |
+        VMM() |
+        QE(ssk)
+    )
