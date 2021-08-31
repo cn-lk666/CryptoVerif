@@ -39,7 +39,7 @@ type skey [bounded].
 type pkey [bounded].
 
 (*channel name*)
-channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, start.
+channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, start.
 
 type key [large,fixed].
 type hashoutput [large, fixed].
@@ -119,56 +119,132 @@ expand IND_CCA2_public_key_enc(
     split (input _t ) : tuple_t splits the input into N parts and returns a tuple of these parts
         let tuple(x1,...,xN) = split (y) in...
 *)
-type tuple_key_bitstring_t.
-type rdata [large,fixed].
+type rdata_t [large,fixed].
 type rdata_other_t [large, bounded, nonuniform].
-expand random_split_2(rdata, pkey , rdata_other_t, tuple_key_bitstring_t, tuple_key_bitstring, split2).
+(*这里两个相同rdata可能会有bug*)
+expand random_split_2(rdata_t, pkey , rdata_other_t, rdata_t, tuple_key_bitstring, split2).
 
-let Challenger() =
+(*There are 4 reserved fragments in the tdr*)
+type reserved_string_t [bounded].
+type rtyp_t [bounded].
+type tdi_t [bounded].
+type tcbi_t [bounded].
+type csvn_t [fixed].
+
+fun tdi_t2bitstring(tdi_t): bitstring [data].
+fun tcbi_t2bitstring(tcbi_t):bitstring[data].
+
+fun rms_except_mac(rtyp_t, reserved_string_t, csvn_t, hashoutput, hashoutput, rdata_t, reserved_string_t): bitstring [data].
+fun request_SEAM(rtyp_t, hashoutput, rdata_t): bitstring [data].
+fun seamreport(bitstring, bitstring): bitstring[data].
+fun tdreport(bitstring, reserved_string_t, tdi_t): bitstring [data].
+fun request_quote(bitstring):bitstring[data].
+fun tdreport_from_VMM(bitstring): bitstring[data].
+fun verifiyreport(bitstring, bitstring):bitstring[data].
+fun verifiyresult(bool):bool.
+
+event check_hash().
+
+let Challenger(spk:pkey) =
 	! qChallenger
 	in(c1, ());
     (*step 1*)
 	out(c2, ()).
 
 let TD() =
+   (*step 2*)
 	! qTD
 	in(c3, ());
- 
-	out(c4, ()).
+    new r:keyseed;
+    new rdata_other:rdata_other_t;
+    let pk=pkgen(r) in
+    let sk=skgen(r) in
+    let rdata =tuple_key_bitstring(pk,rdata_other) in
+	out(c4, (rdata));
+    (*step 9*)
+    in(c11, (tdreport(smr_value, res4, tdi)));
+    let tdr_value=tdreport(smr_value, res4, tdi) in
+	out(c12, (request_quote(tdr_value))).
 
-let TDXM() =
+let TDXM(hk: key) =
 	! qTDXM
-	in(c5, ());
-	(*这里可以理解为用私钥签名*)
-	out(c6, ()).
+    (*step 3*)
+	in(c5, (tuple_key_bitstring(pk,rdata_other)));
+    let rdata =tuple_key_bitstring(pk,rdata_other) in
+    new tdi:tdi_t;
+    new rtyp:rtyp_t;
+	(*step 4*)
+	out(c6, (request_SEAM(rtyp, hash(hk, tdi_t2bitstring(tdi)), rdata)));
+    (*step 7*)
+    in(c9, (seamreport(rms_except_mac_value, mac_value)));
+    let smr_value=seamreport(rms_except_mac_value, mac_value) in
+    new res4:reserved_string_t;
+    let tdr_value=tdreport(smr_value, res4, tdi) in
+    (*step 8*)
+    out(c10, (tdr_value)).
 
-let CPU() =
+
+let CPU(hk:key, mkey:key) =
 	! qCPU
-	in(c7, ());
-	(*这里可以理解为用私钥签名*)
-	out(c8, ()).
+	in(c7, (request_SEAM(rtyp, tdih, rdata)));
+    (*step 5*)
+	(*tcbi represents the data structure for measurement and configuration of TDX module*)
+    new tcbi:tcbi_t;
+    new res1:reserved_string_t;
+    new csvn:csvn_t;
+    let tcbh=hash(hk, tcbi_t2bitstring(tcbi)) in
+    new res2:reserved_string_t;
+    let rms_except_mac_value=rms_except_mac(rtyp, res1, csvn, tcbh, tdih, rdata, res2) in
+    let mac_value=mac(rms_except_mac_value, mkey ) in
+    (*step 6*)
+	out(c8, (seamreport(rms_except_mac_value, mac_value)));
+    (*step 13*)
+    in(c17, verifiyreport(rms_except_mac_value, mac_value));
+    let res=check(rms_except_mac_value,mkey,mac_value) in
+    out(c18, verifiyresult(res)).
 
-let QE() =
+let QE(hk:key, ssk:skey) =
 	! qQE
-	in(c9, ());
-	(*这里可以理解为用私钥签名*)
-	out(c10, ()).
+    (*step 11*)
+	in(c15, (tdreport_from_VMM(tdr_value)));
+    let tdreport(smr_value, res4, tdi)= tdr_value in
+    let seamreport(rms_except_mac_value, mac_value)= smr_value in
+    let rms_except_mac(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_except_mac_value in
+    let hash(hk, tdi)=tdih in(
+        let hash(hk, tcbi)=tcbh in(
+           event check_hash();
+           (*step 12*)
+	        out(c16, (verifiyreport(rms_except_mac_value, mac_value)));
+            (*step 13*)
+            in(c19, verifiyresult(res));
+            out(c20, ()).
+            )
+        else
+            yield.
+    ) else yield.
+	
 
 let VMM() =
 	! qVMM
-	in(c11, ());
-	(*这里可以理解为用私钥签名*)
-	out(c12, ()).
+    (*step 10*)
+    in(c13, (request_quote(tdr_value)));
+	out(c14, (tdreport_from_VMM(tdr_value))).
 
 
 process
 	in(start, ());
+    new r:keyseed;
+    new hk:key;
+    new mkey:key;
+    let ssk=sskgen(r) in
+    let spk=spkgen(r) in
 	out(c0, ());
 	(
-        Challenger() | 
+        hashoracle(hk) |
+        Challenger(spk) | 
         TD() |
-        TDXM() |
-        CPU() |
+        TDXM(hk) |
+        CPU(hk, mkey) |
         VMM() |
-        QE()
+        QE(hk, ssk)
     )
