@@ -39,13 +39,15 @@ type skey [bounded].
 type pkey [bounded].
 
 (*channel name*)
-channel c0, c1, c2, c3, c4, c5, start.
+channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, start.
 
 type key [large,fixed].
+type hashoutput [large, fixed].
+
 expand ROM_hash_large(
     key,                 (**)
     bitstring,         (*hashinput is the type of the input of the hash function.*)
-    bitstring,        (*hashoutput is the type of the output of the hash function, 
+    hashoutput,        (*hashoutput is the type of the output of the hash function, 
                                     must be bounded or nonuniform (typically fixed)*)
                                 (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
     hash,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
@@ -119,65 +121,54 @@ expand IND_CCA2_public_key_enc(
 *)
 type tuple_key_bitstring_t.
 type rdata [large,fixed].
-expand random_split_2(rdata, pkey , bitstring, tuple_key_bitstring_t, tuple_key_bitstring, split2).
+type rdata_other_t [large, bounded, nonuniform].
+expand random_split_2(rdata, pkey , rdata_other_t, tuple_key_bitstring_t, tuple_key_bitstring, split2).
 
-let Challenger(spk: pkey) =
+let Challenger() =
 	! qChallenger
 	in(c1, ());
     (*step 1*)
 	out(c2, ()).
 
-type rdata_other_t[fixed].
 let TD() =
 	! qTD
 	in(c3, ());
-    new tk:keyseed;
-    let pk=pkgen(tk) in
-    let sk=skgen(tk) in
-    new rdata_other:rdata_other_t;
-    let rdata=tuple_key_bitstring(pk, rdata_other) in
-	out(c4, (rdata)).
+ 
+	out(c4, ()).
 
 let TDXM() =
-	! qS
-	in(c1, ());
+	! qTDXM
+	in(c5, ());
 	(*这里可以理解为用私钥签名*)
-	out(c2, ()).
+	out(c6, ()).
 
 let CPU() =
-	! qS
-	in(c1, ());
+	! qCPU
+	in(c7, ());
 	(*这里可以理解为用私钥签名*)
-	out(c2, ()).
+	out(c8, ()).
 
-let QE(ssk:skey) =
-	! qS
-	in(c1, ());
+let QE() =
+	! qQE
+	in(c9, ());
 	(*这里可以理解为用私钥签名*)
-	out(c2, ()).
+	out(c10, ()).
 
 let VMM() =
-	! qS
-	in(c1, ());
+	! qVMM
+	in(c11, ());
 	(*这里可以理解为用私钥签名*)
-	out(c2, ()).
+	out(c12, ()).
 
 
 process
 	in(start, ());
-	new hk: key;
-    new r:keyseed;
-    (*skey for signature in the step 16*)
-	let ssk = sskgen(r) in
-    (*pkey for verification in the step 19*)
-	let spk = spkgen(r) in
 	out(c0, ());
 	(
-        hashoracle(hk) | 
-        Challenger(spk) | 
+        Challenger() | 
         TD() |
         TDXM() |
         CPU() |
         VMM() |
-        QE(ssk)
+        QE()
     )
