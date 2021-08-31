@@ -94,4 +94,10 @@ Auth_Enc_from_Enc_then_MAC(key ,cleartext ,ciphertext ,enc,dec,injbot ,Z ,Penc,P
 
 
 proof {〈command〉; ...;〈command〉}
-    Allows the user to include in the CryptoVerif input file the commands that must be executed by CryptoVerif in order to prove the protocol. The allowed commands are those described in Section 7,except that help and ? are not allowed and that the crypto command must be fully specified (so that no user interaction is required). If the command contains a string that is not a valid identifier, *, or ., then this string must be put between quotes ". This is useful in particular for variable names introduced internally by CryptoVerif and that contain @ (so that they cannot be confused with variables introduced by the user), for example "@2_r1".
+    Allows the user to include in the CryptoVerif input file the commands that must be executed by CryptoVerif 
+    in order to prove the protocol. The allowed commands are those described in Section 7,
+    except that help and ? are not allowed and that the crypto command must be fully specified 
+    (so that no user interaction is required). If the command contains a string 
+    that is not a valid identifier, *, or ., then this string must be put between quotes ". 
+    This is useful in particular for variable names introduced internally by CryptoVerif 
+    and that contain @ (so that they cannot be confused with variables introduced by the user), for example "@2_r1".

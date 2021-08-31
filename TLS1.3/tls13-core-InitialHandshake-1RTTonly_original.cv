@@ -676,7 +676,7 @@ process
   let skS = skgen(kseedS) in
   let pkS = pkcert(kseedS) in
   new kseedC:keyseed;
-  let skC = skgen(kseedC) inServerTerm1
+  let skC = skgen(kseedC) in
   let pkC = pkcert(kseedC) in
   out(io34,(pkS, pkC));
   (Client(hk, skC, pkC, pkS) | Server(hk, skS, pkS, pkC) | corruptS(skS) | corruptC(skC) | hashoracle(hk)))
