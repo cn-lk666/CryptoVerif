@@ -1,0 +1,44 @@
+
+
+channel c1, c2, c3, c4, c5, c6.
+
+type key [large,fixed].
+type hashoutput [large, fixed].
+type testString [fixed].
+
+expand ROM_hash_large(
+    key,                 (**)
+    testString,         (*hashinput is the type of the input of the hash function.*)
+    hashoutput,        (*hashoutput is the type of the output of the hash function, 
+                                    must be bounded or nonuniform (typically fixed)*)
+                                (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
+    hash,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
+    hashoracle,  (*hashoracle is a process that allows the adversary to call the hash function*)
+    qH                      (*qH is the number of queries to the hash oracle*)
+).
+
+event eve1().
+fun outhash(hashoutput):hashoutput [data].
+
+let processA(hk:key, strA:testString)=
+    in(c3, ());
+    let hA=hash(hk,strA) in
+    out(c4,  (outhash(hA))).
+
+let processB(hk:key, strB:testString)=
+    in(c5, (outhash(hA)));
+    new tbool:bool;
+    let tbool=
+    if(hA=hash(hk, strB)) then 
+        true
+    else
+        false
+    in
+    out(c6, tbool).
+
+process
+    in(c1, ());
+    new hk:key;
+    new str1:testString;
+    out(c2, ());
+    (hashoracle(hk) | processA(hk, str1) | processB(hk, str1))

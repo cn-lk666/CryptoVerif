@@ -140,8 +140,9 @@ fun seamreport(bitstring, bitstring): bitstring[data].
 fun tdreport(bitstring, reserved_string_t, tdi_t): bitstring [data].
 fun request_quote(bitstring):bitstring[data].
 fun tdreport_from_VMM(bitstring): bitstring[data].
-fun verifiyreport(bitstring, bitstring):bitstring[data].
+fun verifyreport(bitstring, bitstring):bitstring[data].
 fun verifiyresult(bool):bool.
+fun rptbody_f(bitstring, tcbi_t, reserved_string_t, tdi_t): bitstring[data].
 
 event check_hash().
 
@@ -174,7 +175,8 @@ let TDXM(hk: key) =
     new tdi:tdi_t;
     new rtyp:rtyp_t;
 	(*step 4*)
-	out(c6, (request_SEAM(rtyp, hash(hk, tdi_t2bitstring(tdi)), rdata)));
+    let hash_of_tdi_in_TDXM:hashoutput=hash(hk, tdi_t2bitstring(tdi)) in
+	out(c6, (request_SEAM(rtyp, hash_of_tdi_in_TDXM , rdata)));
     (*step 7*)
     in(c9, (seamreport(rms_except_mac_value, mac_value)));
     let smr_value=seamreport(rms_except_mac_value, mac_value) in
@@ -192,16 +194,17 @@ let CPU(hk:key, mkey:key) =
     new tcbi:tcbi_t;
     new res1:reserved_string_t;
     new csvn:csvn_t;
-    let tcbh=hash(hk, tcbi_t2bitstring(tcbi)) in
+    let hash_of_tcbi_in_CPU:hashoutput=hash(hk, tcbi_t2bitstring(tcbi)) in
     new res2:reserved_string_t;
-    let rms_except_mac_value=rms_except_mac(rtyp, res1, csvn, tcbh, tdih, rdata, res2) in
+    let rms_except_mac_value=rms_except_mac(rtyp, res1, csvn, hash_of_tcbi_in_CPU, tdih, rdata, res2) in
     let mac_value=mac(rms_except_mac_value, mkey ) in
     (*step 6*)
 	out(c8, (seamreport(rms_except_mac_value, mac_value)));
     (*step 13*)
-    in(c17, verifiyreport(rms_except_mac_value, mac_value));
-    let res=check(rms_except_mac_value,mkey,mac_value) in
-    out(c18, verifiyresult(res)).
+    in(c17, verifyreport(rms_except_mac_value1, mac_value1));
+    let res_of_verification=check(rms_except_mac_value1,mkey,mac_value1) in
+    (*step 14*)
+    out(c18, verifiyresult(res_of_verification)).
 
 let QE(hk:key, ssk:skey) =
 	! qQE
@@ -210,26 +213,36 @@ let QE(hk:key, ssk:skey) =
     let tdreport(smr_value, res4, tdi)= tdr_value in
     let seamreport(rms_except_mac_value, mac_value)= smr_value in
     let rms_except_mac(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_except_mac_value in
-    let hash(hk, tdi)=tdih in(
-        let hash(hk, tcbi)=tcbh in(
-           event check_hash();
-           (*step 12*)
-	        out(c16, (verifiyreport(rms_except_mac_value, mac_value)));
-            (*step 13*)
-            in(c19, verifiyresult(res));
-            out(c20, ()).
-            )
+    (*check the hashes*)
+    let resOfHash =
+        find j<=qTDXM suchthat defined(hash_of_tdi_in_TDXM[j])&& tdih=hash_of_tdi_in_TDXM[j] then(
+            find i<=qCPU suchthat defined(hash_of_tcbi_in_CPU[i]) && tcbh=hash_of_tcbi_in_CPU[i] then
+                true
+            else 
+                false
+        )
         else
-            yield.
-    ) else yield.
-	
-
+            false
+    in
+    (*step 12*)
+    if(resOfHash) then
+        out(c16, verifyreport(rms_except_mac_value, mac_value))
+    (*step 15*)
+    in(c19, verifyreport(res_of_verification));
+    if(res_of_verification) then
+        let rptbody=rptbody_f(rms_except_mac_value, tcbi, res4, tdi) in
+        let sig_in_QE= sign(rptbody, ssk) in
+        let quote=(rptbody, sig_in_QE) in
+        (*step 16*)
+        out(c20, quote).
+        
 let VMM() =
 	! qVMM
     (*step 10*)
     in(c13, (request_quote(tdr_value)));
-	out(c14, (tdreport_from_VMM(tdr_value))).
-
+	out(c14, (tdreport_from_VMM(tdr_value)));
+    (*step 17*)
+    in(c21, )
 
 process
 	in(start, ());
