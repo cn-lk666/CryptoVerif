@@ -22,6 +22,8 @@
     18. TD->Challenger: Quote
 *)
 
+
+
 (*replication numbers*)
 param qChallenger, qTD, qTDXM, qCPU, qQE, qVMM.
 
@@ -127,6 +129,9 @@ expand IND_CPA_sym_enc(
                                       for one key and N encryption queries with cleartexts of length at most l.*)
 ).
 
+const Zkey : bitstring.
+equation forall y:key;
+	Z(keyToBitstring(y)) = Zkey.
 
 (*
     random_split_N(input _t ,part1 _t ,...,partN _t ,tuple_t ,tuple,split )
@@ -210,9 +215,9 @@ let TD() =
     in(c23, quote_from_VMM_to_TD_f(quote));
     out(c24, quote_from_TD_to_Challenger_f(quote));
     (*step 20*)
-    in(c28, m1: bitstring);
-	let injbot(key2bitstring(session_key1)) = dec(m1, sk) in
-    find i1<=qChallenger suchthat defined(session_key[i1]) && session_key[i1]=session_key1 then
+    in(c28, m2: bitstring);
+    find i1<=qChallenger suchthat defined(m1[i1]) && m1[i1]=m2 then
+	let injbot(key2bitstring(session_key1)) = dec(m2, sk) in
         event finished().
 
 let TDXM(hk: key) =

@@ -18,13 +18,11 @@ expand keygen(keyseed, key, kgen).
 
 (* Shared-key encryption (CPA Stream cipher) *)
 proba Penc.
-expand IND_CPA_sym_enc(key, plaintext, bitstring, enc, dec, injbot, Z, Penc).
+expand IND_CPA_sym_enc(key, bitstring, bitstring, enc, dec, injbot, Z, Penc).
 
 (* The function Z returns for each bitstring, a bitstring
    of the same length, consisting only of zeroes. *)
-const Zkey : plaintext.
-equation forall y:plaintext;
-	Z(y) = Zkey.
+
 
 (* Mac key generation *)
 expand keygen(mkeyseed, mkey, mkgen).
@@ -36,24 +34,28 @@ expand SUF_CMA_proba_mac(mkey, bitstring, macs, mac, check, Pmac).
 (* Queries *)
 (*Here k2 is the  encrypted message, k3 is the decrypted message*)
 query secret k2 [cv_onesession].
-query secret k3 [cv_onesession].
 
-query secret k2.
-query secret k3.
 
 (* Channels and Processes *)
-channel cA, cB, start, c.
+channel cA, cB, start, c,c1,c2,c3,c4.
+
+fun outEncryption(bitstring):bitstring[data].
+fun keyToBitstring(key):bitstring[data].
+
+const Zkey : bitstring.
+equation forall y:key;
+	Z(keyToBitstring(y)) = Zkey.
 
 let processA(Kab:key, mKab:mkey) =
 	in(cA, ());
-	new k2 : plaintext;
-	let ea1 = enc(k2, Kab) in
-	out(cA, (ea1, mac(ea1, mKab))).
+	new k2 : key;
+	let ea1:bitstring = enc(keyToBitstring(k2), Kab) in
+	out(c1, (ea1) ).
 
 let processB(Kab:key, mKab:mkey) =
-	in(cB, (ea:bitstring, ma:macs));
-	if check(ea, mKab, ma) then
-	let injbot(k3:plaintext) = dec(ea, Kab) in
+	in(c1, (ea2:bitstring));
+	find i<=NA suchthat defined(ea1[i])  && ea2=ea1[i] then
+	let	injbot(keyToBitstring(k3:key)) = dec(ea2, Kab) in
 	out(cB, ()).
 
 process

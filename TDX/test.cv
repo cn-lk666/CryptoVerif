@@ -50,8 +50,6 @@ let processB(sk:skey)=
     !iB
     in(c5, m1:bitstring);
     let injbot(key2bitstring(session_key1)) = dec(m1, sk) in
-    find i<=iA suchthat defined(session_key[i]) && session_key[i]=session_key1 then
-        event finished();
     out(c6, ()).
 
 process
