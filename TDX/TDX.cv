@@ -39,7 +39,8 @@ type skey [bounded].
 type pkey [bounded].
 
 (*channel name*)
-channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, start.
+channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, 
+                    c21, c22, c23, c24, c25, c26, start.
 
 type key [large,fixed].
 type hashoutput [large, fixed].
@@ -122,7 +123,6 @@ expand IND_CCA2_public_key_enc(
 type rdata_t [large,fixed].
 type rdata_other_t [large, bounded, nonuniform].
 (*这里两个相同rdata可能会有bug*)
-expand random_split_2(rdata_t, pkey , rdata_other_t, rdata_t, tuple_key_bitstring, split2).
 
 (*There are 4 reserved fragments in the tdr*)
 type reserved_string_t [bounded].
@@ -134,15 +134,20 @@ type csvn_t [fixed].
 fun tdi_t2bitstring(tdi_t): bitstring [data].
 fun tcbi_t2bitstring(tcbi_t):bitstring[data].
 
-fun rms_except_mac(rtyp_t, reserved_string_t, csvn_t, hashoutput, hashoutput, rdata_t, reserved_string_t): bitstring [data].
+fun rdata_f(pkey, rdata_other_t):rdata_t[data].
+fun rms_except_mac_f(rtyp_t, reserved_string_t, csvn_t, hashoutput, hashoutput, rdata_t, reserved_string_t): bitstring [data].
 fun request_SEAM(rtyp_t, hashoutput, rdata_t): bitstring [data].
-fun seamreport(bitstring, bitstring): bitstring[data].
+fun seamreport_f(bitstring, tcbi_t): bitstring[data].
 fun tdreport(bitstring, reserved_string_t, tdi_t): bitstring [data].
 fun request_quote(bitstring):bitstring[data].
 fun tdreport_from_VMM(bitstring): bitstring[data].
 fun verifyreport(bitstring, bitstring):bitstring[data].
-fun verifiyresult(bool):bool.
+fun verifyresult(bool):bool [data].
 fun rptbody_f(bitstring, tcbi_t, reserved_string_t, tdi_t): bitstring[data].
+fun quote_from_QE_to_VMM_f(bitstring,bitstring):bitstring[data].
+fun quote_from_VMM_to_TD_f(bitstring):bitstring[data].
+fun quote_from_TD_to_Challenger_f(bitstring):bitstring[data].
+fun rms_f(bitstring,bitstring):bitstring[data].
 
 event check_hash().
 
@@ -150,7 +155,18 @@ let Challenger(spk:pkey) =
 	! qChallenger
 	in(c1, ());
     (*step 1*)
-	out(c2, ()).
+	out(c2, ());
+    (*step 19*)
+    in(c25, quote_from_TD_to_Challenger_f(quote));
+    let quote_from_VMM_to_TD_f(quote1)=quote in
+    let quote_from_QE_to_VMM_f(rptbody, sig_in_QE)=quote1 in
+    if(verify(rptbody,spk, sig_in_QE)) then(
+        let rptbody_f(rms_except_mac_value, tcbi, res4, tdi) =rptbody in
+        let  rms_except_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_except_mac_value in
+        let rdata_f(pk, rdata_other)=rdata in
+        out(c26, (pk))
+    )else
+        out(c26, ()).
 
 let TD() =
    (*step 2*)
@@ -160,31 +176,33 @@ let TD() =
     new rdata_other:rdata_other_t;
     let pk=pkgen(r) in
     let sk=skgen(r) in
-    let rdata =tuple_key_bitstring(pk,rdata_other) in
+    let rdata =rdata_f(pk,rdata_other) in
 	out(c4, (rdata));
     (*step 9*)
     in(c11, (tdreport(smr_value, res4, tdi)));
     let tdr_value=tdreport(smr_value, res4, tdi) in
-	out(c12, (request_quote(tdr_value))).
+	out(c12, (request_quote(tdr_value)));
+    (*step 18*)
+    in(c23, quote_from_VMM_to_TD_f(quote));
+    out(c24, quote_from_TD_to_Challenger_f(quote)).
 
 let TDXM(hk: key) =
 	! qTDXM
     (*step 3*)
-	in(c5, (tuple_key_bitstring(pk,rdata_other)));
-    let rdata =tuple_key_bitstring(pk,rdata_other) in
+	in(c5, (rdata_f(pk,rdata_other)));
+    let rdata =rdata_f(pk,rdata_other) in
     new tdi:tdi_t;
     new rtyp:rtyp_t;
 	(*step 4*)
     let hash_of_tdi_in_TDXM:hashoutput=hash(hk, tdi_t2bitstring(tdi)) in
 	out(c6, (request_SEAM(rtyp, hash_of_tdi_in_TDXM , rdata)));
     (*step 7*)
-    in(c9, (seamreport(rms_except_mac_value, mac_value)));
-    let smr_value=seamreport(rms_except_mac_value, mac_value) in
+    in(c9, (seamreport_f(rms_value, tcbi)));
+    let smr_value=seamreport_f(rms_value, tcbi) in
     new res4:reserved_string_t;
     let tdr_value=tdreport(smr_value, res4, tdi) in
     (*step 8*)
     out(c10, (tdr_value)).
-
 
 let CPU(hk:key, mkey:key) =
 	! qCPU
@@ -196,23 +214,25 @@ let CPU(hk:key, mkey:key) =
     new csvn:csvn_t;
     let hash_of_tcbi_in_CPU:hashoutput=hash(hk, tcbi_t2bitstring(tcbi)) in
     new res2:reserved_string_t;
-    let rms_except_mac_value=rms_except_mac(rtyp, res1, csvn, hash_of_tcbi_in_CPU, tdih, rdata, res2) in
+    let rms_except_mac_value=rms_except_mac_f(rtyp, res1, csvn, hash_of_tcbi_in_CPU, tdih, rdata, res2) in
     let mac_value=mac(rms_except_mac_value, mkey ) in
+    let rms_value=rms_f(rms_except_mac_value, mac_value) in
     (*step 6*)
-	out(c8, (seamreport(rms_except_mac_value, mac_value)));
+	out(c8, (seamreport_f(rms_value, tcbi)));
     (*step 13*)
     in(c17, verifyreport(rms_except_mac_value1, mac_value1));
     let res_of_verification=check(rms_except_mac_value1,mkey,mac_value1) in
     (*step 14*)
-    out(c18, verifiyresult(res_of_verification)).
+    out(c18, verifyresult(res_of_verification)).
 
 let QE(hk:key, ssk:skey) =
 	! qQE
     (*step 11*)
 	in(c15, (tdreport_from_VMM(tdr_value)));
     let tdreport(smr_value, res4, tdi)= tdr_value in
-    let seamreport(rms_except_mac_value, mac_value)= smr_value in
-    let rms_except_mac(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_except_mac_value in
+    let seamreport_f(rms_value, tcbi)= smr_value in
+    let rms_f(rms_except_mac_value, mac_value) = rms_value in
+    let rms_except_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_except_mac_value in
     (*check the hashes*)
     let resOfHash =
         find j<=qTDXM suchthat defined(hash_of_tdi_in_TDXM[j])&& tdih=hash_of_tdi_in_TDXM[j] then(
@@ -226,15 +246,17 @@ let QE(hk:key, ssk:skey) =
     in
     (*step 12*)
     if(resOfHash) then
-        out(c16, verifyreport(rms_except_mac_value, mac_value))
+        out(c16, verifyreport(rms_except_mac_value, mac_value));
     (*step 15*)
-    in(c19, verifyreport(res_of_verification));
-    if(res_of_verification) then
+    in(c19, verifyresult(res_of_verification));
+    if(res_of_verification) then (
         let rptbody=rptbody_f(rms_except_mac_value, tcbi, res4, tdi) in
         let sig_in_QE= sign(rptbody, ssk) in
-        let quote=(rptbody, sig_in_QE) in
+        let quote=quote_from_QE_to_VMM_f(rptbody, sig_in_QE) in
         (*step 16*)
-        out(c20, quote).
+        out(c20, (quote))
+    )else
+        out(c20,()).
         
 let VMM() =
 	! qVMM
@@ -242,7 +264,9 @@ let VMM() =
     in(c13, (request_quote(tdr_value)));
 	out(c14, (tdreport_from_VMM(tdr_value)));
     (*step 17*)
-    in(c21, )
+    in(c21, quote_from_QE_to_VMM_f(rptbody, sig_in_QE) );
+    let quote=quote_from_QE_to_VMM_f(rptbody, sig_in_QE) in
+    out(c22, quote_from_VMM_to_TD_f(quote)).
 
 process
 	in(start, ());
