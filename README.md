@@ -22,6 +22,9 @@ We need to add a path in the $PATH
 PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 ```
 ### 2. Tamarin Models for TDX
+```
+tamarin-prover 
+```
 
 ### 3. Understanding the results
 
@@ -36,7 +39,9 @@ cd cryptoverif2.04
 ./build
 ```
 ### 2. CryptoVerif Models for TDX
-
+```
+~/下载/cryptoverif2.04/cryptoverif 
+```
 ### 3. Understanding the results
 
 ## Generation of Implementation from the formally verified model
