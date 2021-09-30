@@ -8,30 +8,49 @@ param iA,iB.
 
 query secret session_key.
 
-table tbl(bitstring, key).
+expand ROM_hash_large(
+    key,                 (**)
+        bitstring,         (*hashinput is the type of the input of the hash function.*)
+    bitstring,        (*hashoutput is the type of the output of the hash function, 
+                                    must be bounded or nonuniform (typically fixed)*)
+                                (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
+    hash,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
+    hashoracle,  (*hashoracle is a process that allows the adversary to call the hash function*)
+    qH                      (*qH is the number of queries to the hash oracle*)
+).
+
+fun key2bitstring(key):bitstring[data].
+
+table tbl(bitstring, bitstring).
 const hostnameA:bitstring.
 implementation table tbl="keytbl";
     type key = 128;
-    fun hostnameA="get_hostname".
+    fun hostnameA="get_hostname";
+    fun hash = "Ssh_crypto.hash";
+    fun key2bitstring="key2bitstring" [inverse = "bitstring2key"].
 
 
-let processA()=
+let processA(hk:key)=
     
     A{
     in(c3, ());
     new session_key:key;
-    insert tbl(hostnameA, session_key);
-    out(c4,  ())
+    insert tbl(hostnameA, hash(hk, key2bitstring(session_key)));
+    out(c4, ())
 }.
 let processB()=
      
 B{
-    in(c5, ());
-    get tbl(x, y) suchthat x=hostnameA in
+    in (c5, ());
+    get tbl(x, y) suchthat x=hostnameA in 
     out(c6, ())
-
 }.
 
 process
+start{
 
-    (!iA processA() | !iB processB())
+in(c1, ());
+    new hk:key;
+out(c2, (hk))
+};
+    ( !iA processA(hk) | !iB processB() |hashoracle(hk))
