@@ -129,9 +129,7 @@ expand IND_CPA_sym_enc(
                                       for one key and N encryption queries with cleartexts of length at most l.*)
 ).
 
-const Zkey : bitstring.
-equation forall y:key;
-	Z(keyToBitstring(y)) = Zkey.
+
 
 (*
     random_split_N(input _t ,part1 _t ,...,partN _t ,tuple_t ,tuple,split )
@@ -172,6 +170,9 @@ fun quote_from_TD_to_Challenger_f(bitstring):bitstring[data].
 fun rms_f(bitstring,bitstring):bitstring[data].
 fun key2bitstring(key):bitstring[data].
 
+const Zkey : bitstring.
+equation forall y:bitstring;
+	Z(y) = Zkey.
 
 event check_hash().
 event finished().
@@ -192,7 +193,7 @@ let Challenger(spk:pkey) =
         let  rms_except_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_except_mac_value in
         let rdata_f(pk, rdata_other)=rdata in
         new session_key:key;
-        let m1=enc(key2bitstring(session_key), pk) in
+        let m1:bitstring=enc(key2bitstring(session_key), pk) in
         out(c26, m1)
     )else
         out(c26,()).
