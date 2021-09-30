@@ -140,7 +140,7 @@ expand IND_CPA_sym_enc(
     split (input _t ) : tuple_t splits the input into N parts and returns a tuple of these parts
         let tuple(x1,...,xN) = split (y) in...
 *)
-type rdata_t [large,fixed].
+type rdata_t.
 type rdata_other_t [large, bounded, nonuniform].
 (*这里两个相同rdata可能会有bug*)
 
@@ -170,6 +170,8 @@ fun quote_from_TD_to_Challenger_f(bitstring):bitstring[data].
 fun rms_f(bitstring,bitstring):bitstring[data].
 fun key2bitstring(key):bitstring[data].
 
+fun test_f1(bitstring):bitstring[data].
+
 const Zkey : bitstring.
 equation forall y:bitstring;
 	Z(y) = Zkey.
@@ -179,22 +181,23 @@ event finished().
 
 query secret session_key.
 
-let Challenger(spk:pkey) =
+let Challenger(spk:pkey, sk1:skey) =
 	! qChallenger
 	in(c1, ());
     (*step 1*)
 	out(c2, ());
     (*step 19*)
-    in(c25, quote_from_TD_to_Challenger_f(quote));
-    let quote_from_VMM_to_TD_f(quote1)=quote in
+    in(c25, m3:bitstring);
+    let test_f1(m1)=m3 in
+    let injbot(quote1)=dec(m1, sk1) in
     let quote_from_QE_to_VMM_f(rptbody, sig_in_QE)=quote1 in
     if(verify(rptbody,spk, sig_in_QE)) then(
         let rptbody_f(rms_except_mac_value, tcbi, res4, tdi) =rptbody in
         let  rms_except_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_except_mac_value in
         let rdata_f(pk, rdata_other)=rdata in
         new session_key:key;
-        let m1:bitstring=enc(key2bitstring(session_key), pk) in
-        out(c26, m1)
+        let m2:bitstring=enc(key2bitstring(session_key), pk) in
+        out(c26, m2)
     )else
         out(c26,()).
 
@@ -202,10 +205,10 @@ let TD() =
    (*step 2*)
 	! qTD
 	in(c3, ());
-    new r:keyseed;
+    new r3:keyseed;
     new rdata_other:rdata_other_t;
-    let pk=pkgen(r) in
-    let sk=skgen(r) in
+    let pk=pkgen(r3) in
+    let sk=skgen(r3) in
     let rdata =rdata_f(pk,rdata_other) in
 	out(c4, (rdata));
     (*step 9*)
@@ -213,13 +216,10 @@ let TD() =
     let tdr_value=tdreport(smr_value, res4, tdi) in
 	out(c12, (request_quote(tdr_value)));
     (*step 18*)
-    in(c23, quote_from_VMM_to_TD_f(quote));
-    out(c24, quote_from_TD_to_Challenger_f(quote));
+
     (*step 20*)
     in(c28, m2: bitstring);
-    find i1<=qChallenger suchthat defined(m1[i1]) && m1[i1]=m2 then
-	let injbot(key2bitstring(session_key1)) = dec(m2, sk) in
-        event finished().
+    out(c29, ()).
 
 let TDXM(hk: key) =
 	! qTDXM
@@ -260,7 +260,7 @@ let CPU(hk:key, mkey:key) =
     (*step 14*)
     out(c18, verifyresult(res_of_verification)).
 
-let QE(hk:key, ssk:skey) =
+let QE(hk:key, ssk:skey, pk1:pkey) =
 	! qQE
     (*step 11*)
 	in(c15, (tdreport_from_VMM(tdr_value)));
@@ -288,8 +288,9 @@ let QE(hk:key, ssk:skey) =
         let rptbody=rptbody_f(rms_except_mac_value, tcbi, res4, tdi) in
         let sig_in_QE= sign(rptbody, ssk) in
         let quote=quote_from_QE_to_VMM_f(rptbody, sig_in_QE) in
+        let m1=enc(quote, pk1) in
         (*step 16*)
-        out(c20, (quote))
+        out(c20, test_f1(m1))
     )else
         out(c20,()).
         
@@ -297,26 +298,28 @@ let VMM() =
 	! qVMM
     (*step 10*)
     in(c13, (request_quote(tdr_value)));
-	out(c14, (tdreport_from_VMM(tdr_value)));
+	out(c14, (tdreport_from_VMM(tdr_value))).
     (*step 17*)
-    in(c21, quote_from_QE_to_VMM_f(rptbody, sig_in_QE) );
-    let quote=quote_from_QE_to_VMM_f(rptbody, sig_in_QE) in
-    out(c22, quote_from_VMM_to_TD_f(quote)).
+
 
 process
 	in(start, ());
-    new r:keyseed;
+    new r1:keyseed;
     new hk:key;
     new mkey:key;
-    let ssk=sskgen(r) in
-    let spk=spkgen(r) in
-	out(c0, ());
+    let ssk=sskgen(r1) in
+    let spk=spkgen(r1) in
+    new r4:keyseed;
+    let sk1=skgen(r4) in
+    let pk1=pkgen(r4) in
+
+    out(c0, ());
 	(
         hashoracle(hk) |
-        Challenger(spk) | 
+        Challenger(spk, sk1) | 
         TD() |
         TDXM(hk) |
         CPU(hk, mkey) |
         VMM() |
-        QE(hk, ssk)
+        QE(hk, ssk, pk1)
     )

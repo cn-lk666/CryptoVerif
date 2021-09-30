@@ -23,4 +23,6 @@ fi
 CRYPTOKIT="-linkpkg -package cryptokit"
 
 echo Proving the protocol...
-"$CV" TDX.pcv 
+"$CV" test_private_channel.pcv
+"$CV" -impl test_private_channel.pcv
+

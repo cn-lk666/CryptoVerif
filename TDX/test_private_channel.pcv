@@ -1,0 +1,37 @@
+
+
+channel c1, c2, c3, c4, c5, c6.
+
+type key [large,fixed].
+
+param iA,iB.
+
+query secret session_key.
+
+table tbl(bitstring, key).
+const hostnameA:bitstring.
+implementation table tbl="keytbl";
+    type key = 128;
+    fun hostnameA="get_hostname".
+
+
+let processA()=
+    
+    A{
+    in(c3, ());
+    new session_key:key;
+    insert tbl(hostnameA, session_key);
+    out(c4,  ())
+}.
+let processB()=
+     
+B{
+    in(c5, ());
+    get tbl(x, y) suchthat x=hostnameA in
+    out(c6, ())
+
+}.
+
+process
+
+    (!iA processA() | !iB processB())
