@@ -41,12 +41,13 @@ type pkey [bounded].
 type keypair [bounded].
 type keyseed [large,fixed].
 fun kp(pkey,skey):keypair [data].
-
+type signature [bounded].
 type sskey [bounded].
 type spkey [bounded].
 type skeypair [bounded].
 type skeyseed [large,fixed].
 fun skp(spkey,sskey):skeypair [data].
+type macres [bounded].
 (*channel name*)
 channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, start.
 
@@ -71,7 +72,7 @@ proba Pmac.
 expand SUF_CMA_det_mac(
     key,            (*mkey is the type of keys, must be bounded*)
     bitstring , (*macinput is the type of inputs of MACs*)
-    bitstring,  (*macres is the type of MACs.*)
+    macres,  (*macres is the type of MACs.*)
     mac,          (*mac(macinput ,mkey ) : macres is the MAC function.*)
     check,      (*check (macinput ,mkey ,macres ) : bool is the verification function*)
     Pmac        (*Pmac(t,N,N′,Nu′,l) is the probability of breaking the SUF-CMA property in time t for one key,
@@ -88,7 +89,7 @@ expand UF_CMA_det_signature(
         spkey,                  (*pkey is the type of public keys, must be bounded.*)
         sskey,                  (*skey is the type of secret keys, must be bounded.*)
         bitstring,            (*signinput*)
-        bitstring,            (*signature*)
+        signature,            (*signature*)
        	sskgen,                  (*skgen(keyseed ) : skey is the secret key generation function.*)
         spkgen,                 (*pkgen (keyseed ) : pkey is the public key generation function.*)
         sign,                     (*sign (signinput ,skey ) : signature is the signature function.*)
@@ -144,70 +145,139 @@ letfun kgen() =  k <-R keyseed;  kp (pkgen(k) ,skgen(k) ).
 letfun kgen_s() =  ks <-R skeyseed;  skp (spkgen(ks) ,sskgen(ks) ).
 
 
+type rtyp_t[bounded].
+type res_t[bounded,nonuniform].
+type csvn_t[fixed].
+type user_data_t [bounded, nonuniform].
+type tcbi_t[fixed].
+type tdi_t[fixed].
+
+type rdata_t[bounded].
+type rms_without_mac_t[bounded].
+type rms_t[bounded].
+type smr_t[bounded].
+type smr_without_mac_t[bounded].
+type tdr_t[bounded].
+type tdr_without_mac_t[bounded].
+type quote_t[bounded].
+
+type hostname[bounded].
+set diffConstants = false.
+const hostname_TD:hostname.
+const hostname_TDXM:hostname.
+const hostname_CPU:hostname.
+
+fun get_rtyp():rtyp_t.
+fun get_tdi():tdi_t.
+
+
+
+fun rdata_f(pkey, user_data_t):rdata_t[data].
+fun rms_without_mac_f(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t): rms_without_mac_t[data].
+fun rms_f(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t, macres):rms_t[data].
+fun smr_f(rms_t, tcbi_t):smr_t[data].
+fun tdr_f(smr_t, res_t, tdi_t):tdr_t[data].
+fun quote_f(tdr_t, signature):quote_t[data].
+fun tdi_t2bitstring(tdi_t): bitstring [data].
+fun tcbi_t2bitstring(tcbi_t):bitstring[data].
+
+table Ch_IAS(bitstring).
+table IAS_Ch(bitstring, bool, pkey).
+
+table TD_TDXM_2(hostname, hostname, rdata_t).
+implementation table TD_TDXM_2="TD_TDXM_2".
+table TDXM_CPU_4(hostname, hostname, rtyp_t, hashoutput, rdata_t).
+implementation table TDXM_CPU_4="TDXM_CPU_4".
+
 implementation
     type skeyseed=64;
     type keyseed=64;
-    type key = 128;            
+    type key = 128;
+    type user_data_t=1024;
+    type macres = "string";
+    fun tdi_t2bitstring="tdi_t2bitstring" [inverse = "bitstring2tdi_t"];
+    fun tcbi_t2bitstring="tdi_t2bitstring" [inverse = "bitstring2tcbi_t"]; 
     type pkey="pkey" [serial = "pkey_to","pkey_from"];
     type skey="skey" [serial = "skey_to","skey_from"];                  
     fun kgen = "(pk_kgen 1024)";
     fun kgen_s = "(pk_kgen 1024)";
     fun kp="id" [inverse="id"];
     fun skp="id" [inverse="id"];
+    fun hostname_TD="get_TD";
+    fun hostname_TDXM="get_TDXM";
+    fun hostname_CPU="get_CPU";
+    fun hash = "Ssh_crypto.hash";
+    fun get_rtyp="get_rtyp";
+    fun get_tdi="get_tdi";
+    fun rdata_f="rdata_f"[inverse = "inv_rdata_f"];
+    type signature="string";
+    type hashoutput=160;
+    type hostname="string" [serial = "id", "id"];
+    type rdata_t="string" [serial = "id", "id"];
+    type rtyp_t="string" [serial = "id", "id"];
     type spkey="pkey" [serial = "pkey_to","pkey_from"];
     type sskey="skey" [serial = "skey_to","skey_from"].
 
 
 
 
-let TD()=
-TDX_TD{
-    in(c6, ());
-    out(c7, ())
-}.
+let TD(pk_TD:pkey, sk_TD:skey)=
+
+    TDX_TD{
+        in(c4, ());
+        new rdata_other:user_data_t;
+        let rdata_TD=rdata_f(pk_TD, rdata_other) in
+        insert TD_TDXM_2(hostname_TD, hostname_TDXM, rdata_TD);
+        out(c5, ())
+    }.
 
 let TDXM(hk_TDXM:key)=
-TDX_TDXM{
-    in(c6, ());
-    out(c7, ())
-}.
+    TDX_TDXM{
+        in(c6, ());
+        get TD_TDXM_2(x, y, rdata_TDXM) suchthat x=hostname_TD && y=hostname_TDXM in
+        let tdi=get_tdi() in
+        let rtyp=get_rtyp() in
+        let tdih=hash(hk_TDXM, tdi_t2bitstring(tdi)) in
+        insert TDXM_CPU_4(hostname_TDXM, hostname_CPU, rtyp, tdih, rdata_TDXM);
+        out(c7, ())
+    }.
 
 let CPU(hk_CPU:key, mkey_CPU:key)=
-TDX_CPU{
-    in(c6, ());
-    out(c7, ())
-}.
+    TDX_CPU{
+        in(c8, ());
+        out(c9, ())
+    }.
 
 let VMM()=
-TDX_VMM{
-    in(c6, ());
-    out(c7, ())
-}.
+    TDX_VMM{
+        in(c10, ());
+        out(c11, ())
+    }.
 
 let QE(hk_QE:key, ssk:sskey, pk: pkey)=
-TDX_QE{
-    in(c6, ());
-    out(c7, ())
-
-}.
-    
+    TDX_QE{
+        in(c12, ());
+        out(c13, ())
+    }.
 
 
 let Challenger()=
-    in(c6, ());
-    out(c7, ()).
+    in(c2, ());
+
+    out(c3, ()).
 
 
 let Application(ssk:sskey, pk:pkey) =
-TDX_keygen_App[hk>hk, mkey>mkey]{
-    in(c10, ());
+TDX_keygen_App[pk3>pk3, sk3>sk3, hk>hk, mkey>mkey]{
+    in(c21, ());
+    let kp (pk3:pkey,sk3:skey) = kgen () in
     new hk:key;(*key for hash*)
     new mkey:key;(*key for mac*)
-    out(c11, ())
+    out(c22, ())
 };
 (
-    (!i<=qApp hashoracle(hk) ) |
-    (!i<=qApp TD() ) |
+    (hashoracle(hk) ) |
+    (!i<=qApp TD(pk3, sk3) ) |
     (!i<=qApp TDXM(hk) ) |    
     (!i<=qApp CPU(hk, mkey) ) |
     (!i<=qApp VMM() ) |
@@ -215,8 +285,8 @@ TDX_keygen_App[hk>hk, mkey>mkey]{
 ).
 
 let IAS(spk:spkey, sk:skey)=
-    in(c6, ());
-    out(c7, ()).
+    in(c26, ());
+    out(c27, ()).
 
 
 
