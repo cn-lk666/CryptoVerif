@@ -184,11 +184,14 @@ fun smr_without_mac_f(rms_without_mac_t, tcbi_t):smr_without_mac_t[data].
 fun tdr_f(smr_t, res_t, tdi_t):tdr_t[data].
 fun tdr_without_mac_f(smr_without_mac_t, res_t, tdi_t):tdr_without_mac_t[data].
 
-fun quote_f(tdr_t, signature):quote_t[data].
+fun quote_f(tdr_without_mac_t, signature):quote_t[data].
 fun tdi_t2bitstring(tdi_t): bitstring [data].
 fun tcbi_t2bitstring(tcbi_t):bitstring[data].
-
-
+fun rms_without_mac_t2bitsring(rms_without_mac_t):bitstring[data].
+fun key2bitstring(key):bitstring[data].
+fun tdr_without_mac_t2bitstring(tdr_without_mac_t):bitstring[data].
+fun quote_t2bitstring(quote_t):bitstring[data].
+fun tdr_without_mac_t2bitsring(tdr_without_mac_t):bitstring[data].
 
 table TD_TDXM_2(hostname, hostname, rdata_t).
 implementation table TD_TDXM_2="TD_TDXM_2".
@@ -196,8 +199,8 @@ table TDXM_CPU_4(hostname, hostname, rtyp_t, hashoutput, rdata_t).
 implementation table TDXM_CPU_4="TDXM_CPU_4".
 table CPU_TDXM_6(hostname, hostname, smr_t).
 implementation table CPU_TDXM_6="CPU_TDXM_6".
-table TDXM_CPU_8(hostname, hostname, tdr_t).
-implementation table TDXM_CPU_8="TDXM_CPU_8".
+table TDXM_TD_8(hostname, hostname, tdr_t).
+implementation table TDXM_TD_8="TDXM_CPU_8".
 table QE_CPU_12(hostname, hostname, rms_t).
 implementation table QE_CPU_12="QE_CPU_12".
 table CPU_QE_14(hostname, hostname, bool).
@@ -205,7 +208,7 @@ implementation table CPU_QE_14="CPU_QE_14".
 table Ch_IAS_19(hostname, hostname, bitstring).
 implementation table Ch_IAS_19="Ch_IAS_19".
 table IAS_Ch_20(hostname, hostname, pkey).
-implementation IAS_Ch_20="IAS_Ch_20".
+implementation table IAS_Ch_20="IAS_Ch_20".
 
 
 implementation
@@ -255,13 +258,13 @@ let TD(pk_TD:pkey, sk_TD:skey)=
         insert TD_TDXM_2(hostname_TD, hostname_TDXM, rdata_TD);
         out(c5, ());
         in(c12, ());
-        get table TDXM_TD_8(x,y,tdr) suchthat x=hostname_TDXM && y=hostname_TD in
+        get TDXM_TD_8(x,y,tdr) suchthat x=hostname_TDXM && y=hostname_TD in
         out(c13, tdr);
         in(c24, m1:bitstring);
         out(c25, m1);
-        in(c32, m2);
+        in(c32, m2:bitstring);
         let injbot(session_key1)=dec(m2, sk_TD) in
-        out(c33,());
+        out(c33,())
     }.
 
 let TDXM(hk_TDXM:key)=
@@ -277,7 +280,7 @@ let TDXM(hk_TDXM:key)=
         get CPU_TDXM_6(x,y,smr) suchthat x=hostname_CPU && y=hostname_TDXM in
         let res4=get_res() in
         let tdr=tdr_f(smr, res4, tdi) in
-        inster TDXM_TD_8(hostname_TDXM, hostname_TD, tdr) in
+        insert TDXM_TD_8(hostname_TDXM, hostname_TD, tdr);
         out(c11, ())
 
     }.
@@ -288,10 +291,11 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
         let csvn =get_csvn() in
         get TDXM_CPU_4(x,y, rtyp, tdih, rdata) suchthat x=hostname_TDXM && y=hostname_CPU in
         let res1=get_res() in
+        let res2=get_res() in
         let tcbi=get_tcbi() in
-        let tcbh=hash(hk_CPU, tcbi) in
+        let tcbh=hash(hk_CPU, tcbi_t2bitstring(tcbi)) in
         let rms_without_mac=rms_without_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2 ) in
-        let mac_CPU=mac(rms_without_mac, mkey) in
+        let mac_CPU=mac(rms_without_mac_t2bitsring(rms_without_mac), mkey_CPU) in
         let rms=rms_f(rms_without_mac, mac_CPU) in
         let smr=smr_f(rms, tcbi) in
         insert CPU_TDXM_6(hostname_CPU, hostname_TDXM, smr);
@@ -299,7 +303,7 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
         in(c18, ());
         get QE_CPU_12(x1, y1, rms1) suchthat x1=hostname_QE && y1=hostname_CPU in
         let rms_f(rms_without_mac1, mac_CPU1)=rms1 in
-        let resOfMac=check(rms_without_mac1, mkey, mac_CPU1) in
+        let resOfMac=check(rms_without_mac_t2bitsring(rms_without_mac1), mkey_CPU, mac_CPU1) in
         insert CPU_QE_14(hostname_CPU, hostname_QE, resOfMac);
         out(c19, ())
             
@@ -323,7 +327,7 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey)=
         let rms_f(rms_without_mac, macres)=rms in
         let rms_without_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_without_mac in
         let resOfHash=
-            if(hash(hk_QE, tcbi)=tcbh && hash(hk_QE, tdi)=tdih)then
+            if(hash(hk_QE, tcbi_t2bitstring(tcbi))=tcbh && hash(hk_QE,tdi_t2bitstring( tdi))=tdih)then
                 true
             else
                 false
@@ -334,14 +338,14 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey)=
         out(c17, ());
         in (c20, ());
         get CPU_QE_14(x1, y1, resOfMac) suchthat x1=hostname_CPU && y1=hostname_QE in
-        if resOfMac then(
+        if resOfMac then
             let smr_without_mac=smr_without_mac_f(rms_without_mac, tcbi) in
             let tdr_without_mac=tdr_without_mac_f(smr_without_mac, res4, tdi) in
-            let sig=sign(tdr_without_mac, ssk) in
+            let sig=sign(tdr_without_mac_t2bitstring(tdr_without_mac), ssk) in
             let quote =quote_f(tdr_without_mac, sig) in
-            let m1=enc(quote, pk) in
+            let m1=enc(quote_t2bitstring(quote), pk) in
             out(c21, m1)
-        )
+        
     }.
 
 
@@ -354,7 +358,7 @@ let Challenger()=
     in(c30, ());
     get IAS_Ch_20(x, y, pk) suchthat x=hostname_IAS && y=hostname_Ch in
     new session_key:key;
-    let m2=enc(key2bitstring(key), pk) in
+    let m2=enc(key2bitstring(session_key), pk) in
     out(c31,(m2)).
 
 
@@ -379,9 +383,9 @@ TDX_keygen_App[pk3>pk3, sk3>sk3, hk>hk, mkey>mkey]{
 let IAS(spk:spkey, sk:skey)=
     in(c28, ());
     get Ch_IAS_19(x, y, m1) suchthat x=hostname_Ch && y=hostname_IAS in
-    let injbot(quote)=dec(m1, sk) in
+    let injbot(quote_t2bitstring(quote))=dec(m1, sk) in
     let quote_f(tdr_without_mac, sig) =quote in
-    if(verify(tdr_without_mac, spk, sig)) then(
+    if(verify(tdr_without_mac_t2bitsring(tdr_without_mac), spk, sig)) then(
         let tdr_without_mac_f(smr_without_mac, res4, tdi)=tdr_without_mac in
         let smr_without_mac_f(rms_without_mac, tcbi)=smr_without_mac in
         let rms_without_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_without_mac in
