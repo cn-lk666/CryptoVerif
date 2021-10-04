@@ -24,7 +24,7 @@
 
 
 (*replication numbers*)
-param qChallenger, qTD, qTDXM, qCPU, qQE, qVMM.
+param qChallenger, qApp, qIAS.
 
 (*
     bounded means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other
@@ -155,26 +155,48 @@ table TD_TDXM_2(rdata_t).
 table TDXM_CPU_4(rtyp_t, hashoutput, rdata_t).
 table CPU_
 
+let Challenger()=
+    in(c6, ());
+    out(c7, ()).
+
+
+let Application(ssk1:skey, pk2:pkey) =
+TDX_keygen_App[hk>hk, mkey>mkey]{
+
+    new hk:key;(*key for hash*)
+    new mkey:key(*key for mac*)
+};
+TDX_App{
+    (!i<=qAPP hashoracle(hk) ) |
+    (!i<=qAPP TD() )|
+    (!i<=qAPP TDXM(hk) )|
+    (!i<=qAPP CPU(hk, mkey) )|
+    (!i<=qAPP VMM() )|
+    (!i<=qAPP QE(hk, ssk1, pk2) )
+}.
+    
+
+
+let IAS(spk1:pkey, sk2:skey)=
+    in(c8, ());
+    out(c9, ()).
+
+
+
 
 process
-	in(start, ());
-    new hk:key;(*key for hash*)
-    new mkey:key;(*key for mac*)
-    new r1:keyseed;(*keyseed for signature*)
-    let spk1=spkgen(r1) in
-    let ssk1=sskgen(r1) in
-    new r2:keyseed;(*keyseed for asymmetric encryption*)
-    let sk2=skgen(r4) in
-    let pk2=pkgen(r4) in
-
-    out(c0, ());
+    TDX_Keygen [spk1 > spk1, ssk1 > ssk1, pk2 > pk2, sk2 > sk2 ]{
+        in(start, ());
+        new r1:keyseed;(*keyseed for signature*)
+        let spk1=spkgen(r1) in
+        let ssk1=sskgen(r1) in
+        new r2:keyseed;(*keyseed for asymmetric encryption*)
+        let pk2=pkgen(r4) in
+        let sk2=skgen(r4) in
+        out (c1, ())
+    };
 	(
-        hashoracle(hk) |
-        Challenger() | 
-        TD() |
-        TDXM(hk) |
-        CPU(hk, mkey) |
-        VMM() |
-        QE(hk, ssk1, pk2) |
-        Server(spk2, sk2)
+        (!i<= qChallenger Challenger()) | 
+        (Application(ssk1, pk2)) |
+        (!i<= qIAS IAS(spk2, sk2))
     )

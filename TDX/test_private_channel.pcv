@@ -46,11 +46,16 @@ B{
     out(c6, ())
 }.
 
+let Server()=
+server{
+  new hk:key;
+    (
+    (! i <= iB  processA(hk))|
+    (! i <= iB processB())
+    )
+}.
+  
 process
-start{
-
 in(c1, ());
-    new hk:key;
-out(c2, (hk))
-};
-    ( !iA processA(hk) | !iB processB() |hashoracle(hk))
+out(c2, ());
+    ( !iA Server)
