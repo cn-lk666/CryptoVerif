@@ -183,11 +183,11 @@ fun tdr_without_mac_f(smr_without_mac_t, res_t, tdi_t):tdr_without_mac_t[data].
 fun quote_f(tdr_without_mac_t, signature):quote_t[data].
 fun tdi_t2bitstring(tdi_t): bitstring [data].
 fun tcbi_t2bitstring(tcbi_t):bitstring[data].
-fun rms_without_mac_t2bitsring(rms_without_mac_t):bitstring[data].
+fun rms_without_mac_t2bitstring(rms_without_mac_t):bitstring[data].
 fun key2bitstring(key):bitstring[data].
 fun tdr_without_mac_t2bitstring(tdr_without_mac_t):bitstring[data].
 fun quote_t2bitstring(quote_t):bitstring[data].
-fun tdr_without_mac_t2bitsring(tdr_without_mac_t):bitstring[data].
+fun tdr_without_mac_t2bitstring(tdr_without_mac_t):bitstring[data].
 fun Ch_TD(bitstring):bitstring[data].
 fun QE_Ch(bitstring):bitstring[data].
 
@@ -329,7 +329,7 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
         let tcbi=get_tcbi() in
         let tcbh=hash(hk_CPU, tcbi_t2bitstring(tcbi)) in
         let rms_without_mac=rms_without_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2 ) in
-        let mac_CPU=mac(rms_without_mac_t2bitsring(rms_without_mac), mkey_CPU) in
+        let mac_CPU=mac(rms_without_mac_t2bitstring(rms_without_mac), mkey_CPU) in
         let rms=rms_f(rms_without_mac, mac_CPU) in
         let smr=smr_f(rms, tcbi) in
         (*
@@ -344,7 +344,7 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
         *)
 
         let rms_f(rms_without_mac1, mac_CPU1)=rms1 in
-        let resOfMac=check(rms_without_mac_t2bitsring(rms_without_mac1), mkey_CPU, mac_CPU1) in
+        let resOfMac=check(rms_without_mac_t2bitstring(rms_without_mac1), mkey_CPU, mac_CPU1) in
         (*
         
         insert CPU_QE_14(hostname_CPU, hostname_QE, resOfMac);
@@ -407,7 +407,7 @@ let Challenger(spk:spkey, sk:skey)=
     in(c26, QE_Ch(m1));
     let injbot(quote_t2bitstring(quote))=dec(m1, sk) in
     let quote_f(tdr_without_mac, sig) =quote in
-    if(verify(tdr_without_mac_t2bitsring(tdr_without_mac), spk, sig)) then(
+    if(verify(tdr_without_mac_t2bitstring(tdr_without_mac), spk, sig)) then(
         let tdr_without_mac_f(smr_without_mac, res4, tdi)=tdr_without_mac in
         let smr_without_mac_f(rms_without_mac, tcbi)=smr_without_mac in
         let rms_without_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_without_mac in
@@ -445,7 +445,7 @@ let IAS(spk:spkey, sk:skey)=
     get Ch_IAS_19(x, y, m1) suchthat x=hostname_Ch && y=hostname_IAS in
     let injbot(quote_t2bitstring(quote))=dec(m1, sk) in
     let quote_f(tdr_without_mac, sig) =quote in
-    if(verify(tdr_without_mac_t2bitsring(tdr_without_mac), spk, sig)) then(
+    if(verify(tdr_without_mac_t2bitstring(tdr_without_mac), spk, sig)) then(
         let tdr_without_mac_f(smr_without_mac, res4, tdi)=tdr_without_mac in
         let smr_without_mac_f(rms_without_mac, tcbi)=smr_without_mac in
         let rms_without_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_without_mac in

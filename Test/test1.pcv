@@ -1,0 +1,178 @@
+param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
+
+channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, start.
+
+type macres_t [bounded].
+type key [large,fixed].
+type sskey [bounded].
+type spkey [bounded].
+type skey [bounded].
+type pkey [bounded].
+type signature [bounded].
+type keyseed [large,fixed].
+type rdata_t[bounded].
+type user_data_t [bounded, nonuniform].
+
+(* MAC *)
+proba Pmac.
+expand SUF_CMA_det_mac(
+    key,            (*mkey is the type of keys, must be bounded*)
+    bitstring , (*macinput is the type of inputs of MACs*)
+    macres_t,  (*macres_t is the type of MACs.*)
+    mac,          (*mac(macinput ,mkey ) : macres_t is the MAC function.*)
+    check,      (*check (macinput ,mkey ,macres_t ) : bool is the verification function*)
+    Pmac        (*Pmac(t,N,N′,Nu′,l) is the probability of breaking the SUF-CMA property in time t for one key,
+                N MAC queries, N′ verification queries modified by the transformation and Nu verification queries
+                left unchanged by the transformation for messages of length at most l.*)
+).
+
+(* Signature *)
+proba Psign.
+proba Psigncoll.
+expand UF_CMA_det_signature(
+        keyseed,
+        spkey,                  (*pkey is the type of public keys, must be bounded.*)
+        sskey,                  (*skey is the type of secret keys, must be bounded.*)
+        bitstring,            (*signinput*)
+        signature,            (*signature*)
+       	sskgen,                  (*skgen(keyseed ) : skey is the secret key generation function.*)
+        spkgen,                 (*pkgen (keyseed ) : pkey is the public key generation function.*)
+        sign,                     (*sign (signinput ,skey ) : signature is the signature function.*)
+        verify,                  (*check (signinput ,pkey ,signature) : bool is the verification function.*)
+        Psign,                  (*Psign (t,N,l) is the probability of breaking the UF-CMA property 
+                                        in time t, for one key, N signature queries with messages of length at most l.*)
+        Psigncoll           (*Psigncoll is the probability of collision between independently generated keys.*)
+).
+
+
+query secret session_key.
+
+(* Asymmetric encryption *)
+proba Penc.
+proba Penccoll.
+expand IND_CCA2_public_key_enc(
+        keyseed, 
+        pkey,                       (*pkey is the type of public keys, must be bounded*)
+        skey,                        (*skey is the type of secret keys, must be bounded*) 
+        bitstring,                (*cleartext is the type of cleartexts.*)
+        bitstring,             (*ciphertext is the type of ciphertexts.*)
+        skgen,                      (*skgen(keyseed ) : skey is the secret key generation function.*)
+        pkgen,                      (*pkgen (keyseed ) : pkey is the public key generation function.*)
+        enc,                            (*enc(cleartext ,pkey ) : ciphertext is the encryption function. 
+                                                Internally, it generates random coins, so that it is probabilistic*)
+        dec,                            (*dec(ciphertext ,skey ) : bitstringbot is the decryption function; it returns bottom 
+                                                when decryption fails*)
+        injbot,                         (*injbot (cleartext ) : bitstringbot is the natural injection from cleartext to bitstringbot*)
+        Z,                                  (*Z (cleartext ) : cleartext is the function that returns for each cleartext a cleartext of 
+                                                the same length consisting only of zeroes.*)
+        Penc,                           (*Penc(t,N) is the probability of breaking the IND-CCA2 property
+                                                (indistinguishable under adaptive chosen ciphertext attacks)
+                                                in time t for one key and N decryption queries.*)
+        Penccoll                    (*Penccoll is the probability of collision between independently generated keys.*)
+).
+
+const Zkey : bitstring.
+equation forall y:bitstring;
+	Z(y) = Zkey.
+
+
+fun rdata_t2bitstring(rdata_t):bitstring[data].
+fun quote_f(bitstring, signature):bitstring[data].
+fun key2bitstring(key):bitstring[data].
+fun Ch_TD(bitstring):bitstring[data].
+fun rdata_f(pkey, user_data_t):rdata_t[data].
+fun QE_Ch(bitstring):bitstring[data].
+
+let TD(pk_TD:pkey, sk_TD:skey)=
+
+
+        in(c4, ());
+        new rdata_other:user_data_t;
+        let rdata_TD1:rdata_t=rdata_f(pk_TD, rdata_other) in
+
+        out(c13, rdata_TD1);
+
+        in(c32, Ch_TD(m2));
+        let injbot(session_key1)=dec(m2, sk_TD) in
+        out(c33,()).
+
+
+let QE( ssk:sskey, pk: pkey)=
+
+
+        in(c16, ());
+        find i<=qTD suchthat defined (rdata_TD1[i]) then(
+            let sig=sign(rdata_t2bitstring(rdata_TD1[i]), ssk) in
+            let quote =quote_f(rdata_t2bitstring(rdata_TD1[i]), sig) in
+            let m1=enc(quote, pk) in
+            out(c21, QE_Ch(m1))
+        ).
+            
+        
+            
+
+
+
+let Challenger(spk:spkey, sk:skey)=
+    in(c2, ());
+    out(c3, ());
+    in(c26, QE_Ch(m1));
+    let injbot(quote)=dec(m1, sk) in
+    let quote_f(rdata_t2bitstring(rdata_TD), sig) =quote in
+    if(verify(rdata_t2bitstring(rdata_TD), spk, sig)) then(
+        
+        let rdata_f(x1, y1)=rdata_TD in
+        new session_key:key;
+        let m2=enc(key2bitstring(session_key), x1) in
+
+        out(c29, (Ch_TD(m2)))
+    ).
+
+
+
+
+let Application(ssk:sskey, pk:pkey) =
+TDX_keygen_App[pk3>pk3, sk3>sk3]{
+    in(c21, ());
+    new r3:keyseed;
+    let pk3:pkey=pkgen(r3) in
+    let sk3:skey=skgen(r3) in
+    out(c22, ())
+};
+(
+    (!i<=qTD TD(pk3, sk3) ) |
+    
+    (!i<=qQE QE( ssk, pk) )   
+).
+(*
+let IAS(spk:spkey, sk:skey)=
+    in(c28, ());
+    get Ch_IAS_19(x, y, m1) suchthat x=hostname_Ch && y=hostname_IAS in
+    let injbot(quote_t2bitstring(quote))=dec(m1, sk) in
+    let quote_f(tdr_without_mac, sig) =quote in
+    if(verify(tdr_without_mac_t2bitstring(tdr_without_mac), spk, sig)) then(
+        let tdr_without_mac_f(smr_without_mac, res4, tdi)=tdr_without_mac in
+        let smr_without_mac_f(rms_without_mac, tcbi)=smr_without_mac in
+        let rms_without_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_without_mac in
+        let rdata_f(x1, y1)=rdata in
+        insert IAS_Ch_20(hostname_IAS, hostname_Ch, x1);
+        out(c29, ())
+    ).
+*)
+
+
+process
+    TDX_Keygen [spk1 > spk_IAS, ssk1 > ssk_QE, pk2 > pk_QE, sk2 > sk_IAS ]{
+        in(start, ());
+        new r1 :keyseed;
+        let spk1:spkey=spkgen(r1) in
+        let ssk1:sskey=sskgen(r1) in 
+        new r2 :keyseed;
+        let pk2:pkey=pkgen(r2) in
+        let sk2:skey=skgen(r2) in
+        out (c1, ())
+    };
+	(
+        (!i<= qChallenger Challenger(spk1, sk2)) | 
+        (Application(ssk1, pk2)) 
+    )
