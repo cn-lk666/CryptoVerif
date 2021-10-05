@@ -94,5 +94,5 @@ process
     new r2:keyseed;
     let pk=pkgen(r2) in
     let sk=skgen(r2) in
-    out(c2, ());
+    out(c2, (pk));
     (processA(spk, sk) | processB(ssk, pk))

@@ -24,8 +24,13 @@
 
 
 (*replication numbers*)
-param qChallenger, qApp, qIAS.
+param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
 
+
+proof{
+    crypto ind_cca2(enc) r3;
+    auto
+}
 (*
     bounded means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other
         words, the type is a finite subset of bitstrings plus ⊥.
@@ -47,7 +52,7 @@ type spkey [bounded].
 type skeypair [bounded].
 type skeyseed [large,fixed].
 fun skp(spkey,sskey):skeypair [data].
-type macres [bounded].
+type macres_t [bounded].
 (*channel name*)
 channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, start.
 
@@ -72,9 +77,9 @@ proba Pmac.
 expand SUF_CMA_det_mac(
     key,            (*mkey is the type of keys, must be bounded*)
     bitstring , (*macinput is the type of inputs of MACs*)
-    macres,  (*macres is the type of MACs.*)
-    mac,          (*mac(macinput ,mkey ) : macres is the MAC function.*)
-    check,      (*check (macinput ,mkey ,macres ) : bool is the verification function*)
+    macres_t,  (*macres_t is the type of MACs.*)
+    mac,          (*mac(macinput ,mkey ) : macres_t is the MAC function.*)
+    check,      (*check (macinput ,mkey ,macres_t ) : bool is the verification function*)
     Pmac        (*Pmac(t,N,N′,Nu′,l) is the probability of breaking the SUF-CMA property in time t for one key,
                 N MAC queries, N′ verification queries modified by the transformation and Nu verification queries
                 left unchanged by the transformation for messages of length at most l.*)
@@ -126,9 +131,9 @@ expand IND_CCA2_public_key_enc(
 
 
 
-
-letfun kgen() =  k <-R keyseed;  kp (pkgen(k) ,skgen(k) ).
-letfun kgen_s() =  ks <-R skeyseed;  skp (spkgen(ks) ,sskgen(ks) ).
+letfun kgen3() =  r3 <-R keyseed;  kp (pkgen(r3) ,skgen(r3) ).
+letfun kgen2() =  r2 <-R keyseed;  kp (pkgen(r2) ,skgen(r2) ).
+letfun kgen_s1() =  r1 <-R skeyseed;  skp (spkgen(r1) ,sskgen(r1) ).
 
 
 type rtyp_t[bounded].
@@ -169,7 +174,7 @@ fun get_res():res_t.
 
 fun rdata_f(pkey, user_data_t):rdata_t[data].
 fun rms_without_mac_f(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t): rms_without_mac_t[data].
-fun rms_f(rms_without_mac_t, macres):rms_t[data].
+fun rms_f(rms_without_mac_t, macres_t):rms_t[data].
 fun smr_f(rms_t, tcbi_t):smr_t[data].
 fun smr_without_mac_f(rms_without_mac_t, tcbi_t):smr_without_mac_t[data].
 fun tdr_f(smr_t, res_t, tdi_t):tdr_t[data].
@@ -183,6 +188,8 @@ fun key2bitstring(key):bitstring[data].
 fun tdr_without_mac_t2bitstring(tdr_without_mac_t):bitstring[data].
 fun quote_t2bitstring(quote_t):bitstring[data].
 fun tdr_without_mac_t2bitsring(tdr_without_mac_t):bitstring[data].
+fun Ch_TD(bitstring):bitstring[data].
+fun QE_Ch(bitstring):bitstring[data].
 
 table TD_TDXM_2(hostname, hostname, rdata_t).
 implementation table TD_TDXM_2="TD_TDXM_2".
@@ -191,7 +198,7 @@ implementation table TDXM_CPU_4="TDXM_CPU_4".
 table CPU_TDXM_6(hostname, hostname, smr_t).
 implementation table CPU_TDXM_6="CPU_TDXM_6".
 table TDXM_TD_8(hostname, hostname, tdr_t).
-implementation table TDXM_TD_8="TDXM_CPU_8".
+implementation table TDXM_TD_8="TDXM_TD_8".
 table QE_CPU_12(hostname, hostname, rms_t).
 implementation table QE_CPU_12="QE_CPU_12".
 table CPU_QE_14(hostname, hostname, bool).
@@ -201,19 +208,26 @@ implementation table Ch_IAS_19="Ch_IAS_19".
 table IAS_Ch_20(hostname, hostname, pkey).
 implementation table IAS_Ch_20="IAS_Ch_20".
 
+const Zkey : bitstring.
+equation forall y:bitstring;
+	Z(y) = Zkey.
 
 implementation
     type skeyseed=64;
     type keyseed=64;
     type key = 128;
     type user_data_t=1024;
-    type macres = "string";
+    type macres_t = "string";
     fun tdi_t2bitstring="tdi_t2bitstring" [inverse = "bitstring2tdi_t"];
     fun tcbi_t2bitstring="tdi_t2bitstring" [inverse = "bitstring2tcbi_t"]; 
     type pkey="pkey" [serial = "pkey_to","pkey_from"];
     type skey="skey" [serial = "skey_to","skey_from"];                  
-    fun kgen = "(pk_kgen 1024)";
-    fun kgen_s = "(pk_kgen 1024)";
+    fun pkgen = "(pk_kgen 1024)";
+    fun skgen = "(pk_kgen 1024)";
+    fun kgen_s1 = "(pk_kgen 1024)";
+    fun kgen2 = "(pk_kgen 1024)";
+    fun kgen3 = "(pk_kgen 1024)";
+
     fun kp="id" [inverse="id"];
     fun skp="id" [inverse="id"];
 
@@ -236,7 +250,9 @@ implementation
     type hashoutput=160;
     type hostname="string" [serial = "id", "id"];
     type rdata_t="string" [serial = "id", "id"];
+    type tdr_t="string" [serial = "id", "id"];
     type rtyp_t="string" [serial = "id", "id"];
+    type smr_t="string" [serial = "id", "id"];
     type spkey="pkey" [serial = "pkey_to","pkey_from"];
     type sskey="skey" [serial = "skey_to","skey_from"].
 
@@ -250,14 +266,18 @@ let TD(pk_TD:pkey, sk_TD:skey)=
         in(c4, ());
         new rdata_other:user_data_t;
         let rdata_TD=rdata_f(pk_TD, rdata_other) in
+        (*
         insert TD_TDXM_2(hostname_TD, hostname_TDXM, rdata_TD);
+        *)
         out(c5, ());
         in(c12, ());
+        (*
         get TDXM_TD_8(x,y,tdr) suchthat x=hostname_TDXM && y=hostname_TD in
+        *)
         out(c13, tdr);
-        in(c24, m1:bitstring);
-        out(c25, m1);
-        in(c32, m2:bitstring);
+        (*in(c24, m1:bitstring);
+        out(c25, m1);*)
+        in(c32, Ch_TD(m2));
         let injbot(session_key1)=dec(m2, sk_TD) in
         out(c33,())
     }.
@@ -265,17 +285,32 @@ let TD(pk_TD:pkey, sk_TD:skey)=
 let TDXM(hk_TDXM:key)=
     TDX_TDXM{
         in(c6, ());
+        (*
+        
         get TD_TDXM_2(x, y, rdata_TDXM) suchthat x=hostname_TD && y=hostname_TDXM in
+        *)
         let tdi=get_tdi() in
         let rtyp=get_rtyp() in
         let tdih=hash(hk_TDXM, tdi_t2bitstring(tdi)) in
+        
+        (*
+        
         insert TDXM_CPU_4(hostname_TDXM, hostname_CPU, rtyp, tdih, rdata_TDXM);
+        *)
+        
         out(c7, ());
         in(c10, ());
-        get CPU_TDXM_6(x,y,smr) suchthat x=hostname_CPU && y=hostname_TDXM in
+        (*
+        get CPU_TDXM_6(x1,y1,smr) suchthat x1=hostname_CPU && y1=hostname_TDXM in
+        
+        *)
         let res4=get_res() in
         let tdr=tdr_f(smr, res4, tdi) in
+
+        (*
         insert TDXM_TD_8(hostname_TDXM, hostname_TD, tdr);
+        
+        *)
         out(c11, ())
 
     }.
@@ -284,7 +319,11 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
     TDX_CPU{
         in(c8, ());
         let csvn =get_csvn() in
+(*
+
         get TDXM_CPU_4(x,y, rtyp, tdih, rdata) suchthat x=hostname_TDXM && y=hostname_CPU in
+*)
+
         let res1=get_res() in
         let res2=get_res() in
         let tcbi=get_tcbi() in
@@ -293,18 +332,27 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
         let mac_CPU=mac(rms_without_mac_t2bitsring(rms_without_mac), mkey_CPU) in
         let rms=rms_f(rms_without_mac, mac_CPU) in
         let smr=smr_f(rms, tcbi) in
+        (*
+        
         insert CPU_TDXM_6(hostname_CPU, hostname_TDXM, smr);
+        *)
         out(c9, ());
         in(c18, ());
+        (*
+        
         get QE_CPU_12(x1, y1, rms1) suchthat x1=hostname_QE && y1=hostname_CPU in
+        *)
+
         let rms_f(rms_without_mac1, mac_CPU1)=rms1 in
         let resOfMac=check(rms_without_mac_t2bitsring(rms_without_mac1), mkey_CPU, mac_CPU1) in
+        (*
+        
         insert CPU_QE_14(hostname_CPU, hostname_QE, resOfMac);
+        *)
         out(c19, ())
-            
-
     }.
 
+(*
 let VMM()=
     TDX_VMM{
         in(c14, (tdr:tdr_t));
@@ -312,6 +360,7 @@ let VMM()=
         in(c22, m1:bitstring);
         out(c23, m1)
     }.
+*)
 
 let QE(hk_QE:key, ssk:sskey, pk: pkey)=
     TDX_QE{
@@ -329,52 +378,68 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey)=
         in
         
         if(resOfHash) then
+            (*
+            
             insert QE_CPU_12(hostname_QE, hostname_CPU, rms);
+            *)
         out(c17, ());
         in (c20, ());
+        
+        (*
         get CPU_QE_14(x1, y1, resOfMac) suchthat x1=hostname_CPU && y1=hostname_QE in
+        
+        *)
+        
         if resOfMac then
             let smr_without_mac=smr_without_mac_f(rms_without_mac, tcbi) in
             let tdr_without_mac=tdr_without_mac_f(smr_without_mac, res4, tdi) in
             let sig=sign(tdr_without_mac_t2bitstring(tdr_without_mac), ssk) in
             let quote =quote_f(tdr_without_mac, sig) in
             let m1=enc(quote_t2bitstring(quote), pk) in
-            out(c21, m1)
+            out(c21, QE_Ch(m1))
         
     }.
 
 
-let Challenger()=
+let Challenger(spk:spkey, sk:skey)=
     in(c2, ());
     out(c3, ());
-    in(c26, m1:bitstring);
-    insert Ch_IAS_19(hostname_Ch, hostname_IAS, m1);
-    out(c27, ());
-    in(c30, ());
-    get IAS_Ch_20(x, y, pk) suchthat x=hostname_IAS && y=hostname_Ch in
-    new session_key:key;
-    let m2=enc(key2bitstring(session_key), pk) in
-    out(c31,(m2)).
+    in(c26, QE_Ch(m1));
+    let injbot(quote_t2bitstring(quote))=dec(m1, sk) in
+    let quote_f(tdr_without_mac, sig) =quote in
+    if(verify(tdr_without_mac_t2bitsring(tdr_without_mac), spk, sig)) then(
+        let tdr_without_mac_f(smr_without_mac, res4, tdi)=tdr_without_mac in
+        let smr_without_mac_f(rms_without_mac, tcbi)=smr_without_mac in
+        let rms_without_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_without_mac in
+        let rdata_f(x1, y1)=rdata in
+        new session_key:key;
+        let m2=enc(key2bitstring(session_key), x1) in
+
+        out(c29, (Ch_TD(m2)))
+    ).
+
 
 
 
 let Application(ssk:sskey, pk:pkey) =
 TDX_keygen_App[pk3>pk3, sk3>sk3, hk>hk, mkey>mkey]{
     in(c21, ());
-    let kp (pk3:pkey,sk3:skey) = kgen () in
+    new r3:keyseed;
+    let pk3:pkey=pkgen(r3) in
+    let sk3:skey=skgen(r3) in
     new hk:key;(*key for hash*)
     new mkey:key;(*key for mac*)
     out(c22, ())
 };
 (
     (hashoracle(hk) ) |
-    (!i<=qApp TD(pk3, sk3) ) |
-    (!i<=qApp TDXM(hk) ) |    
-    (!i<=qApp CPU(hk, mkey) ) |
-    (!i<=qApp VMM() ) |
-    (!i<=qApp QE(hk, ssk, pk) )   
+    (!i<=qTD TD(pk3, sk3) ) |
+    (!i<=qTDXM TDXM(hk) ) |    
+    (!i<=qCPU CPU(hk, mkey) ) |
+    
+    (!i<=qQE QE(hk, ssk, pk) )   
 ).
-
+(*
 let IAS(spk:spkey, sk:skey)=
     in(c28, ());
     get Ch_IAS_19(x, y, m1) suchthat x=hostname_Ch && y=hostname_IAS in
@@ -388,18 +453,17 @@ let IAS(spk:spkey, sk:skey)=
         insert IAS_Ch_20(hostname_IAS, hostname_Ch, x1);
         out(c29, ())
     ).
-
+*)
 
 
 process
     TDX_Keygen [spk1 > spk_IAS, ssk1 > ssk_QE, pk2 > pk_QE, sk2 > sk_IAS ]{
         in(start, ());
-        let skp (spk1:spkey,ssk1:sskey) = kgen_s () in
-        let kp (pk2:pkey,sk2:skey) = kgen () in
+        let skp (spk1:spkey,ssk1:sskey) = kgen_s1 () in
+        let kp (pk2:pkey,sk2:skey) = kgen2 () in
         out (c1, ())
     };
 	(
-        (!i<= qChallenger Challenger()) | 
-        (Application(ssk1, pk2)) |
-        (!i<= qIAS IAS(spk1, sk2))
+        (!i<= qChallenger Challenger(spk1, sk2)) | 
+        (Application(ssk1, pk2)) 
     )
