@@ -101,8 +101,9 @@ let QE( ssk:sskey, pk: pkey)=
 
         in(c16, ());
         find i<=qTD suchthat defined (rdata_TD1[i]) then(
-            let sig=sign(rdata_t2bitstring(rdata_TD1[i]), ssk) in
-            let quote =quote_f(rdata_t2bitstring(rdata_TD1[i]), sig) in
+            let rdata_QE=rdata_TD1[i] in
+            let sig=sign(rdata_t2bitstring(rdata_QE), ssk) in
+            let quote =quote_f(rdata_t2bitstring(rdata_QE), sig) in
             let m1=enc(quote, pk) in
             out(c21, (m1))
         ).

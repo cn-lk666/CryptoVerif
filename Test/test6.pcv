@@ -1,0 +1,345 @@
+(*
+    TDX protocol
+    six entities: Challenger, CPU, TDXM, TD, VMM, QE.
+    Steps:
+    1. Challenger->TD: Attestation requirements
+    2. TD generate rdata and TD->TDXM: request TD report
+    3.  Assemble tdi from TDCS and compute its hash tdih
+    4. TDXM->CPU: rtyp, tdi, rdata and request SEAMREPORT
+    5. CPU genarate SEAMREPORT
+    6. CPU->TDXM: SEAMREPORT
+    7. TDXM create TDREPORT
+    8. TDXM->TD: TDREPORT
+    9. TD->VMM: TDREPORT and request Quote
+    10. VMM->QE: TDREPORT
+    11. QE check hashes
+    12. QE ->CPU: report mac struct
+    13. CPU verify the MAC in the report
+    14. CPU->QE: Verification result
+    15. QE sign to form Quote
+    16. QE->VMM: Quote
+    17. VMM->TD: TD: Quote
+    18. TD->Challenger: Quote
+*)
+
+
+(*replication numbers*)
+param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
+
+
+proof{
+    crypto ind_cca2(enc) r3;
+    auto
+}
+(*
+    bounded means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other
+        words, the type is a finite subset of bitstrings plus ⊥.
+    fixed means that the type is the set of all bitstrings of a certain length n. In particular, the
+        type is a finite set, so fixed implies bounded.
+    large: By default, large means that the type T is large enough so that all collisions with ran-
+        dom elements of T can be eliminated
+*)
+(*These three types are used in the macro IND_CCA2_public_key_enc and UF_CMA_det_signature*)
+type skey [bounded].
+type pkey [bounded].
+
+type keypair [bounded].
+type keyseed [large,fixed].
+fun kp(pkey,skey):keypair [data].
+type signature [bounded].
+type sskey [bounded].
+type spkey [bounded].
+type skeypair [bounded].
+type skeyseed [large,fixed].
+fun skp(spkey,sskey):skeypair [data].
+type macres_t [bounded].
+(*channel name*)
+channel c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23, start.
+
+(*session key*)
+type key [large,fixed].
+type hashoutput [large, fixed].
+
+(* Hash *)
+expand ROM_hash_large(
+    key,                 (**)
+    bitstring,         (*hashinput is the type of the input of the hash function.*)
+    hashoutput,        (*hashoutput is the type of the output of the hash function, 
+                                    must be bounded or nonuniform (typically fixed)*)
+                                (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
+    hash,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
+    hashoracle,  (*hashoracle is a process that allows the adversary to call the hash function*)
+    qH                      (*qH is the number of queries to the hash oracle*)
+).
+
+(* MAC *)
+proba Pmac.
+expand SUF_CMA_det_mac(
+    key,            (*mkey is the type of keys, must be bounded*)
+    bitstring , (*macinput is the type of inputs of MACs*)
+    macres_t,  (*macres_t is the type of MACs.*)
+    mac,          (*mac(macinput ,mkey ) : macres_t is the MAC function.*)
+    check,      (*check (macinput ,mkey ,macres_t ) : bool is the verification function*)
+    Pmac        (*Pmac(t,N,N′,Nu′,l) is the probability of breaking the SUF-CMA property in time t for one key,
+                N MAC queries, N′ verification queries modified by the transformation and Nu verification queries
+                left unchanged by the transformation for messages of length at most l.*)
+).
+
+
+(* Signature *)
+proba Psign.
+proba Psigncoll.
+expand UF_CMA_det_signature(
+        skeyseed,
+        spkey,                  (*pkey is the type of public keys, must be bounded.*)
+        sskey,                  (*skey is the type of secret keys, must be bounded.*)
+        bitstring,            (*signinput*)
+        signature,            (*signature*)
+       	sskgen,                  (*skgen(keyseed ) : skey is the secret key generation function.*)
+        spkgen,                 (*pkgen (keyseed ) : pkey is the public key generation function.*)
+        sign,                     (*sign (signinput ,skey ) : signature is the signature function.*)
+        verify,                  (*check (signinput ,pkey ,signature) : bool is the verification function.*)
+        Psign,                  (*Psign (t,N,l) is the probability of breaking the UF-CMA property 
+                                        in time t, for one key, N signature queries with messages of length at most l.*)
+        Psigncoll           (*Psigncoll is the probability of collision between independently generated keys.*)
+).
+
+
+(* Asymmetric encryption *)
+proba Penc.
+proba Penccoll.
+expand IND_CCA2_public_key_enc(
+        keyseed, 
+        pkey,                       (*pkey is the type of public keys, must be bounded*)
+        skey,                        (*skey is the type of secret keys, must be bounded*) 
+        bitstring,                (*cleartext is the type of cleartexts.*)
+        bitstring,             (*ciphertext is the type of ciphertexts.*)
+        skgen,                      (*skgen(keyseed ) : skey is the secret key generation function.*)
+        pkgen,                      (*pkgen (keyseed ) : pkey is the public key generation function.*)
+        enc,                            (*enc(cleartext ,pkey ) : ciphertext is the encryption function. 
+                                                Internally, it generates random coins, so that it is probabilistic*)
+        dec,                            (*dec(ciphertext ,skey ) : bitstringbot is the decryption function; it returns bottom 
+                                                when decryption fails*)
+        injbot,                         (*injbot (cleartext ) : bitstringbot is the natural injection from cleartext to bitstringbot*)
+        Z,                                  (*Z (cleartext ) : cleartext is the function that returns for each cleartext a cleartext of 
+                                                the same length consisting only of zeroes.*)
+        Penc,                           (*Penc(t,N) is the probability of breaking the IND-CCA2 property
+                                                (indistinguishable under adaptive chosen ciphertext attacks)
+                                                in time t for one key and N decryption queries.*)
+        Penccoll                    (*Penccoll is the probability of collision between independently generated keys.*)
+).
+
+
+
+
+
+type rtyp_t[bounded].
+type res_t[fixed].
+type csvn_t[fixed].
+type user_data_t [bounded, nonuniform].
+type tcbi_t[fixed].
+type tdi_t[fixed].
+
+type rdata_t[bounded].
+type rms_without_mac_t[bounded].
+type rms_t[bounded].
+type smr_t[bounded].
+type smr_without_mac_t[bounded].
+type tdr_t[bounded].
+type tdr_without_mac_t[bounded].
+type quote_t[bounded].
+
+type hostname[bounded].
+set diffConstants = false.
+const hostname_TD:hostname.
+const hostname_TDXM:hostname.
+const hostname_CPU:hostname.
+const hostname_QE:hostname.
+const hostname_Ch:hostname.
+const hostname_IAS:hostname.
+
+set casesInCorresp = false.
+    (* Distringuishing cases in the proof of correspondences
+       is too slow with the "unique channel id" property,
+       and not necessary *)
+
+fun get_rtyp():rtyp_t.
+fun get_tdi():tdi_t.
+fun get_tcbi():tcbi_t.
+fun get_csvn():csvn_t.
+fun get_res():res_t.
+
+fun rdata_f(pkey, user_data_t):rdata_t[data].
+fun rms_without_mac_f(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t): rms_without_mac_t[data].
+fun rms_f(rms_without_mac_t, macres_t):rms_t[data].
+fun smr_f(rms_t, tcbi_t):smr_t[data].
+fun smr_without_mac_f(rms_without_mac_t, tcbi_t):smr_without_mac_t[data].
+fun tdr_f(smr_t, res_t, tdi_t):tdr_t[data].
+fun tdr_without_mac_f(smr_without_mac_t, res_t, tdi_t):tdr_without_mac_t[data].
+
+fun quote_f(tdr_without_mac_t, signature):quote_t[data].
+fun tdi_t2bitstring(tdi_t): bitstring [data].
+fun tcbi_t2bitstring(tcbi_t):bitstring[data].
+fun rms_without_mac_t2bitstring(rms_without_mac_t):bitstring[data].
+fun key2bitstring(key):bitstring[data].
+fun tdr_without_mac_t2bitstring(tdr_without_mac_t):bitstring[data].
+fun quote_t2bitstring(quote_t):bitstring[data].
+
+
+
+const Zkey : bitstring.
+equation forall y:bitstring;
+	Z(y) = Zkey.
+
+
+query secret session_key.
+
+
+let TD(pk_TD:pkey, sk_TD:skey)=
+
+    in(c4, ());
+    new rdata_other:user_data_t;
+    let rdata_TD:rdata_t=rdata_f(pk_TD, rdata_other) in
+    out(c5, ());
+    in(c12, ());
+    find i<=qTDXM suchthat defined(tdr_TDXM[i]) then(
+        let tdr_TD=tdr_TDXM[i] in
+        out(c13, tdr_TD)
+
+
+    ).
+
+
+let TDXM(hk_TDXM:key)=
+
+    in(c6, ());
+    let tdi_TDXM=get_tdi() in
+    let rtyp_TDXM:rtyp_t=get_rtyp() in
+    let tdih_TDXM:hashoutput=hash(hk_TDXM, tdi_t2bitstring(tdi_TDXM)) in
+    find i<=qTD suchthat defined(rdata_TD[i]) then(
+        let rdata_TDXM:rdata_t=rdata_TD[i] in
+        out(c7, ());
+        in(c10, ());
+        let res4_TDXM=get_res() in
+        find j<=qCPU suchthat defined(smr_CPU[j]) then(
+            let smr_TDXM=smr_CPU[j] in
+            let tdr_TDXM:tdr_t=tdr_f(smr_TDXM, res4_TDXM, tdi_TDXM) in
+            out(c11, ())
+        )
+    ).
+  
+
+let CPU(hk_CPU:key, mkey_CPU:key)=
+
+    in(c8, ());
+    find i<=qTDXM suchthat defined (rdata_TDXM[i], rtyp_TDXM[i], tdih_TDXM[i]) then(
+        let rdata_CPU=rdata_TDXM[i] in
+        let rtyp_CPU=rtyp_TDXM[i] in
+        let tdih_CPU=tdih_TDXM[i] in
+        let csvn_CPU =get_csvn() in
+        let res1_CPU=get_res() in
+        let res2_CPU=get_res() in
+        let tcbi_CPU=get_tcbi() in
+        let tcbh_CPU=hash(hk_CPU, tcbi_t2bitstring(tcbi_CPU)) in
+        let rms_without_mac_CPU=rms_without_mac_f(rtyp_CPU, res1_CPU, csvn_CPU, tcbh_CPU, tdih_CPU, rdata_CPU, res2_CPU ) in
+        let mac_CPU=mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey_CPU) in
+        let rms_CPU=rms_f(rms_without_mac_CPU, mac_CPU) in
+        let smr_CPU:smr_t=smr_f(rms_CPU, tcbi_CPU) in
+        out(c9, ());
+        in(c18, ());
+        find j<=qQE suchthat defined(rms_QE_to_CPU[j]) then (
+            
+            let rms_f(rms_without_mac_QE_to_CPU, mac_QE_to_CPU) =rms_QE_to_CPU[j] in
+            
+            if(check(rms_without_mac_t2bitstring(rms_without_mac_QE_to_CPU), mkey_CPU, mac_QE_to_CPU))then (
+               let rms_without_mac_from_CPU:rms_without_mac_t=rms_without_mac_QE_to_CPU in
+
+               out(c19, ())
+            )
+        )
+    ).
+
+
+
+let QE(hk_QE:key, ssk:sskey, pk: pkey, mkey_QE:key)=
+
+
+    in(c16, (tdr_QE:tdr_t));
+    let tdr_f(smr_QE, res4_QE, tdi_QE)=tdr_QE in
+    let smr_f(rms_QE, tcbi_QE)=smr_QE in
+    let rms_f(rms_without_mac_QE, macres_QE)=rms_QE in
+    let rms_without_mac_f(rtyp_QE, res1_QE, csvn_QE, tcbh_QE, tdih_QE, rdata_QE, res2_QE)=rms_without_mac_QE in
+    if(hash(hk_QE, tcbi_t2bitstring(tcbi_QE))=tcbh_QE && hash(hk_QE,tdi_t2bitstring( tdi_QE))=tdih_QE) then(
+        let rms_QE_to_CPU:rms_t=rms_QE in
+        out(c17, ());
+        in(c20, ());
+        find i<=qCPU suchthat defined(rms_without_mac_from_CPU[i]) && rms_without_mac_QE=rms_without_mac_from_CPU[i] then(
+                let rms_without_mac_f(rtyp_QE1, res1_QE1, csvn_QE1, tcbh_QE1, tdih_QE1, rdata_QE1, res2_QE1)=rms_without_mac_QE in
+                let rdata_f(x1, y1)=rdata_QE in
+                new session_key :key;
+                let m1_QE=enc(key2bitstring(session_key), x1) in
+                out(c21, m1_QE)
+        )
+    ).
+            
+
+
+
+
+let Challenger(spk:spkey, sk:skey)=
+    in(c2, ());
+    out(c3, ()).
+
+
+
+
+let Application(ssk:sskey, pk:pkey) =
+TDX_keygen_App[pk3>pk3, sk3>sk3, hk>hk, mkey>mkey]{
+    in(c22, ());
+    new r3:keyseed;
+    let pk3:pkey=pkgen(r3) in
+    let sk3:skey=skgen(r3) in
+    new hk:key;(*key for hash*)
+    new mkey:key;(*key for mac*)
+    out(c23, ())
+};
+(
+    (hashoracle(hk) ) |
+    (!i<=qTD TD(pk3, sk3) ) |
+    (!i<=qTDXM TDXM(hk) ) |    
+    (!i<=qCPU CPU(hk, mkey) ) |
+    
+    (!i<=qQE QE(hk, ssk, pk, mkey) )   
+).
+(*
+let IAS(spk:spkey, sk:skey)=
+    in(c28, ());
+    get Ch_IAS_19(x, y, m1) suchthat x=hostname_Ch && y=hostname_IAS in
+    let injbot(quote_t2bitstring(quote))=dec(m1, sk) in
+    let quote_f(tdr_without_mac, sig) =quote in
+    if(verify(tdr_without_mac_t2bitstring(tdr_without_mac), spk, sig)) then(
+        let tdr_without_mac_f(smr_without_mac, res4, tdi)=tdr_without_mac in
+        let smr_without_mac_f(rms_without_mac, tcbi)=smr_without_mac in
+        let rms_without_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_without_mac in
+        let rdata_f(x1, y1)=rdata in
+        insert IAS_Ch_20(hostname_IAS, hostname_Ch, x1);
+        out(c29, ())
+    ).
+*)
+
+
+process
+
+        in(start, ());
+        new r1:skeyseed;
+        let spk1=spkgen(r1) in
+        let ssk1=sskgen(r1) in
+        new r2:keyseed;
+        let pk2=pkgen(r2) in
+        let sk2=skgen(r2) in
+        out (c1, ());
+
+	(
+        (!i<= qChallenger Challenger(spk1, sk2)) | 
+        (Application(ssk1, pk2)) 
+    )
