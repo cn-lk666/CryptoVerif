@@ -54,7 +54,7 @@ type skeyseed [large,fixed].
 fun skp(spkey,sskey):skeypair [data].
 type macres_t [bounded].
 (*channel name*)
-channel c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23, start.
+channel c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23,c24, c25, start.
 
 (*session key*)
 type key [large,fixed].
@@ -199,6 +199,7 @@ let TD(pk_TD:pkey, sk_TD:skey)=
 
     in(c4, ());
     new rdata_other:user_data_t;
+    let pk_TD1:pkey=pk_TD in
     let rdata_TD:rdata_t=rdata_f(pk_TD, rdata_other) in
     out(c5, ());
     in(c12, ());
@@ -261,7 +262,7 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
 
 
 
-let QE(hk_QE:key, ssk:sskey, pk: pkey, mkey_QE:key)=
+let QE(hk_QE:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey)=
 
 
     in(c16, (tdr_QE:tdr_t));
@@ -275,10 +276,27 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey, mkey_QE:key)=
         in(c20, ());
         find i<=qCPU suchthat defined(rms_without_mac_from_CPU[i]) && rms_without_mac_QE=rms_without_mac_from_CPU[i] then(
             
-                let rdata_f(x1, y1)=rdata_QE in
-                new session_key :key;
-                let m1_QE=enc(key2bitstring(session_key), x1) in
-                out(c21, m1_QE)
+            let smr_without_mac_QE=smr_without_mac_f(rms_without_mac_QE, tcbi_QE) in
+            let tdr_without_mac_QE=tdr_without_mac_f(smr_without_mac_QE, res4_QE, tdi_QE) in
+            let sig_QE=sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk) in
+            let quote_QE =quote_f(tdr_without_mac_QE, sig_QE) in
+            let m1=enc(quote_t2bitstring(quote_QE), pk) in
+            out(c21, (m1));
+            in(c22, (m2:bitstring));
+            let injbot(quote_t2bitstring(quote_Ch))=dec(m2, sk) in
+            let quote_f(tdr_without_mac_Ch, sig_Ch) =quote_Ch in
+            if(verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk, sig_Ch)) then(
+                let tdr_without_mac_f(smr_without_mac_Ch, res4_Ch, tdi_Ch)=tdr_without_mac_Ch in
+                let smr_without_mac_f(rms_without_mac_Ch, tcbi_Ch)=smr_without_mac_Ch in
+                let rms_without_mac_f(rtyp_Ch, res1_Ch, csvn_Ch, tcbh_Ch, tdih_Ch, rdata_Ch, res2_Ch)=rms_without_mac_Ch in
+                let rdata_f(x1_Ch, y1_Ch)=rdata_Ch in
+                new session_key:key;
+                let m2_Ch=enc(key2bitstring(session_key), x1_Ch) in
+                out(c23, (m2_Ch))
+            
+            
+            )
+
         )
     ).
             
@@ -287,30 +305,14 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey, mkey_QE:key)=
 
 
 let Challenger(spk:spkey, sk:skey)=
-    in(c2, ());
-    out(c3, ()).
-
-
-
-
-let Application(ssk:sskey, pk:pkey) =
-TDX_keygen_App[pk3>pk3, sk3>sk3, hk>hk, mkey>mkey]{
-    in(c22, ());
-    new r3:keyseed;
-    let pk3:pkey=pkgen(r3) in
-    let sk3:skey=skgen(r3) in
-    new hk:key;(*key for hash*)
-    new mkey:key;(*key for mac*)
-    out(c23, ())
-};
-(
-    (hashoracle(hk) ) |
-    (!i<=qTD TD(pk3, sk3) ) |
-    (!i<=qTDXM TDXM(hk) ) |    
-    (!i<=qCPU CPU(hk, mkey) ) |
     
-    (!i<=qQE QE(hk, ssk, pk, mkey) )   
-).
+    in(c22, ());
+    out(c23, ()).
+
+
+
+
+
 (*
 let IAS(spk:spkey, sk:skey)=
     in(c28, ());
@@ -337,9 +339,19 @@ process
         new r2:keyseed;
         let pk2=pkgen(r2) in
         let sk2=skgen(r2) in
+            new r3:keyseed;
+    let pk3:pkey=pkgen(r3) in
+    let sk3:skey=skgen(r3) in
+    new hk:key;(*key for hash*)
+    new mkey:key;(*key for mac*)
         out (c1, ());
 
 	(
         (!i<= qChallenger Challenger(spk1, sk2)) | 
-        (Application(ssk1, pk2)) 
+        (hashoracle(hk) ) |
+        (!i<=qTD TD(pk3, sk3) ) |
+        (!i<=qTDXM TDXM(hk) ) |    
+        (!i<=qCPU CPU(hk, mkey) ) |
+        
+        (!i<=qQE QE(hk, ssk1, pk2, spk1, sk2) )
     )
