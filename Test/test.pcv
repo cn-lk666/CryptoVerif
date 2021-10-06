@@ -1,6 +1,6 @@
 param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
 
-channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, start.
+channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, start.
 
 type macres_t [bounded].
 type key [large,fixed].
@@ -12,6 +12,8 @@ type signature [bounded].
 type keyseed [large,fixed].
 type rdata_t[bounded].
 type user_data_t [bounded, nonuniform].
+
+
 
 (* MAC *)
 proba Pmac.
@@ -79,33 +81,31 @@ equation forall y:bitstring;
 fun rdata_t2bitstring(rdata_t):bitstring[data].
 fun quote_f(bitstring, signature):bitstring[data].
 fun key2bitstring(key):bitstring[data].
-fun Ch_TD(bitstring):bitstring[data].
 fun rdata_f(pkey, user_data_t):rdata_t[data].
-fun QE_Ch(bitstring):bitstring[data].
 
 let TD(pk_TD:pkey, sk_TD:skey)=
 
     TDX_TD{
-        in(c4, ());
+        in(c6, ());
         new rdata_other:user_data_t;
         let rdata_TD=rdata_f(pk_TD, rdata_other) in
 
-        out(c13, rdata_TD);
+        out(c7, rdata_TD);
 
-        in(c32, Ch_TD(m2));
+        in(c9, (m2:bitstring));
         let injbot(session_key1)=dec(m2, sk_TD) in
-        out(c33,())
+        out(c10,())
     }.
 
 let QE(ssk:sskey, pk: pkey)=
     TDX_QE{
 
-        in(c16, (rdata_TD:rdata_t));
+        in(c7, (rdata_TD1:rdata_t));
 
-            let sig=sign(rdata_t2bitstring(rdata_TD), ssk) in
-            let quote =quote_f(rdata_t2bitstring(rdata_TD), sig) in
-            let m1=enc(quote, pk) in
-            out(c21, QE_Ch(m1))
+            let sig=sign(rdata_t2bitstring(rdata_TD1), ssk) in
+            let quote =quote_f(rdata_t2bitstring(rdata_TD1), sig) in
+            let m1_QE=enc(quote, pk) in
+            out(c8, (m1_QE))
         
     }.
 
@@ -113,16 +113,16 @@ let QE(ssk:sskey, pk: pkey)=
 let Challenger(spk:spkey, sk:skey)=
     in(c2, ());
     out(c3, ());
-    in(c26, QE_Ch(m1));
-    let injbot(quote)=dec(m1, sk) in
+    in(c8, (m1_Ch:bitstring));
+    let injbot(quote)=dec(m1_Ch, sk) in
     let quote_f(rdata_t2bitstring(rdata_TD), sig) =quote in
     if(verify(rdata_t2bitstring(rdata_TD), spk, sig)) then(
         
         let rdata_f(x1, y1)=rdata_TD in
         new session_key:key;
-        let m2=enc(key2bitstring(session_key), x1) in
+        let m2_Ch=enc(key2bitstring(session_key), x1) in
 
-        out(c29, (Ch_TD(m2)))
+        out(c9, (m2_Ch))
     ).
 
 
@@ -130,11 +130,11 @@ let Challenger(spk:spkey, sk:skey)=
 
 let Application(ssk:sskey, pk:pkey) =
 TDX_keygen_App[pk3>pk3, sk3>sk3]{
-    in(c21, ());
+    in(c4, ());
     new r3:keyseed;
     let pk3:pkey=pkgen(r3) in
     let sk3:skey=skgen(r3) in
-    out(c22, ())
+    out(c5, ())
 };
 (
     (!i<=qTD TD(pk3, sk3) ) |
