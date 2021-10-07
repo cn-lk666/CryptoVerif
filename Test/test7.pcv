@@ -270,7 +270,7 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey)=
     let smr_f(rms_QE, tcbi_QE)=smr_QE in
     let rms_f(rms_without_mac_QE, macres_QE)=rms_QE in
     let rms_without_mac_f(rtyp_QE, res1_QE, csvn_QE, tcbh_QE, tdih_QE, rdata_QE, res2_QE)=rms_without_mac_QE in
-    if(hash(hk_QE, tcbi_t2bitstring(tcbi_QE))=tcbh_QE && hash(hk_QE,tdi_t2bitstring( tdi_QE))=tdih_QE) then(
+    if (hash(hk_QE, tcbi_t2bitstring(tcbi_QE))=tcbh_QE) && (hash(hk_QE,tdi_t2bitstring(tdi_QE))=tdih_QE) then(
         let rms_QE_to_CPU:rms_t=rms_QE in
         out(c17, ());
         in(c20, ());
@@ -281,8 +281,22 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey)=
             let sig_QE=sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk) in
             let quote_QE =quote_f(tdr_without_mac_QE, sig_QE) in
             let m1=enc(quote_t2bitstring(quote_QE), pk) in
-            out(c21, (m1));
-            in(c22, (m2:bitstring));
+            out(c21, (m1))
+            
+
+        )
+    ).
+            
+
+
+
+
+let Challenger(spk:spkey, sk:skey)=
+    
+    in(c22, ());
+    out(c23, ());
+
+in(c22, (m2:bitstring));
             let injbot(quote_t2bitstring(quote_Ch))=dec(m2, sk) in
             let quote_f(tdr_without_mac_Ch, sig_Ch) =quote_Ch in
             if(verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk, sig_Ch)) then(
@@ -295,21 +309,7 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey)=
                 out(c23, (m2_Ch))
             
             
-            )
-
-        )
-    ).
-            
-
-
-
-
-let Challenger(spk:spkey, sk:skey)=
-    
-    in(c22, ());
-    out(c23, ()).
-
-
+            ).
 
 
 
@@ -347,8 +347,8 @@ process
         out (c1, ());
 
 	(
-        (!i<= qChallenger Challenger(spk1, sk2)) | 
         (hashoracle(hk) ) |
+        (!i<= qChallenger Challenger(spk1, sk2)) | 
         (!i<=qTD TD(pk3, sk3) ) |
         (!i<=qTDXM TDXM(hk) ) |    
         (!i<=qCPU CPU(hk, mkey) ) |
