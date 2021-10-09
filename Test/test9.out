@@ -944,7 +944,10 @@ Game 6 is
         let m_15: bitstring = quote_t2bitstring(quote_QE) in
         new r3_3: enc_seed;
         new r2_2: enc_seed;
-        let m3_QE: bitstring = (let x_1: bitstring = m_15 in (let y_1: pkey = pk2 in {522}if defined(r3_2) && {523}(y_1 = pkgen2_1(r3_2)) then (let m2_1: bitstring = enc_r2(Z(x_1), y_1, r2_2) in m2_1) else enc_r(x_1, y_1, r3_3))) in
+        let m3_QE: bitstring = 
+          (let x_1: bitstring = m_15 in 
+            (let y_1: pkey = pk2 in 
+              {522}if defined(r3_2) && {523}(y_1 = pkgen2_1(r3_2)) then (let m2_1: bitstring = enc_r2(Z(x_1), y_1, r2_2) in m2_1) else enc_r(x_1, y_1, r3_3))) in
         out(c19[i_4], m3_QE)
       ))
 
