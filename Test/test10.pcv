@@ -27,10 +27,7 @@
 param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
 
 
-proof{
-    crypto ind_cca2(enc) r3;
-    auto
-}
+set interactiveMode = true.
 (*
     bounded means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other
         words, the type is a finite subset of bitstrings plus ⊥.
@@ -58,19 +55,8 @@ channel c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c1
 
 (*session key*)
 type key [large,fixed].
-type hashoutput [large, fixed].
 
 (* Hash *)
-expand ROM_hash_large(
-    key,                 (**)
-    bitstring,         (*hashinput is the type of the input of the hash function.*)
-    hashoutput,        (*hashoutput is the type of the output of the hash function, 
-                                    must be bounded or nonuniform (typically fixed)*)
-                                (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
-    hash,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
-    hashoracle,  (*hashoracle is a process that allows the adversary to call the hash function*)
-    qH                      (*qH is the number of queries to the hash oracle*)
-).
 
 (* MAC *)
 proba Pmac.
@@ -184,7 +170,7 @@ fun get_csvn():csvn_t.
 fun get_res():res_t.
 
 fun rdata_f(pkey, user_data_t):rdata_t[data].
-fun rms_without_mac_f(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t): rms_without_mac_t[data].
+fun rms_without_mac_f(rtyp_t, res_t, csvn_t, rdata_t, res_t): rms_without_mac_t[data].
 fun rms_f(rms_without_mac_t, macres_t):rms_t[data].
 fun smr_f(rms_t, tcbi_t):smr_t[data].
 fun smr_without_mac_f(rms_without_mac_t, tcbi_t):smr_without_mac_t[data].
@@ -199,23 +185,23 @@ fun key2bitstring(key):bitstring[data].
 fun tdr_without_mac_t2bitstring(tdr_without_mac_t):bitstring[data].
 fun quote_t2bitstring(quote_t):bitstring[data].
 fun rdata_t2bitstring(rdata_t):bitstring[data].
-fun arg_TDXM_CPU(rtyp_t, hashoutput, rdata_t):bitstring[data].
+fun arg_TDXM_CPU(rtyp_t, rdata_t):bitstring[data].
 fun smr_t2bitstring(smr_t):bitstring[data].
 fun tdr_t2bitstring(tdr_t):bitstring[data].
 fun rms_t2bitstring(rms_t):bitstring[data].
 fun bool2bitstring(bool):bitstring[data].
 
-event QuoteVerified(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t).
-event CPUsentSMR(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t, macres_t, tcbi_t).
-event eve_QE(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t).
-query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput, x5:hashoutput, x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
-	event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(eve_QE(x1, x2, x3, x4, x5, x6, x7)).
+event QuoteVerified(rtyp_t, res_t, csvn_t,  rdata_t, res_t).
+event CPUsentSMR(rtyp_t, res_t, csvn_t,  rdata_t, res_t, macres_t, tcbi_t).
+event eve_QE(rtyp_t, res_t, csvn_t,  rdata_t, res_t).
+query x1:rtyp_t, x2:res_t, x3:csvn_t, x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
+	event(QuoteVerified(x1, x2, x3 , x6, x7)) ==> event(eve_QE(x1, x2, x3,  x6, x7)).
 
-query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput, x5:hashoutput, x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
-	event(eve_QE(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8, x9)).
+query x1:rtyp_t, x2:res_t, x3:csvn_t, x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
+	event(eve_QE(x1, x2, x3 , x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x6, x7, x8, x9)).
 
-query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput, x5:hashoutput, x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
-	event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8, x9)).
+query x1:rtyp_t, x2:res_t, x3:csvn_t,  x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
+	event(QuoteVerified(x1, x2, x3,  x6, x7)) ==> event(CPUsentSMR(x1, x2, x3,  x6, x7, x8, x9)).
 
 event TDXMsentTDR_8(smr_t, tdi_t).
 event QEaccepted2_14(smr_t, tdi_t).
@@ -255,9 +241,10 @@ let TDXM(hk_TDXM:key, sym_key_TDXM:key)=
     in(c6, (m1_TDXM:bitstring));
     let sym_injbot(rdata_t2bitstring(rdata_TDXM))=sym_dec(m1_TDXM, sym_key_TDXM) in
     new tdi_TDXM:tdi_t;
+    out(c6, tdi_t2bitstring(tdi_TDXM));
+    in(c6,());
     let rtyp_TDXM:rtyp_t=get_rtyp() in
-    let tdih_TDXM:hashoutput=hash(hk_TDXM, tdi_t2bitstring(tdi_TDXM)) in
-    let m2_TDXM=sym_enc(arg_TDXM_CPU(rtyp_TDXM, tdih_TDXM, rdata_TDXM), sym_key_TDXM) in
+    let m2_TDXM=sym_enc(arg_TDXM_CPU(rtyp_TDXM, rdata_TDXM), sym_key_TDXM) in
     out(c7, (m2_TDXM));
     in(c10, (m3_TDXM:bitstring));
     let res4_TDXM=get_res() in
@@ -271,18 +258,17 @@ let TDXM(hk_TDXM:key, sym_key_TDXM:key)=
 let CPU(hk_CPU:key, mkey_CPU:key, sym_key_CPU:key)=
 
     in(c8, (m1_CPU:bitstring));
-    let sym_injbot(arg_TDXM_CPU(rtyp_CPU, tdih_CPU, rdata_CPU))=sym_dec(m1_CPU, sym_key_CPU) in
+    let sym_injbot(arg_TDXM_CPU(rtyp_CPU, rdata_CPU))=sym_dec(m1_CPU, sym_key_CPU) in
 
     new csvn_CPU:csvn_t;
     new res1_CPU:res_t;
     new res2_CPU:res_t;
     new tcbi_CPU:tcbi_t;
-    let tcbh_CPU=hash(hk_CPU, tcbi_t2bitstring(tcbi_CPU)) in
-    let rms_without_mac_CPU=rms_without_mac_f(rtyp_CPU, res1_CPU, csvn_CPU, tcbh_CPU, tdih_CPU, rdata_CPU, res2_CPU ) in
+    let rms_without_mac_CPU=rms_without_mac_f(rtyp_CPU, res1_CPU, csvn_CPU, rdata_CPU, res2_CPU ) in
     let mac_CPU=mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey_CPU) in
     let rms_CPU=rms_f(rms_without_mac_CPU, mac_CPU) in
     let smr_CPU:smr_t=smr_f(rms_CPU, tcbi_CPU) in
-    event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, tcbh_CPU, tdih_CPU, rdata_CPU, res2_CPU, mac_CPU, tcbi_CPU);
+    event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, rdata_CPU, res2_CPU, mac_CPU, tcbi_CPU);
     let m2_CPU=sym_enc(smr_t2bitstring(smr_CPU), sym_key_CPU) in
     out(c9, (m2_CPU));
     in(c16, m3_CPU:bitstring);
@@ -303,8 +289,8 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey, sym_key_QE:key)=
     let tdr_f(smr_QE, res4_QE, tdi_QE)=tdr_QE in
     let smr_f(rms_QE, tcbi_QE)=smr_QE in
     let rms_f(rms_without_mac_QE, macres_QE)=rms_QE in
-    let rms_without_mac_f(rtyp_QE, res1_QE, csvn_QE, tcbh_QE, tdih_QE, rdata_QE, res2_QE)=rms_without_mac_QE in
-    if (hash(hk_QE, tcbi_t2bitstring(tcbi_QE))=tcbh_QE) && (hash(hk_QE,tdi_t2bitstring(tdi_QE))=tdih_QE) then(
+    let rms_without_mac_f(rtyp_QE, res1_QE, csvn_QE, rdata_QE, res2_QE)=rms_without_mac_QE in
+    
         let m1_QE=sym_enc(rms_t2bitstring(rms_QE), sym_key_QE) in
         out(c15, m1_QE);
         in(c18, m2_QE:bitstring);
@@ -317,7 +303,7 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey, sym_key_QE:key)=
             let m3_QE=enc(quote_t2bitstring(quote_QE), pk) in
             out (c19, m3_QE)
         )
-    ).
+    .
             
 
 
@@ -325,17 +311,17 @@ let QE(hk_QE:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey, sym_key_QE:key)=
 
 let Challenger(spk:spkey, sk:skey)=
     
-    in(c22, ());
-    out(c23, ());
+    in(c20, ());
+    out(c21, ());
     in(c22, (m1_Ch:bitstring));
     let injbot(quote_t2bitstring(quote_Ch))=dec(m1_Ch, sk) in
     let quote_f(tdr_without_mac_Ch, sig_Ch) =quote_Ch in
     if(verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk, sig_Ch)) then(
         let tdr_without_mac_f(smr_without_mac_Ch, res4_Ch, tdi_Ch)=tdr_without_mac_Ch in
         let smr_without_mac_f(rms_without_mac_Ch, tcbi_Ch)=smr_without_mac_Ch in
-        let rms_without_mac_f(rtyp_Ch, res1_Ch, csvn_Ch, tcbh_Ch, tdih_Ch, rdata_Ch, res2_Ch)=rms_without_mac_Ch in
+        let rms_without_mac_f(rtyp_Ch, res1_Ch, csvn_Ch, rdata_Ch, res2_Ch)=rms_without_mac_Ch in
         let rdata_f(x1_Ch, y1_Ch)=rdata_Ch in
-        event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tcbh_Ch, tdih_Ch, rdata_Ch, res2_Ch);
+        event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, rdata_Ch, res2_Ch);
         new session_key:key;
         let m2_Ch=enc(key2bitstring(session_key), x1_Ch) in
         out(c23, (m2_Ch))  
@@ -380,7 +366,6 @@ process
 
 	(
         (!i<= qChallenger Challenger(spk1, sk2)) | 
-        (hashoracle(hk) ) |
         (!i<=qTD TD(pk3, sk3, sym_key) ) |
         (!i<=qTDXM TDXM(hk, sym_key) ) |    
         (!i<=qCPU CPU(hk, mkey, sym_key) ) |
