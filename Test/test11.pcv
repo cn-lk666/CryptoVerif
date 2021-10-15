@@ -1,0 +1,54 @@
+
+channel start, c1, c2, c3, c4, c5.
+(*session key*)
+type key [fixed].
+type keyseed [fixed].
+param qC, qS.
+(*Symmetric encryption*)
+proba sym_Penc.
+
+expand keygen(keyseed, key, kgen).
+expand IND_CCA2_sym_enc(
+        key, 
+        bitstring,      (*cleartext is the type of cleartexts.*)
+        bitstring,       (*ciphertext is the type of ciphertexts.*)
+        sym_enc,       (*enc(cleartext ,key ) : ciphertext is the encryption function. *)
+        sym_dec,       (*dec(ciphertext ,key ) : bitstringbot is the decryption function; 
+                                      it returns bottom when decryption fails.*)
+        sym_injbot ,            (*injbot (cleartext ) : bitstringbot is the natural injection from cleartext to bitstringbot.*)
+        sym_Z,                      (*Z (cleartext ) : cleartext is the function that 
+                                    returns for each cleartext a cleartext of the same length consisting only of zeroes.*)
+        sym_Penc      (*Penc(t,N,l) is the probability of breaking the IND-CPA property in time t 
+                                      for one key and N encryption queries with cleartexts of length at most l.*)
+).
+
+query secret session_key.
+fun session_key2bitstring(key):bitstring[data].
+
+const Zkey : bitstring.
+equation forall y:key;
+	sym_Z(session_key2bitstring(y)) = Zkey.
+
+let Client(sym_key_C:key)=
+    in (c5, ());
+    new session_key:key;
+    let m1_C=sym_enc(session_key2bitstring(session_key),sym_key_C) in
+    out(c1, m1_C).
+
+let Server(sym_key_S:key)=
+    in(c2, m1_S:bitstring);
+    let sym_injbot(session_key2bitstring(session_key1))=sym_dec(m1_S, sym_key_S) in
+    out(c3, ()).
+
+process
+
+    in(start, ());
+
+    new rk:keyseed;
+    let sym_key=kgen(rk)in
+        out (c4, ());
+
+	(
+        (!i<= qC Client(sym_key)) | 
+        (!i<=qS Server(sym_key) ) 
+    )

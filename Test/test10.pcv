@@ -117,7 +117,7 @@ expand IND_CCA2_public_key_enc(
 
 (*Symmetric encryption*)
 proba sym_Penc.
-expand IND_CPA_sym_enc(
+expand IND_CCA2_sym_enc(
         key, 
         bitstring,      (*cleartext is the type of cleartexts.*)
         bitstring,       (*ciphertext is the type of ciphertexts.*)
@@ -140,7 +140,7 @@ type user_data_t [bounded, nonuniform].
 type tcbi_t[fixed].
 type tdi_t[fixed].
 
-type rdata_t[bounded].
+type rdata_t[fixed].
 type rms_without_mac_t[bounded].
 type rms_t[bounded].
 type smr_t[bounded].

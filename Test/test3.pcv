@@ -99,7 +99,6 @@ let TD(pk_TD:pkey, mk_TD:key, sk_TD:skey)=
 
 
 
-
 let Challenger(mk_Ch:key)=
     in(c2, (pk:pkey, macres:macres_t));
     if(check(pkey2bitstring(pk), mk_Ch, macres)) then(

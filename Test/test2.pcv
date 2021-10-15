@@ -83,6 +83,10 @@ fun quote_f(bitstring, signature):bitstring[data].
 fun key2bitstring(key):bitstring[data].
 fun rdata_f(pkey, user_data_t):rdata_t[data].
 
+
+set interactiveMode = true.
+
+
 let TD(pk_TD:pkey, sk_TD:skey)=
 
     TDX_TD{

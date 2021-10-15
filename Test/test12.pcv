@@ -55,18 +55,30 @@ channel c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c1
 
 (*session key*)
 type key [large,fixed].
-type hashoutput [large, fixed].
+type hashoutput1 [large, fixed].
+type hashoutput2 [large, fixed].
 
 (* Hash *)
 expand ROM_hash_large(
     key,                 (**)
     bitstring,         (*hashinput is the type of the input of the hash function.*)
-    hashoutput,        (*hashoutput is the type of the output of the hash function, 
+    hashoutput1,        (*hashoutput is the type of the output of the hash function, 
                                     must be bounded or nonuniform (typically fixed)*)
                                 (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
-    hash,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
-    hashoracle,  (*hashoracle is a process that allows the adversary to call the hash function*)
-    qH                      (*qH is the number of queries to the hash oracle*)
+    hash1,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
+    hashoracle1,  (*hashoracle is a process that allows the adversary to call the hash function*)
+    qH1                      (*qH is the number of queries to the hash oracle*)
+).
+
+expand ROM_hash_large(
+    key,                 (**)
+    bitstring,         (*hashinput is the type of the input of the hash function.*)
+    hashoutput2,        (*hashoutput is the type of the output of the hash function, 
+                                    must be bounded or nonuniform (typically fixed)*)
+                                (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
+    hash2,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
+    hashoracle2,  (*hashoracle is a process that allows the adversary to call the hash function*)
+    qH2                      (*qH is the number of queries to the hash oracle*)
 ).
 
 (* MAC *)
@@ -135,8 +147,8 @@ type rtyp_t[fixed].
 type res_t[fixed].
 type csvn_t[fixed].
 type user_data_t [bounded, nonuniform].
-type tcbi_t[fixed].
 type tdi_t[fixed].
+type tcbi_t[fixed].
 
 type rdata_t[bounded].
 type arg_TDXM_CPU_t[bounded].
@@ -168,7 +180,7 @@ fun get_csvn():csvn_t.
 fun get_res():res_t.
 
 fun rdata_f(pkey, user_data_t):rdata_t[data].
-fun rms_without_mac_f(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t): rms_without_mac_t[data].
+fun rms_without_mac_f(rtyp_t, res_t, csvn_t, hashoutput1, hashoutput2, rdata_t, res_t): rms_without_mac_t[data].
 fun rms_f(rms_without_mac_t, macres_t):rms_t[data].
 fun smr_f(rms_t, tcbi_t):smr_t[data].
 fun smr_without_mac_f(rms_without_mac_t, tcbi_t):smr_without_mac_t[data].
@@ -177,24 +189,24 @@ fun tdr_without_mac_f(smr_without_mac_t, res_t, tdi_t):tdr_without_mac_t[data].
 
 fun quote_f(tdr_without_mac_t, signature):quote_t[data].
 fun tdi_t2bitstring(tdi_t): bitstring [data].
-fun tcbi_t2bitstring(tcbi_t):bitstring[data].
 fun rms_without_mac_t2bitstring(rms_without_mac_t):bitstring[data].
 fun key2bitstring(key):bitstring[data].
 fun tdr_without_mac_t2bitstring(tdr_without_mac_t):bitstring[data].
 fun quote_t2bitstring(quote_t):bitstring[data].
-fun arg_TDXM_CPU_f(rdata_t, rtyp_t, hashoutput):arg_TDXM_CPU_t[data].
+fun arg_TDXM_CPU_f(rdata_t, rtyp_t, hashoutput1):arg_TDXM_CPU_t[data].
+fun tcbi_t2bitstring(tcbi_t):bitstring[data].
 
-event QuoteVerified(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t).
-event CPUsentSMR(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t, macres_t, tcbi_t).
-event eve_QE(rtyp_t, res_t, csvn_t, hashoutput, hashoutput, rdata_t, res_t).
-query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput, x5:hashoutput, x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
-	event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(eve_QE(x1, x2, x3, x4, x5, x6, x7)).
+event QuoteVerified(rtyp_t, res_t, csvn_t, hashoutput1,hashoutput2, rdata_t, res_t).
+event CPUsentSMR(rtyp_t, res_t, csvn_t, hashoutput1,hashoutput2, rdata_t, res_t, macres_t).
+event eve_QE(rtyp_t, res_t, csvn_t, hashoutput1,hashoutput2, rdata_t, res_t).
+query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput1, x5:hashoutput2, x6:rdata_t, x7:res_t, x8:macres_t;
+	event(QuoteVerified(x1, x2, x3, x4,x5, x6, x7)) ==> event(eve_QE(x1, x2, x3, x4,x5,  x6, x7)).
 
-query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput, x5:hashoutput, x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
-	event(eve_QE(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8, x9)).
+query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput1, x5:hashoutput2, x6:rdata_t, x7:res_t, x8:macres_t;
+	event(eve_QE(x1, x2, x3, x4,x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8 )).
 
-query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput, x5:hashoutput, x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
-	event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8, x9)).
+query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput1, x5:hashoutput2,x6:rdata_t, x7:res_t, x8:macres_t;
+	event(QuoteVerified(x1, x2, x3, x4,x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4,x5, x6, x7, x8 )).
 
 event TDXMsentTDR_8(smr_t, tdi_t).
 event QEaccepted2_14(smr_t, tdi_t).
@@ -230,7 +242,7 @@ let TDXM(hk_TDXM:key)=
     find i<=qTD suchthat defined(rdata_TD[i]) then(
         new rtyp_TDXM:rtyp_t;
         let tdi_TDXM=get_tdi() in
-        let tdih_TDXM=hash(hk_TDXM, tdi_t2bitstring(tdi_TDXM)) in
+        let tdih_TDXM=hash1(hk_TDXM, tdi_t2bitstring(tdi_TDXM)) in
         let rdata_TDXM:rdata_t=rdata_TD[i] in
         let arg_TDXM_CPU:arg_TDXM_CPU_t=arg_TDXM_CPU_f(rdata_TDXM, rtyp_TDXM, tdih_TDXM) in
         out(c7, ());
@@ -238,8 +250,8 @@ let TDXM(hk_TDXM:key)=
         let res4_TDXM=get_res() in
         find j<=qCPU suchthat defined(smr_CPU[j]) then(
             let smr_TDXM=smr_CPU[j] in
-            let tdr_TDXM:tdr_t=tdr_f(smr_TDXM, res4_TDXM, tdi_TDXM) in
             event TDXMsentTDR_8(smr_TDXM, tdi_TDXM);
+            let tdr_TDXM:tdr_t=tdr_f(smr_TDXM, res4_TDXM, tdi_TDXM) in
             out(c11, ())
         )
     ).
@@ -252,14 +264,14 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
         let arg_TDXM_CPU_f(rdata_CPU, rtyp_CPU, tdih_CPU)=arg_TDXM_CPU[i] in
         let csvn_CPU =get_csvn() in
         let res1_CPU=get_res() in
-        let res2_CPU=get_res() in
         let tcbi_CPU=get_tcbi() in
-        let tcbh_CPU=hash(hk_CPU, tcbi_t2bitstring(tcbi_CPU)) in
-        let rms_without_mac_CPU=rms_without_mac_f(rtyp_CPU, res1_CPU, csvn_CPU, tcbh_CPU, tdih_CPU, rdata_CPU, res2_CPU ) in
+        let res2_CPU=get_res() in
+        let tcbh_CPU=hash2(hk_CPU, tcbi_t2bitstring(tcbi_CPU) ) in
+        let rms_without_mac_CPU=rms_without_mac_f(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU ) in
         let mac_CPU=mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey_CPU) in
         let rms_CPU=rms_f(rms_without_mac_CPU, mac_CPU) in
         let smr_CPU:smr_t=smr_f(rms_CPU, tcbi_CPU) in
-        event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, tcbh_CPU, tdih_CPU, rdata_CPU, res2_CPU, mac_CPU, tcbi_CPU);
+        event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU, mac_CPU);
         out(c9, ());
         in(c18, ());
         find j<=qQE suchthat defined(rms_QE_to_CPU[j]) then (
@@ -275,21 +287,24 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
 
 
 
-let QE(hk_QE:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey)=
+
+let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey)=
 
 
     in(c16, (tdr_QE:tdr_t));
+    find i<=qTD suchthat defined (tdr_TD[i]) && tdr_QE=tdr_TD[i] then
+
     let tdr_f(smr_QE, res4_QE, tdi_QE)=tdr_QE in
     let smr_f(rms_QE, tcbi_QE)=smr_QE in
     let rms_f(rms_without_mac_QE, macres_QE)=rms_QE in
-    let rms_without_mac_f(rtyp_QE, res1_QE, csvn_QE, tcbh_QE, tdih_QE, rdata_QE, res2_QE)=rms_without_mac_QE in
+    let rms_without_mac_f(rtyp_QE, res1_QE, csvn_QE, tdih_QE, tcbh_QE, rdata_QE, res2_QE)=rms_without_mac_QE in
     let rms_QE_to_CPU:rms_t=rms_QE in
     out(c17, ());
     in(c20, ());
-    if(hash(hk_QE,tcbi_t2bitstring(tcbi_QE) )=tcbh_QE)then(
+    if tdih_QE=hash1(hk_QE1,tdi_t2bitstring(tdi_QE)) && tcbh_QE=hash2(hk_QE2, tcbi_t2bitstring(tcbi_QE)) then(
 
-    find i<=qCPU suchthat defined(rms_without_mac_from_CPU[i]) && rms_without_mac_QE=rms_without_mac_from_CPU[i] then(
-        event eve_QE(rtyp_QE, res1_QE, csvn_QE, tcbh_QE, tdih_QE, rdata_QE, res2_QE);
+    find j<=qCPU suchthat defined(rms_without_mac_from_CPU[j]) && rms_without_mac_QE=rms_without_mac_from_CPU[j] then(
+        event eve_QE(rtyp_QE, res1_QE, csvn_QE, tdih_QE, tcbh_QE, rdata_QE, res2_QE);
         event QEaccepted2_14(smr_QE, tdi_QE );
         let smr_without_mac_QE=smr_without_mac_f(rms_without_mac_QE, tcbi_QE) in
         let tdr_without_mac_QE=tdr_without_mac_f(smr_without_mac_QE, res4_QE, tdi_QE) in
@@ -312,21 +327,21 @@ let Challenger(spk:spkey, sk:skey)=
     in(c14, ());
     out(c15, ());
 
-    in(c22, (m2:bitstring));
-    let injbot(quote_t2bitstring(quote_Ch))=dec(m2, sk) in
-    let quote_f(tdr_without_mac_Ch, sig_Ch) =quote_Ch in
-    if(verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk, sig_Ch)) then(
-        let tdr_without_mac_f(smr_without_mac_Ch, res4_Ch, tdi_Ch)=tdr_without_mac_Ch in
-        let smr_without_mac_f(rms_without_mac_Ch, tcbi_Ch)=smr_without_mac_Ch in
-        let rms_without_mac_f(rtyp_Ch, res1_Ch, csvn_Ch, tcbh_Ch, tdih_Ch, rdata_Ch, res2_Ch)=rms_without_mac_Ch in
-        let rdata_f(x1_Ch, y1_Ch)=rdata_Ch in
-        event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tcbh_Ch, tdih_Ch, rdata_Ch, res2_Ch);
-        new session_key:key;
-        let m2_Ch=enc(key2bitstring(session_key), x1_Ch) in
-        out(c23, (m2_Ch))
-    
-    
-    ).
+in(c22, (m2:bitstring));
+            let injbot(quote_t2bitstring(quote_Ch))=dec(m2, sk) in
+            let quote_f(tdr_without_mac_Ch, sig_Ch) =quote_Ch in
+            if(verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk, sig_Ch)) then(
+                let tdr_without_mac_f(smr_without_mac_Ch, res4_Ch, tdi_Ch)=tdr_without_mac_Ch in
+                let smr_without_mac_f(rms_without_mac_Ch, tcbi_Ch)=smr_without_mac_Ch in
+                let rms_without_mac_f(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch)=rms_without_mac_Ch in
+                let rdata_f(x1_Ch, y1_Ch)=rdata_Ch in
+                event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch,tcbh_CH, rdata_Ch, res2_Ch);
+                new session_key:key;
+                let m2_Ch=enc(key2bitstring(session_key), x1_Ch) in
+                out(c23, (m2_Ch))
+            
+            
+            ).
 
 
 
@@ -359,16 +374,18 @@ process
             new r3:keyseed;
     let pk3:pkey=pkgen(r3) in
     let sk3:skey=skgen(r3) in
-    new hk:key;(*key for hash*)
+    new hk1:key;(*key for hash*)
+    new hk2:key;(*key for hash*)
     new mkey:key;(*key for mac*)
         out (c1, ());
 
 	(
         (!i<= qChallenger Challenger(spk1, sk2)) | 
-        (hashoracle(hk) ) |
+        (hashoracle1(hk1) ) |
+        (hashoracle2(hk2) ) |
         (!i<=qTD TD(pk3, sk3) ) |
-        (!i<=qTDXM TDXM(hk) ) |    
-        (!i<=qCPU CPU(hk, mkey) ) |
+        (!i<=qTDXM TDXM(hk1) ) |    
+        (!i<=qCPU CPU(hk2, mkey) ) |
         
-        (!i<=qQE QE(hk, ssk1, pk2, spk1, sk2) )
+        (!i<=qQE QE(hk1,hk2, ssk1, pk2, spk1, sk2) )
     )

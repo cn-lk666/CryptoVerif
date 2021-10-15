@@ -1,0 +1,171 @@
+(*************************************************************
+ *                                                           *
+ *       Cryptographic protocol verifier                     *
+ *                                                           *
+ *       Bruno Blanchet and David Cadé                       *
+ *                                                           *
+ *       Copyright (C) ENS, CNRS, INRIA, 2005-2020           *
+ *                                                           *
+ *************************************************************)
+
+(*
+
+    Copyright ENS, CNRS, INRIA 
+    contributors: Bruno Blanchet, Bruno.Blanchet@inria.fr
+                  David Cadé
+
+This software is a computer program whose purpose is to verify 
+cryptographic protocols in the computational model.
+
+This software is governed by the CeCILL-B license under French law and
+abiding by the rules of distribution of free software.  You can  use, 
+modify and/ or redistribute the software under the terms of the CeCILL-B
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info". 
+
+As a counterpart to the access to the source code and  rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty  and the software's author,  the holder of the
+economic rights,  and the successive licensors  have only  limited
+liability. 
+
+In this respect, the user's attention is drawn to the risks associated
+with loading,  using,  modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean  that it is complicated to manipulate,  and  that  also
+therefore means  that it is reserved for developers  and  experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or 
+data to be ensured and,  more generally, to use and operate it in the 
+same conditions as regards security. 
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL-B license and that you accept its terms.
+
+*)
+(* One-Encryption Key Exchange *)
+
+(* Proof indications *)
+set interactiveMode = true.
+
+
+(* Parameter and type declarations *)
+
+param NU, NS [small].
+param NP [passive].
+
+type Z [large, bounded].
+type G [large, bounded].
+type passwd [password, bounded].
+
+type hash0 [fixed,large].
+type hash1 [fixed,large].
+type host [bounded].
+
+(* Computational Diffie-Hellman *)
+
+expand DH_good_group(G, Z, g, exp, exp', mult).
+proba pCDH.
+proba pZero.
+expand CDH_RSR(G, Z, g, exp, exp', mult, pCDH, pZero).
+
+(* Ideal cipher model *)
+
+type cipherkey [fixed].
+
+expand ICM_cipher(cipherkey, passwd, G, enc, dec, enc_dec_oracle, qE, qD).
+
+(* Hash functions in the random oracle model *)
+
+type hashkey [fixed].
+
+fun concat(host, host, G, G, G): bitstring [data].
+
+expand ROM_hash_large(hashkey, bitstring, hash0, h0, hashoracle0, qH0).
+
+expand ROM_hash_large(hashkey, bitstring, hash1, h1, hashoracle1, qH1).
+
+(* Host names *)
+
+const U : host.
+const S : host.
+
+(* Queries *)
+
+query secret sk_u.
+query secret sk_s.
+
+event termS(host, G, host, G, hash1, hash0).
+event acceptU(host, G, host, G, hash1, hash0).
+
+query x:host, X:G, y:host, Ystar:G, a: hash1, k:hash0;
+	inj-event(termS(x,X,y,Ystar,a,k)) ==> inj-event(acceptU(x,X,y,Ystar,a,k))
+	public_vars sk_u, sk_s.
+query x:host, X:G, y:host, Ystar:G, a: hash1, k:hash0, k':hash0;
+	event(termS(x,X,y,Ystar,a,k)) && event(acceptU(x,X,y,Ystar,a,k')) ==> k = k'
+	public_vars sk_u, sk_s.
+
+(* Client *)
+
+let processU(hk0: hashkey, hk1: hashkey, ck: cipherkey, pw: passwd) =
+	foreach iU <= NU do 
+	OC1() :=
+	x <-R Z;
+	X <- exp(g,x);
+	return(U, X);
+	OC2(=S, Ystar_u: G) :=
+	Y_u <- dec(ck, Ystar_u, pw);
+	K_u <- exp(Y_u, x);
+	auth_u <- h1(hk1,concat(U,S,X,Y_u,K_u));
+	sk_u: hash0 <- h0(hk0,concat(U,S,X,Y_u,K_u));
+	event acceptU(U, X, S, Ystar_u, auth_u, sk_u);
+	return(auth_u).
+
+(* Server *)
+
+let processS(hk0: hashkey, hk1: hashkey, ck: cipherkey, pw: passwd) =
+	foreach iS <= NS do 
+	OS1(=U, X_s: G) :=
+	y <-R Z;
+	Y <- exp(g,y);
+	Ystar <- enc(ck, Y, pw);
+	return(S, Ystar);
+	OS2(auth_s: hash1) :=
+	K_s <- exp(X_s, y);
+	if auth_s = h1(hk1,concat(U,S,X_s,Y,K_s)) then
+	sk_s: hash0 <- h0(hk0,concat(U,S,X_s,Y,K_s));
+	event termS(U, X_s, S, Ystar, auth_s, sk_s).
+
+(* Sessions that are subject only to a passive attack.
+   We send a transcript of the session *)
+
+let processPassive(hk0: hashkey, hk1: hashkey, ck: cipherkey, pw: passwd) =
+	foreach iP <= NP do 
+	OP() :=
+	xp <-R Z;
+	Xp <- exp(g, xp);
+	yp <-R Z;
+	Yp <- exp(g, yp);
+	Kp <- exp(g, mult(xp,yp));
+	Ystarp <- enc(ck, Yp, pw);
+	authp <- h1(hk1, concat(U, S, Xp, Yp, Kp));
+	sk_p: hash0 <- h0(hk0, concat(U, S, Xp, Yp, Kp));
+	return(U, Xp, S, Ystarp, authp).
+
+process 
+	Ostart() :=
+	hk0 <-R hashkey;
+	hk1 <-R hashkey;
+	ck <-R cipherkey;
+	pw0 <-R passwd;
+	return;
+	(run processU(hk0, hk1, ck, pw0) |
+	 run processS(hk0, hk1, ck, pw0) |
+	 run processPassive(hk0, hk1, ck, pw0) | 
+	 run enc_dec_oracle(ck) | run hashoracle0(hk0) | run hashoracle1(hk1))
+
+(* EXPECTED
+All queries proved.
+5.248s (user 5.232s + system 0.016s), max rss 45796K
+END *)

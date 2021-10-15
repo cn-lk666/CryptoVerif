@@ -2,6 +2,9 @@ param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
 
 channel c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, start.
 
+set interactiveMode = true.
+
+
 type macres_t [bounded].
 type key [large,fixed].
 type sskey [bounded].
@@ -12,6 +15,19 @@ type signature [bounded].
 type keyseed [large,fixed].
 type rdata_t[bounded].
 type user_data_t [bounded, nonuniform].
+
+type hashoutput [large, fixed].
+
+expand ROM_hash_large(
+    key,                 (**)
+    bitstring,         (*hashinput is the type of the input of the hash function.*)
+    hashoutput,        (*hashoutput is the type of the output of the hash function, 
+                                    must be bounded or nonuniform (typically fixed)*)
+                                (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
+    hash,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
+    hashoracle,  (*hashoracle is a process that allows the adversary to call the hash function*)
+    qH                      (*qH is the number of queries to the hash oracle*)
+).
 
 (* MAC *)
 proba Pmac.
@@ -75,41 +91,57 @@ const Zkey : bitstring.
 equation forall y:bitstring;
 	Z(y) = Zkey.
 
+type tcbi_t[fixed].
 
 fun rdata_t2bitstring(rdata_t):bitstring[data].
 fun quote_f(bitstring, signature):bitstring[data].
 fun key2bitstring(key):bitstring[data].
 fun rdata_f(pkey, user_data_t):rdata_t[data].
+fun get_tcbi():tcbi_t.
+fun concat(rdata_t, tcbi_t, hashoutput):bitstring[data].
+fun tcbi_t2bitstring(tcbi_t):bitstring[data].
 
 
-let TD(pk_TD:pkey, sk_TD:skey)=
+let TD(hk_TD:key)=
+
+    in(c4, ());
+    new rdata_other:user_data_t;
+    new r3:keyseed;
+    let pk_TD=pkgen(r3) in
+    let rdata_TD1:rdata_t=rdata_f(pk_TD, rdata_other) in
+    let tcbi_TD=get_tcbi() in
+    let tcbh_TD:hashoutput=hash(hk_TD, tcbi_t2bitstring(tcbi_TD) ) in
+    out(c5, ());
+
+    in(c6, ());
+
+    let m1_TD:bitstring=concat(rdata_TD1, tcbi_TD, tcbh_TD) in
+    out(c13, m1_TD).
 
 
-        in(c4, ());
-        new rdata_other:user_data_t;
-        let rdata_TD1:rdata_t=rdata_f(pk_TD, rdata_other) in
-
-        out(c13, rdata_TD1);
-
-        in(c32, (m2:bitstring));
-        let injbot(session_key1)=dec(m2, sk_TD) in
-        out(c33,()).
+let QE( hk_QE:key, ssk:sskey, pk: pkey)=
 
 
-let QE( ssk:sskey, pk: pkey)=
-
-
-        in(c16, ());
-        find i<=qTD suchthat defined (rdata_TD1[i]) then(
-            let rdata_QE=rdata_TD1[i] in
+    in(c16, (m1_QE:bitstring));
+    find i<=qTD suchthat defined (m1_TD[i]) && m1_QE=m1_TD[i]then(
+        let concat(rdata_QE, tcbi_QE, tcbh_QE)=m1_QE in
+        if(hash(hk_QE,tcbi_t2bitstring(tcbi_QE) )=tcbh_QE) then(
             let sig=sign(rdata_t2bitstring(rdata_QE), ssk) in
             let quote =quote_f(rdata_t2bitstring(rdata_QE), sig) in
             let m1=enc(quote, pk) in
             out(c21, (m1))
-        ).
-            
+        )
         
+    ).
             
+let TDXM(hk_TDXM:key)=
+    in(c4,());
+    find i<=qTD suchthat defined (tcbh_TD[i]) then(
+        
+        out(c5, ()).      
+    )
+
+
 
 
 
@@ -131,19 +163,7 @@ let Challenger(spk:spkey, sk:skey)=
 
 
 
-let Application(ssk:sskey, pk:pkey) =
-TDX_keygen_App[pk3>pk3, sk3>sk3]{
-    in(c21, ());
-    new r3:keyseed;
-    let pk3:pkey=pkgen(r3) in
-    let sk3:skey=skgen(r3) in
-    out(c22, ())
-};
-(
-    (!i<=qTD TD(pk3, sk3) ) |
-    
-    (!i<=qQE QE( ssk, pk) )   
-).
+
 (*
 let IAS(spk:spkey, sk:skey)=
     in(c28, ());
@@ -162,7 +182,7 @@ let IAS(spk:spkey, sk:skey)=
 
 
 process
-    TDX_Keygen [spk1 > spk_IAS, ssk1 > ssk_QE, pk2 > pk_QE, sk2 > sk_IAS ]{
+
         in(start, ());
         new r1 :keyseed;
         let spk1:spkey=spkgen(r1) in
@@ -170,9 +190,12 @@ process
         new r2 :keyseed;
         let pk2:pkey=pkgen(r2) in
         let sk2:skey=skgen(r2) in
-        out (c1, ())
-    };
+        new hk:key;
+        out(c1, ());
+
 	(
         (!i<= qChallenger Challenger(spk1, sk2)) | 
-        (Application(ssk1, pk2)) 
+        (!i<=qTD TD(hk) ) |
+        (!i<=qTDXM) TDXM(hk) |
+        (!i<=qQE QE( hk,ssk1, pk2) )   
     )

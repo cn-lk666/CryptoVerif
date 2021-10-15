@@ -56,6 +56,10 @@ type keyseed [fixed].
 type seed [fixed].
 type macs [bounded].
 
+type host [bounded].
+const A : host.
+const B : host.
+
 fun keyToBitstring(key):bitstring [data].
 
 (* Shared-key generation *)
@@ -78,25 +82,30 @@ expand keygen(mkeyseed, mkey, mkgen).
 proba Pmac.
 expand SUF_CMA_proba_mac(mkey, bitstring, macs, mac, check, Pmac).
 
-(* Queries *)
-query secret k2 [cv_onesession].
-query secret k3 [cv_onesession].
+event eveA(host, bitstring, macs).
+event eveB(host, bitstring, macs).
 
-query secret k2.
-query secret k3.
+query  x1:bitstring, x2:macs;
+
+	event(eveB(A, x1, x2)) ==> event(eveA(B, x1, x2)).
+
+(* Queries *)
+
 
 (* Channels and Processes *)
 channel cA, cB, start, c.
 
 let processA(Kab:key, mKab:mkey) =
-	in(cA, ());
+	in(cA, (=B));
 	new k2 : key;
 	let ea1 = enc(keyToBitstring(k2), Kab) in
-	out(cA, (ea1, mac(ea1, mKab))).
+	event eveA(B, ea1, mac(ea1, mKab));
+	out(cA, (B, ea1, mac(ea1, mKab))).
 
 let processB(Kab:key, mKab:mkey) =
-	in(cB, (ea:bitstring, ma:macs));
+	in(cB, (=A, ea:bitstring, ma:macs));
 	if check(ea, mKab, ma) then
+	event eveB(A, ea, ma);
 	let injbot(keyToBitstring(k3:key)) = dec(ea, Kab) in
 	out(cB, ()).
 
