@@ -45,7 +45,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
 *)
 (* One-Encryption Key Exchange *)
-
 (* Proof indications *)
 set interactiveMode = true.
 proof {
