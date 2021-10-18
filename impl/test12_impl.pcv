@@ -29,11 +29,9 @@ param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
 set interactiveMode = true.
 proof{
     crypto ind_cca2(enc);
-
-crypto uf_cma(sign);
-
-crypto ind_cca2(enc);
-success
+    crypto uf_cma(sign);
+    crypto ind_cca2(enc);
+    success
 }
 
 (*
@@ -47,24 +45,37 @@ success
 (*These three types are used in the macro IND_CCA2_public_key_enc and UF_CMA_det_signature*)
 type skey [bounded].
 type pkey [bounded].
-
 type keypair [bounded].
 type keyseed [large,fixed].
-fun kp(pkey,skey):keypair [data].
 type signature [bounded].
 type sskey [bounded].
 type spkey [bounded].
 type skeypair [bounded].
 type skeyseed [large,fixed].
-fun skp(spkey,sskey):skeypair [data].
-type macres_t [bounded].
-(*channel name*)
-channel c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23,c24, c25, start.
 
+type macres_t [bounded].
 (*session key*)
 type key [large,fixed].
 type hashoutput1 [large, fixed].
 type hashoutput2 [large, fixed].
+type rtyp_t[bounded].
+type res_t[bounded].
+type csvn_t[bounded].
+type user_data_t [bounded, nonuniform].
+type tdi_t[bounded].
+type tcbi_t[bounded].
+type rdata_t[bounded].
+type arg_TDXM_CPU_t[bounded].
+type rms_without_mac_t[bounded].
+type rms_t[bounded].
+type smr_t[bounded].
+type smr_without_mac_t[bounded].
+type tdr_t[bounded].
+type tdr_without_mac_t[bounded].
+type quote_t[bounded].
+
+(*channel name*)
+channel c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23,c24, c25, start.
 
 (* Hash *)
 expand ROM_hash_large(
@@ -146,55 +157,36 @@ expand IND_CCA2_public_key_enc(
         Penccoll                    (*Penccoll is the probability of collision between independently generated keys.*)
 ).
 
-
-
-
-
-
-type rtyp_t[bounded].
-type res_t[bounded].
-type csvn_t[bounded].
-type user_data_t [bounded, nonuniform].
-type tdi_t[bounded].
-type tcbi_t[bounded].
-type rdata_t[bounded].
-type arg_TDXM_CPU_t[bounded].
-type rms_without_mac_t[bounded].
-type rms_t[bounded].
-type smr_t[bounded].
-type smr_without_mac_t[bounded].
-type tdr_t[bounded].
-type tdr_without_mac_t[bounded].
-type quote_t[bounded].
-
-
 set casesInCorresp = false.
     (* Distringuishing cases in the proof of correspondences
        is too slow with the "unique channel id" property,
        and not necessary *)
 
 fun get_rtyp():rtyp_t.
+fun get_user_data():user_data_t.
 fun get_tdi():tdi_t.
 fun get_tcbi():tcbi_t.
 fun get_csvn():csvn_t.
 fun get_res():res_t.
+fun kp(pkey,skey):keypair [data].
+fun skp(spkey,sskey):skeypair [data].
 
 fun rdata_f(pkey, user_data_t):rdata_t[data].
-fun rms_without_mac_f(rtyp_t, res_t, csvn_t, hashoutput1, hashoutput2, rdata_t, res_t): rms_without_mac_t[data].
+fun arg_TDXM_CPU_f(rdata_t, rtyp_t, hashoutput1):arg_TDXM_CPU_t[data].
 fun rms_f(rms_without_mac_t, macres_t):rms_t[data].
 fun smr_f(rms_t, tcbi_t):smr_t[data].
-fun smr_without_mac_f(rms_without_mac_t, tcbi_t):smr_without_mac_t[data].
 fun tdr_f(smr_t, res_t, tdi_t):tdr_t[data].
+fun rms_without_mac_f(rtyp_t, res_t, csvn_t, hashoutput1, hashoutput2, rdata_t, res_t): rms_without_mac_t[data].
+fun smr_without_mac_f(rms_without_mac_t, tcbi_t):smr_without_mac_t[data].
 fun tdr_without_mac_f(smr_without_mac_t, res_t, tdi_t):tdr_without_mac_t[data].
-
-fun quote_f(tdr_without_mac_t, signature):quote_t[data].
-fun tdi_t2bitstring(tdi_t): bitstring [data].
 fun rms_without_mac_t2bitstring(rms_without_mac_t):bitstring[data].
-fun key2bitstring(key):bitstring[data].
 fun tdr_without_mac_t2bitstring(tdr_without_mac_t):bitstring[data].
-fun quote_t2bitstring(quote_t):bitstring[data].
-fun arg_TDXM_CPU_f(rdata_t, rtyp_t, hashoutput1):arg_TDXM_CPU_t[data].
+fun quote_f(tdr_without_mac_t, signature):quote_t[data].
+
+fun tdi_t2bitstring(tdi_t): bitstring [data].
+fun key2bitstring(key):bitstring[data].
 fun tcbi_t2bitstring(tcbi_t):bitstring[data].
+fun quote_t2bitstring(quote_t):bitstring[data].
 
 
 
@@ -246,10 +238,24 @@ implementation
     type key = 128;
     type user_data_t=1024;
     type macres_t = "string";
-    fun tdi_t2bitstring="tdi_t2bitstring" [inverse = "bitstring2tdi_t"];
-    fun tcbi_t2bitstring="tcbi_t2bitstring" [inverse = "bitstring2tcbi_t"]; 
     type pkey="pkey" [serial = "pkey_to","pkey_from"];
-    type skey="skey" [serial = "skey_to","skey_from"];                  
+    type skey="skey" [serial = "skey_to","skey_from"];
+    type spkey="pkey" [serial = "pkey_to","pkey_from"];
+    type sskey="skey" [serial = "skey_to","skey_from"];
+    type signature="string";
+    type hashoutput1=160;
+    type hashoutput2=160;
+    type rdata_t="string" [serial = "id", "id"];
+    type tdr_t="string" [serial = "id", "id"];
+    type rms_t ="string"[serial="id", "id"];
+    type rms_without_mac_t="string"[serial ="id", "id"];
+    type res_t="string" [serial = "id", "id"];
+    type tdi_t="string" [serial = "id", "id"];
+    type tcbi_t="string" [serial = "id", "id"];
+    type rtyp_t="string" [serial = "id", "id"];
+    type smr_t="string" [serial = "id", "id"];
+    type arg_TDXM_CPU_t="string"[serial = "id", "id"];
+
     fun kgen = "(pk_kgen 1024)";
     fun kgen_s = "(pk_kgen 1024)";
     fun kp="id" [inverse="id"];
@@ -260,51 +266,38 @@ implementation
     fun injbot="injbot" [inverse =  "injbot_inv"];
     fun hash1 = "Ssh_crypto.hash";
     fun hash2 = "Ssh_crypto.hash";
+    fun verify="(rsassa_pss_verify 8)";
+    fun mac = "(mac Cryptokit.MAC.hmac_sha1)";
+    fun check = "(mac_check Cryptokit.MAC.hmac_sha1)";
     fun get_rtyp="get_rtyp";
     fun get_tdi="get_tdi";
     fun get_csvn="get_csvn";
     fun get_tcbi="get_tcbi";
     fun get_res="get_res";
+    fun get_user_data="get_user_data";
     fun rdata_f="rdata_f"[inverse = "inv_rdata_f"];
     fun arg_TDXM_CPU_f="arg_TDXM_CPU_f"[inverse ="inv_arg_TDXM_CPU_f"];
-    type signature="string";
-    type hashoutput1=160;
-    type hashoutput2=160;
-    type rdata_t="string" [serial = "id", "id"];
-    type tdr_t="string" [serial = "id", "id"];
-    fun tdr_f="tdr_f"[inverse="inv_tdr_f"];
+
     fun smr_f="smr_F"[inverse="inv_smr_f"];
     fun rms_f="rms_f"[inverse="inv_rms_f"];
-    fun rms_without_mac_f="rms_without_mac_f"[inverse="inv_rms_without_mac_f"];
+    fun tdr_f="tdr_f"[inverse="inv_tdr_f"];
     fun smr_without_mac_f="smr_without_mac_f"[inverse="inv_smr_without_mac_f"];
+    fun rms_without_mac_f="rms_without_mac_f"[inverse="inv_rms_without_mac_f"];
     fun tdr_without_mac_f="tdr_without_mac_f"[inverse="inv_tdr_without_mac_f"];
-    fun tdr_without_mac_t2bitstring="tdr_without_mac_t2bitstring"[inverse="bitstring2tdr_without_mac_t"];
     fun quote_f="quote_f"[inverse="inv_quote_f"];
-    fun quote_t2bitstring="quote_t2bitstring"[inverse="bitstring2quote_t"];
-    fun verify="(rsassa_pss_verify 8)";
+    fun tcbi_t2bitstring="tcbi_t2bitstring" [inverse = "bitstring2tcbi_t"]; 
+    fun tdi_t2bitstring="tdi_t2bitstring" [inverse = "bitstring2tdi_t"];
     fun key2bitstring="key2bitstring"[inverse="bitstring2key"];
-    fun mac = "(mac Cryptokit.MAC.hmac_sha1)";
     fun rms_without_mac_t2bitstring="rms_without_mac_t2bitstring"[inverse="bitstring2rms_without_mac_t"];
-    fun check = "(mac_check Cryptokit.MAC.hmac_sha1)";
-    type rms_t ="string"[serial="id", "id"];
-    type rms_without_mac_t="string"[serial ="id", "id"];
-
-    type res_t="string" [serial = "id", "id"];
-    type tdi_t="string" [serial = "id", "id"];
-    type tcbi_t="string" [serial = "id", "id"];
-    type rtyp_t="string" [serial = "id", "id"];
-    type smr_t="string" [serial = "id", "id"];
-    type arg_TDXM_CPU_t="string"[serial = "id", "id"];
-    type spkey="pkey" [serial = "pkey_to","pkey_from"];
-    type sskey="skey" [serial = "skey_to","skey_from"].
+    fun tdr_without_mac_t2bitstring="tdr_without_mac_t2bitstring"[inverse="bitstring2tdr_without_mac_t"];
+    fun quote_t2bitstring="quote_t2bitstring"[inverse="bitstring2quote_t"].
 
 
 let TD()=
-
 TDX_TD[pk_TD>Impl_pk_TD, sk_TD>Impl_sk_TD]{
     in(c4, ());
     let kp(pk_TD:pkey, sk_TD:skey)=kgen() in
-    new rdata_other:user_data_t;
+    let rdata_other:user_data_t=get_user_data() in
     let rdata_TD:rdata_t=rdata_f(pk_TD, rdata_other) in
     insert mes_TD_TDXM_2(rdata_TD);
     out(c5, ());
@@ -338,7 +331,6 @@ TDX_TDXM[res4_TDXM> Impl_res4_TDXM, tdi_TDXM>Impl_tdi_TDXM]{
 
 let CPU(hk_CPU:key, mkey_CPU:key)=
 TDX_CPU{
-    
     in(c8, ());
     get mes_TDXM_CPU_4(arg_TDXM_CPU) in
     let arg_TDXM_CPU_f(rdata_CPU, rtyp_CPU, tdih_CPU)=arg_TDXM_CPU in
