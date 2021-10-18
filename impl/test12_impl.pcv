@@ -301,7 +301,7 @@ implementation
 
 let TD()=
 
-TDX_TD_init[pk_TD>Impl_pk_TD, sk_TD>Impl_sk_TD]{
+TDX_TD[pk_TD>Impl_pk_TD, sk_TD>Impl_sk_TD]{
     in(c4, ());
     let kp(pk_TD:pkey, sk_TD:skey)=kgen() in
     new rdata_other:user_data_t;
@@ -315,7 +315,7 @@ TDX_TD_init[pk_TD>Impl_pk_TD, sk_TD>Impl_sk_TD]{
 
 
 let TDXM(hk_TDXM:key)=
-TDX_TDXM_init[res4_TDXM> Impl_res4_TDXM, tdi_TDXM>Impl_tdi_TDXM]{
+TDX_TDXM[res4_TDXM> Impl_res4_TDXM, tdi_TDXM>Impl_tdi_TDXM]{
     in(c6, ());
     let rtyp_TDXM=get_rtyp() in
     let tdi_TDXM:tdi_t=get_tdi() in
@@ -337,7 +337,8 @@ TDX_TDXM_init[res4_TDXM> Impl_res4_TDXM, tdi_TDXM>Impl_tdi_TDXM]{
   
 
 let CPU(hk_CPU:key, mkey_CPU:key)=
-TDX_CPU_init{
+TDX_CPU{
+    
     in(c8, ());
     get mes_TDXM_CPU_4(arg_TDXM_CPU) in
     let arg_TDXM_CPU_f(rdata_CPU, rtyp_CPU, tdih_CPU)=arg_TDXM_CPU in
@@ -352,10 +353,7 @@ TDX_CPU_init{
     let smr_CPU=smr_f(rms_CPU, tcbi_CPU) in
     event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU, mac_CPU);
     insert mes_CPU_TDXM_6(smr_CPU);
-    out(c9, ())
-};
-foreach i<=qCPU do
-TDX_CPU{
+    out(c9, ());
     in(c16, ());
     get mes_QE_CPU_12(rms_QE_to_CPU) in
     let rms_f(rms_without_mac_QE_to_CPU, mac_QE_to_CPU) =rms_QE_to_CPU in
@@ -370,7 +368,6 @@ TDX_CPU{
 
 
 let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey)=
-foreach i<=qQE do
 TDX_QE{
     in(c14, (tdr_QE:tdr_t));
     get mes_TDXM_TD_8(tdr_TDXM) suchthat tdr_QE=tdr_TDXM in
@@ -394,7 +391,6 @@ TDX_QE{
 }.
 
 let Challenger(spk:spkey, sk:skey)=
-foreach i<=qChallenger do
 TDX_Ch{
     in(c20, ());
     out(c21, ());
@@ -424,11 +420,11 @@ keygen[spk1>Impl_spk1, ssk1>Impl_ssk1, pk2>Impl_pk2, sk2>Impl_sk2, hk1>Impl_hk1,
     out (c1, ())
 };
 	(
-        ( Challenger(spk1, sk2)) | 
+        (!i<=qChallenger Challenger(spk1, sk2)) | 
         (hashoracle1(hk1) ) |
         (hashoracle2(hk2) ) |
         (!i<=qTD TD() ) |
         (!i<=qTDXM TDXM(hk1) ) |    
-        (CPU(hk2, mkey) ) |
-        (QE(hk1, hk2, ssk1, pk2, spk1, sk2) )
+        (!i<=qCPU CPU(hk2, mkey) ) |
+        (!i<=qQE QE(hk1, hk2, ssk1, pk2, spk1, sk2) )
     )
