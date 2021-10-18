@@ -34,6 +34,8 @@ let init () =
              if true then begin 
                if ((mac_check Cryptokit.MAC.hmac_sha1) (rms_without_mac_t2bitstring var_rms_5fwithout_5fmac_5fQE_5fto_5fCPU_0) var_mkey_0 var_mac_5fQE_5fto_5fCPU_0) then
                begin
+                 insert_in_table "mes_CPU_QE_14" [(id (var_rms_5fwithout_5fmac_5fQE_5fto_5fCPU_0))];
+
                  let var_rms_5fwithout_5fmac_5ffrom_5fCPU_1 = var_rms_5fwithout_5fmac_5fQE_5fto_5fCPU_0 in 
                  ()
                end

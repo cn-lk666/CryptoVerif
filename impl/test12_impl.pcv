@@ -27,6 +27,14 @@
 param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
 
 set interactiveMode = true.
+proof{
+    crypto ind_cca2(enc);
+
+crypto uf_cma(sign);
+
+crypto ind_cca2(enc);
+success
+}
 
 (*
     bounded means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other
@@ -158,13 +166,7 @@ type smr_without_mac_t[bounded].
 type tdr_t[bounded].
 type tdr_without_mac_t[bounded].
 type quote_t[bounded].
-type hostname[bounded].
-const hostname_TD:hostname.
-const hostname_TDXM:hostname.
-const hostname_CPU:hostname.
-const hostname_QE:hostname.
-const hostname_Ch:hostname.
-const hostname_IAS:hostname.
+
 
 set casesInCorresp = false.
     (* Distringuishing cases in the proof of correspondences
@@ -296,17 +298,16 @@ implementation
     type spkey="pkey" [serial = "pkey_to","pkey_from"];
     type sskey="skey" [serial = "skey_to","skey_from"].
 
+
 let TD()=
+
 TDX_TD_init[pk_TD>Impl_pk_TD, sk_TD>Impl_sk_TD]{
     in(c4, ());
-    new rdata_other:user_data_t;
     let kp(pk_TD:pkey, sk_TD:skey)=kgen() in
+    new rdata_other:user_data_t;
     let rdata_TD:rdata_t=rdata_f(pk_TD, rdata_other) in
     insert mes_TD_TDXM_2(rdata_TD);
-    out(c5, ())
-};
-foreach i<=qTD do
-TDX_TD{
+    out(c5, ());
     in(c12, ());
     get mes_TDXM_TD_8(tdr_TD) in
     out(c13, tdr_TD)
@@ -321,11 +322,10 @@ TDX_TDXM_init[res4_TDXM> Impl_res4_TDXM, tdi_TDXM>Impl_tdi_TDXM]{
     let tdih_TDXM=hash1(hk_TDXM, tdi_t2bitstring(tdi_TDXM)) in
     get mes_TD_TDXM_2(rdata_TDXM) in
     let arg_TDXM_CPU:arg_TDXM_CPU_t=arg_TDXM_CPU_f(rdata_TDXM, rtyp_TDXM, tdih_TDXM) in
+    insert mes_TDXM_CPU_4(arg_TDXM_CPU);
     let res4_TDXM:res_t=get_res() in
-    out(c7, ())
-};
-foreach i<=qTDXM do
-TDX_TDXM{
+    out(c7, ());
+
     in(c10, ());
     get mes_CPU_TDXM_6(smr_TDXM) in
     event TDXMsentTDR_8(smr_TDXM, tdi_TDXM);
@@ -360,6 +360,7 @@ TDX_CPU{
     get mes_QE_CPU_12(rms_QE_to_CPU) in
     let rms_f(rms_without_mac_QE_to_CPU, mac_QE_to_CPU) =rms_QE_to_CPU in
     if(check(rms_without_mac_t2bitstring(rms_without_mac_QE_to_CPU), mkey_CPU, mac_QE_to_CPU))then 
+        insert mes_CPU_QE_14(rms_without_mac_QE_to_CPU);
         let rms_without_mac_from_CPU:rms_without_mac_t=rms_without_mac_QE_to_CPU in
         out(c17, ())
     
@@ -426,8 +427,8 @@ keygen[spk1>Impl_spk1, ssk1>Impl_ssk1, pk2>Impl_pk2, sk2>Impl_sk2, hk1>Impl_hk1,
         ( Challenger(spk1, sk2)) | 
         (hashoracle1(hk1) ) |
         (hashoracle2(hk2) ) |
-        (TD() ) |
-        (TDXM(hk1) ) |    
+        (!i<=qTD TD() ) |
+        (!i<=qTDXM TDXM(hk1) ) |    
         (CPU(hk2, mkey) ) |
         (QE(hk1, hk2, ssk1, pk2, spk1, sk2) )
     )
