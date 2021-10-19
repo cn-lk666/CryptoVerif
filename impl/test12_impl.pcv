@@ -61,7 +61,7 @@ type hashoutput2 [large, fixed].
 type rtyp_t[bounded].
 type res_t[bounded].
 type csvn_t[bounded].
-type user_data_t [bounded, nonuniform].
+type user_data_t [bounded].
 type tdi_t[bounded].
 type tcbi_t[bounded].
 type rdata_t[bounded].
@@ -264,8 +264,8 @@ implementation
     fun dec="pk_dec";
     fun sign="(rsassa_pss_sign 8)";
     fun injbot="injbot" [inverse =  "injbot_inv"];
-    fun hash1 = "Ssh_crypto.hash";
-    fun hash2 = "Ssh_crypto.hash";
+    fun hash1 = "hash";
+    fun hash2 = "hash";
     fun verify="(rsassa_pss_verify 8)";
     fun mac = "(mac Cryptokit.MAC.hmac_sha1)";
     fun check = "(mac_check Cryptokit.MAC.hmac_sha1)";
@@ -275,9 +275,9 @@ implementation
     fun get_tcbi="get_tcbi";
     fun get_res="get_res";
     fun get_user_data="get_user_data";
+
     fun rdata_f="rdata_f"[inverse = "inv_rdata_f"];
     fun arg_TDXM_CPU_f="arg_TDXM_CPU_f"[inverse ="inv_arg_TDXM_CPU_f"];
-
     fun smr_f="smr_F"[inverse="inv_smr_f"];
     fun rms_f="rms_f"[inverse="inv_rms_f"];
     fun tdr_f="tdr_f"[inverse="inv_tdr_f"];
