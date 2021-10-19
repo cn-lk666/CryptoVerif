@@ -11,7 +11,7 @@ file_exists_or_abort()
     fi
 }
 
-file_exists_or_abort TDX.pcv
+file_exists_or_abort test12_impl.pcv
 
 if [ -x ../../cryptoverif ]
 then
@@ -23,7 +23,10 @@ fi
 CRYPTOKIT="-linkpkg -package cryptokit"
 
 echo Proving the protocol...
-"$CV" test_private_channel.pcv
-"$CV" -impl test_private_channel.pcv
+"$CV" test12_impl.pcv > test12_impl.out
+grep -E '(RESULT|All)' test12_impl.out | grep -v "RESULT time"
+echo Generating implementation...
+"$CV" -impl test12_impl.pcv
+
 
 

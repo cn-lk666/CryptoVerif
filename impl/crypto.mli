@@ -71,38 +71,9 @@ val unconcat_str_str_str : string -> (string * string * string)
 val concat_pk_str : pkey -> string -> string
 val unconcat_pk_str : string -> (pkey * string)
 
-(* Returns the host name *)
-val get_hostname : unit -> string
-
 (*Padding*)
 val pad : Cryptokit.Padding.scheme -> int -> string -> string
 val pad_inv : Cryptokit.Padding.scheme -> string -> string
-
-(*Symmetric encryption
-   [sym_r_enc f] is the encryption function
-   [sym_r_enc f msg key rd] returns the ciphertext, where 
-   - [f] is a function that defines the encryption scheme. A recommended choice
-   is Cryptokit.Cipher.aes ~mode:Cryptokit.Cipher.CBC ~pad:Cryptokit.Padding.length
-   for AES in CBC mode with length padding.
-   - [msg] is the cleartext
-   - [key] is the encryption key. The appropriate length of the key is 
-   determined by the underlying block cipher (16, 24, or 32 bytes for AES).
-   - [rd] is a random initialization vector. Its length must be the block
-   size of the underlying block cipher (16 bytes for AES). *)
-val sym_r_enc : (?iv:string -> string -> Cryptokit.Cipher.direction -> Cryptokit.transform) -> string -> string -> string -> string
-(* [sym_r_dec iv_size f] is the encryption function
-   [sym_r_dec iv_size f msg key] returns (Some ciphertext) when decryption
-   succeeds and (None) when decryption fails, where
-   - [iv_size] is the size of the initialization vector, that is, the block size 
-   of the underlying block cipher. It is determined by the underlying block cipher
-   (16 for AES)
-   - [f] is a function that defines the encryption scheme. A recommended choice
-   is Cryptokit.Cipher.aes ~mode:Cryptokit.Cipher.CBC ~pad:Cryptokit.Padding.length
-   for AES in CBC mode with length padding.
-   - [msg] is the ciphertext
-   - [key] is the encryption key. The appropriate length of the key is 
-   determined by the underlying block cipher (16, 24, or 32 bytes for AES). *)
-val sym_r_dec : int -> (?iv:string -> string -> Cryptokit.Cipher.direction -> Cryptokit.transform) -> string -> string -> string option
 
 (* MAC
    [mac f] is the MAC function
@@ -114,7 +85,6 @@ val mac : (string -> Cryptokit.hash) -> string -> string -> string
 (* [mac_check f] is the MAC verification function 
    [mac_check f msg key vmac] returns true when [vmac] is a correct mac of [msg] with key [key]
    It simply compares [vmac] with the MAC computed by [mac f msg key] *)
-val mac_check : (string -> Cryptokit.hash) -> string -> string -> string -> bool
 
 (* Public key cryptography *)
 
@@ -202,22 +172,10 @@ val rsassa_pss_sign : int -> string -> skey -> string
 *)
 val rsassa_pss_verify : int -> string -> pkey -> string -> bool
 
-(*Diffie-Hellman *)
-
-type dh_parameters
-type dh_secret
-
-(* The group 14 of rfc3526 *)
-val dh_group14 : dh_parameters
-(* Generates new parameters *)
-val dh_new_parameters : ?rng:Cryptokit.Random.rng -> ?privlen:int -> int -> dh_parameters
-(* [dh_rand params] Creates a new private secret using the parameters *)
-val dh_rand : dh_parameters -> unit -> dh_secret
-(* [dh_message params] calculates g^[x] mod p. Use with letfun message (x:Z) = exp(g,x) in CV source *)
-val dh_message : dh_parameters -> dh_secret -> string
-(* [dh_exp params] calculates [a]^[b] mod p and deletes the contents of b *)
-val dh_exp : dh_parameters -> string -> dh_secret -> string
 
 (* For debug purposes. Prints on stderr the time taken to compute the
    function in argument and returns its result. *)
 val time : string -> (unit -> 'a) -> 'a
+
+(* hash function : sha1 *)
+val hash : unit -> string -> string

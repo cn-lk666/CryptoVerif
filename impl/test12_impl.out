@@ -1,0 +1,3334 @@
+Doing expand get, insert... Done.
+Doing simplify (non-expanded game)... No change.
+Doing expand... Done.
+Doing remove assignments of findcond... Done.
+Doing simplify... Applied collision new r1: keyseed; new r2: keyseed; return((pkgen(r1) = pkgen(r2))) <=(Penccoll)=> return(false) with r2 -> k_3[i2_23], r1 -> k_3[i2_22] Probability: Penccoll * qTD * qTD
+Run simplify 2 time(s). Fixpoint reached.
+Done.
+Doing move all binders... Done.
+Doing remove assignments of findcond... No change.
+Doing merge branches... No change.
+Trying equivalence ind_cca2(enc)... Failed.
+Doing remove assignments of binder x1_Ch... No change.
+Doing remove assignments of binder sk2... Done.
+Doing remove assignments of binder pk2... Done.
+Trying equivalence ind_cca2(enc) with r_3, r_2, k_2... Transf. OK Transf. done Succeeded.
+Doing simplify (non-expanded game)... No change.
+Doing expand... Applied collision new r1: keyseed; new r2: keyseed; return((pkgen(r1) = pkgen2_1(r2))) <=(Penccoll)=> return(false) with r2 -> k_4, r1 -> k_3[i2_55] Probability: Penccoll * qTD
+Done.
+Doing remove assignments of findcond... Done.
+Doing simplify... Doing global dependency analysis on session_key inside simplify... The variable session_key depends on session_key and occurs in a query.
+No change
+Doing global dependency analysis on session_key inside simplify... The variable session_key depends on session_key and occurs in a query.
+No change
+Run simplify 2 time(s). Fixpoint reached.
+Done.
+Doing move all binders... Done.
+Doing remove assignments of findcond... Done.
+Doing merge branches... No change.
+Trying equivalence uf_cma(sign)... Failed.
+Doing remove assignments of binder spk1... Done.
+Trying equivalence uf_cma(sign) with ks... Transf. OK Transf. done Succeeded.
+Doing simplify (non-expanded game)... Done.
+Doing expand... Done.
+Doing remove assignments of findcond... No change.
+Doing simplify... Run simplify 2 time(s). Fixpoint reached.
+Done.
+Doing move all binders... Done.
+Doing remove assignments of findcond... No change.
+Doing merge branches... No change.
+Trying equivalence ind_cca2(enc)... Failed.
+Doing remove assignments of binder pk_TD... Done.
+Trying equivalence ind_cca2(enc) with k_3, r3_3... Transf. OK Transf. done Succeeded.
+Doing simplify (non-expanded game)... No change.
+Doing expand... Done.
+Doing remove assignments of findcond... Done.
+Doing simplify... Run simplify 2 time(s). Fixpoint reached.
+Done.
+Doing move all binders... No change.
+Doing remove assignments of findcond... Done.
+Doing merge branches... No change.
+Proved query event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(eve_QE(x1, x2, x3, x4, x5, x6, x7))
+Proved query event(eve_QE(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8))
+Proved query event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8))
+Proved query event(QEaccepted2_14(x1, x2)) ==> event(TDXMsentTDR_8(x1, x2))
+Proved one-session secrecy of session_key
+Proved secrecy of session_key
+===================== Proof starts =======================
+Initial state
+Game 1 is
+     in(start, ());
+     let skp(spk1: spkey, ssk1: sskey) = (new ks: skeyseed; skp(spkgen(ks), sskgen(ks))) in
+     let kp(pk2: pkey, sk2: skey) = (new k_2: keyseed; kp(pkgen(k_2), skgen(k_2))) in
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec(m2, sk2) in
+       let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+       if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+       let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+       let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+       let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+       let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+       event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+       new session_key: key;
+       let m2_Ch: bitstring = (let m_2: bitstring = key2bitstring(session_key) in new r_2: enc_seed; enc_r(m_2, x1_Ch, r_2)) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       let kp(pk_TD: pkey, sk_TD: skey) = (new k_3: keyseed; kp(pkgen(k_3), skgen(k_3))) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       insert mes_TD_TDXM_2(rdata_TD);
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       get mes_TDXM_TD_8(tdr_TD: tdr_t) in
+       out(c13[i_1], tdr_TD)
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let rtyp_TDXM: rtyp_t = get_rtyp in
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       get mes_TD_TDXM_2(rdata_TDXM: rdata_t) in
+       let arg_TDXM_CPU_1: arg_TDXM_CPU_t = arg_TDXM_CPU_f(rdata_TDXM, rtyp_TDXM, tdih_TDXM) in
+       insert mes_TDXM_CPU_4(arg_TDXM_CPU_1);
+       let res4_TDXM: res_t = get_res in
+       out(c7[i_2], ());
+       in(c10[i_2], ());
+       get mes_CPU_TDXM_6(smr_TDXM: smr_t) in
+       event TDXMsentTDR_8(smr_TDXM, tdi_TDXM);
+       let tdr_TDXM_1: tdr_t = tdr_f(smr_TDXM, res4_TDXM, tdi_TDXM) in
+       event TDXMsentTDR_8(smr_TDXM, tdi_TDXM);
+       insert mes_TDXM_TD_8(tdr_TDXM_1);
+       out(c11[i_2], ())
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       get mes_TDXM_CPU_4(arg_TDXM_CPU_2: arg_TDXM_CPU_t) in
+       let arg_TDXM_CPU_f(rdata_CPU: rdata_t, rtyp_CPU: rtyp_t, tdih_CPU: hashoutput1) = arg_TDXM_CPU_2 in
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU, mac_CPU);
+       insert mes_CPU_TDXM_6(smr_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       get mes_QE_CPU_12(rms_QE_to_CPU: rms_t) in
+       let rms_f(rms_without_mac_QE_to_CPU: rms_without_mac_t, mac_QE_to_CPU: macres_t) = rms_QE_to_CPU in
+       if check(rms_without_mac_t2bitstring(rms_without_mac_QE_to_CPU), mkey, mac_QE_to_CPU) then
+       insert mes_CPU_QE_14(rms_without_mac_QE_to_CPU);
+       let rms_without_mac_from_CPU_1: rms_without_mac_t = rms_without_mac_QE_to_CPU in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       get mes_TDXM_TD_8(tdr_TDXM_2: tdr_t) suchthat tdr_QE = tdr_TDXM_2 in
+       let tdr_f(smr_QE: smr_t, res4_QE: res_t, tdi_QE: tdi_t) = tdr_QE in
+       let smr_f(rms_QE: rms_t, tcbi_QE: tcbi_t) = smr_QE in
+       let rms_f(rms_without_mac_QE: rms_without_mac_t, macres_QE: macres_t) = rms_QE in
+       let rms_without_mac_f(rtyp_QE: rtyp_t, res1_QE: res_t, csvn_QE: csvn_t, tdih_QE: hashoutput1, tcbh_QE: hashoutput2, rdata_QE: rdata_t, res2_QE: res_t) = rms_without_mac_QE in
+       insert mes_QE_CPU_12(rms_QE);
+       if (tdih_QE = hash1(hk1, tdi_t2bitstring(tdi_QE))) && (tcbh_QE = hash2(hk2, tcbi_t2bitstring(tcbi_QE))) then
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       get mes_CPU_QE_14(rms_without_mac_from_CPU_2: rms_without_mac_t) suchthat rms_without_mac_from_CPU_2 = rms_without_mac_QE in
+       event eve_QE(rtyp_QE, res1_QE, csvn_QE, tdih_QE, tcbh_QE, rdata_QE, res2_QE);
+       event QEaccepted2_14(smr_QE, tdi_QE);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_QE, tcbi_QE) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_QE, tdi_QE) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m1: bitstring = (let m_3: bitstring = quote_t2bitstring(quote_QE) in new r_3: enc_seed; enc_r(m_3, pk2, r_3)) in
+       out(c19[i_4], m1)
+     ))
+
+
+Applying expand get, insert
+  - Expand get/insert for table mes_TD_TDXM_2
+  - Expand get/insert for table mes_TDXM_TD_8
+  - Expand get/insert for table mes_TDXM_CPU_4
+  - Expand get/insert for table mes_CPU_TDXM_6
+  - Expand get/insert for table mes_CPU_QE_14
+  - Expand get/insert for table mes_QE_CPU_12
+yields
+
+Game 2 is
+     in(start, ());
+  {2}let skp(spk1: spkey, ssk1: sskey) = (new ks: skeyseed; skp(spkgen(ks), sskgen(ks))) in
+  {9}let kp(pk2: pkey, sk2: skey) = (new k_2: keyseed; kp(pkgen(k_2), skgen(k_2))) in
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec(m2, sk2) in
+       let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+       if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+       let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+       let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+       let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+       let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+       event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+       new session_key: key;
+       let m2_Ch: bitstring = (let m_2: bitstring = key2bitstring(session_key) in new r_2: enc_seed; enc_r(m_2, x1_Ch, r_2)) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+{131}  let kp(pk_TD: pkey, sk_TD: skey) = (new k_3: keyseed; kp(pkgen(k_3), skgen(k_3))) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       let mes_TD_TDXM_1: rdata_t = rdata_TD in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(mes_TDXM_TD_1[u_13]) then
+       out(c13[i_1], mes_TDXM_TD_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let rtyp_TDXM: rtyp_t = get_rtyp in
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(mes_TD_TDXM_1[u_11]) then
+       let arg_TDXM_CPU_1: arg_TDXM_CPU_t = arg_TDXM_CPU_f(mes_TD_TDXM_1[u_10], rtyp_TDXM, tdih_TDXM) in
+       let mes_TDXM_CPU_1: arg_TDXM_CPU_t = arg_TDXM_CPU_1 in
+       let res4_TDXM: res_t = get_res in
+       out(c7[i_2], ());
+       in(c10[i_2], ());
+       find u_8 = u_9 <= qCPU suchthat defined(mes_CPU_TDXM_1[u_9]) then
+       event TDXMsentTDR_8(mes_CPU_TDXM_1[u_8], tdi_TDXM);
+       let tdr_TDXM_1: tdr_t = tdr_f(mes_CPU_TDXM_1[u_8], res4_TDXM, tdi_TDXM) in
+       event TDXMsentTDR_8(mes_CPU_TDXM_1[u_8], tdi_TDXM);
+       let mes_TDXM_TD_1: tdr_t = tdr_TDXM_1 in
+       out(c11[i_2], ())
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+{255}  find u_6 = u_7 <= qTDXM suchthat defined(mes_TDXM_CPU_1[u_7]) then
+{258}  let arg_TDXM_CPU_f(rdata_CPU: rdata_t, rtyp_CPU: rtyp_t, tdih_CPU: hashoutput1) = mes_TDXM_CPU_1[u_6] in
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU, mac_CPU);
+       let mes_CPU_TDXM_1: smr_t = smr_CPU in
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+{338}  find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+{341}  let rms_f(rms_without_mac_QE_to_CPU: rms_without_mac_t, mac_QE_to_CPU: macres_t) = mes_QE_CPU_1[u_4] in
+{345}  if check(rms_without_mac_t2bitstring(rms_without_mac_QE_to_CPU), mkey, mac_QE_to_CPU) then
+       let mes_CPU_QE_1: rms_without_mac_t = rms_without_mac_QE_to_CPU in
+       let rms_without_mac_from_CPU_1: rms_without_mac_t = rms_without_mac_QE_to_CPU in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+{383}  find u_2 = u_3 <= qTDXM suchthat defined(mes_TDXM_TD_1[u_3]) && (tdr_QE = mes_TDXM_TD_1[u_3]) then
+{390}  let tdr_f(smr_QE: smr_t, res4_QE: res_t, tdi_QE: tdi_t) = tdr_QE in
+{393}  let smr_f(rms_QE: rms_t, tcbi_QE: tcbi_t) = smr_QE in
+{396}  let rms_f(rms_without_mac_QE: rms_without_mac_t, macres_QE: macres_t) = rms_QE in
+{399}  let rms_without_mac_f(rtyp_QE: rtyp_t, res1_QE: res_t, csvn_QE: csvn_t, tdih_QE: hashoutput1, tcbh_QE: hashoutput2, rdata_QE: rdata_t, res2_QE: res_t) = rms_without_mac_QE in
+       let mes_QE_CPU_1: rms_t = rms_QE in
+{405}  if (tdih_QE = hash1(hk1, tdi_t2bitstring(tdi_QE))) && (tcbh_QE = hash2(hk2, tcbi_t2bitstring(tcbi_QE))) then
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1]) && (mes_CPU_QE_1[u_1] = rms_without_mac_QE) then
+       event eve_QE(rtyp_QE, res1_QE, csvn_QE, tdih_QE, tcbh_QE, rdata_QE, res2_QE);
+       event QEaccepted2_14(smr_QE, tdi_QE);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_QE, tcbi_QE) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_QE, tdi_QE) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m1: bitstring = (let m_3: bitstring = quote_t2bitstring(quote_QE) in new r_3: enc_seed; enc_r(m_3, pk2, r_3)) in
+       out(c19[i_4], m1)
+     ))
+
+
+Applying expand
+  - Expand if/find/let
+    - Simplify pattern skp(spk1: spkey, ssk1: sskey) (tuple expanded) at 2
+    - Simplify pattern kp(pk2: pkey, sk2: skey) (tuple expanded) at 9
+    - Simplify pattern tdr_f(smr_QE: smr_t, res4_QE: res_t, tdi_QE: tdi_t) (tuple expanded) at 390
+    - Simplify pattern smr_f(rms_QE: rms_t, tcbi_QE: tcbi_t) (tuple expanded) at 393
+    - Simplify pattern rms_f(rms_without_mac_QE: rms_without_mac_t, macres_QE: macres_t) (tuple expanded) at 396
+    - Simplify pattern rms_without_mac_f(rtyp_QE: rtyp_t, res1_QE: res_t, csvn_QE: csvn_t, tdih_QE: hashoutput1, tcbh_QE: hashoutput2, rdata_QE: rdata_t, res2_QE: res_t) (tuple expanded) at 399
+    - Test at 405 always true
+    - Replaced defined condition mes_TDXM_TD_1[u_3] with rtyp_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], csvn_CPU[u_8[u_3]], tdih_CPU[u_8[u_3]], tcbh_CPU[u_8[u_3]], rdata_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], mac_CPU[u_8[u_3]], rms_CPU[u_8[u_3]], tcbi_CPU[u_8[u_3]], mes_CPU_TDXM_1[u_8[u_3]], res4_TDXM[u_3], tdi_TDXM[u_3], mes_TDXM_TD_1[u_3] in find at 383
+    - Simplify pattern arg_TDXM_CPU_f(rdata_CPU: rdata_t, rtyp_CPU: rtyp_t, tdih_CPU: hashoutput1) (tuple expanded) at 258
+    - Simplify pattern rms_f(rms_without_mac_QE_to_CPU: rms_without_mac_t, mac_QE_to_CPU: macres_t) (tuple expanded) at 341
+    - Test at 345 always true
+    - Replaced defined condition mes_QE_CPU_1[u_5] with mes_QE_CPU_1[u_5], rms_without_mac_CPU[u_8[u_2[u_5]]], mac_CPU[u_8[u_2[u_5]]] in find at 338
+    - Replaced defined condition mes_TDXM_CPU_1[u_7] with mes_TDXM_CPU_1[u_7], mes_TD_TDXM_1[u_10[u_7]], rtyp_TDXM[u_7], tdih_TDXM[u_7] in find at 255
+    - Simplify pattern kp(pk_TD: pkey, sk_TD: skey) (tuple expanded) at 131
+yields
+
+Game 3 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_2: keyseed;
+     let sk2: skey = skgen(k_2) in
+     let pk2: pkey = pkgen(k_2) in
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec(m2, sk2) in
+       let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+       if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+       let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+       let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+       let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+       let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+       event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r_2: enc_seed;
+       let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r_2) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let sk_TD: skey = skgen(k_3) in
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       let mes_TD_TDXM_1: rdata_t = rdata_TD in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(mes_TDXM_TD_1[u_13]) then
+       out(c13[i_1], mes_TDXM_TD_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let rtyp_TDXM: rtyp_t = get_rtyp in
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(mes_TD_TDXM_1[u_11]) then
+       let arg_TDXM_CPU_1: arg_TDXM_CPU_t = arg_TDXM_CPU_f(mes_TD_TDXM_1[u_10], rtyp_TDXM, tdih_TDXM) in
+       let mes_TDXM_CPU_1: arg_TDXM_CPU_t = arg_TDXM_CPU_1 in
+       let res4_TDXM: res_t = get_res in
+       out(c7[i_2], ());
+       in(c10[i_2], ());
+       find u_8 = u_9 <= qCPU suchthat defined(mes_CPU_TDXM_1[u_9]) then
+       event TDXMsentTDR_8(mes_CPU_TDXM_1[u_8], tdi_TDXM);
+       let tdr_TDXM_1: tdr_t = tdr_f(mes_CPU_TDXM_1[u_8], res4_TDXM, tdi_TDXM) in
+       event TDXMsentTDR_8(mes_CPU_TDXM_1[u_8], tdi_TDXM);
+       let mes_TDXM_TD_1: tdr_t = tdr_TDXM_1 in
+       out(c11[i_2], ())
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(mes_TDXM_CPU_1[u_7], mes_TD_TDXM_1[u_10[u_7]], rtyp_TDXM[u_7], tdih_TDXM[u_7]) then
+       let tdih_CPU: hashoutput1 = tdih_TDXM[u_6] in
+       let rtyp_CPU: rtyp_t = rtyp_TDXM[u_6] in
+       let rdata_CPU: rdata_t = mes_TD_TDXM_1[u_10[u_6]] in
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU, mac_CPU);
+       let mes_CPU_TDXM_1: smr_t = smr_CPU in
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5], rms_without_mac_CPU[u_8[u_2[u_5]]], mac_CPU[u_8[u_2[u_5]]]) then
+       let mac_QE_to_CPU: macres_t = mac_CPU[u_8[u_2[u_4]]] in
+       let rms_without_mac_QE_to_CPU: rms_without_mac_t = rms_without_mac_CPU[u_8[u_2[u_4]]] in
+       let mes_CPU_QE_1: rms_without_mac_t = rms_without_mac_QE_to_CPU in
+       let rms_without_mac_from_CPU_1: rms_without_mac_t = rms_without_mac_QE_to_CPU in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(rtyp_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], csvn_CPU[u_8[u_3]], tdih_CPU[u_8[u_3]], tcbh_CPU[u_8[u_3]], rdata_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], mac_CPU[u_8[u_3]], rms_CPU[u_8[u_3]], tcbi_CPU[u_8[u_3]], mes_CPU_TDXM_1[u_8[u_3]], res4_TDXM[u_3], tdi_TDXM[u_3], mes_TDXM_TD_1[u_3]) && (tdr_QE = mes_TDXM_TD_1[u_3]) then
+       let tdi_QE: tdi_t = tdi_TDXM[u_2] in
+       let res4_QE: res_t = res4_TDXM[u_2] in
+       let smr_QE: smr_t = mes_CPU_TDXM_1[u_8[u_2]] in
+       let tcbi_QE: tcbi_t = tcbi_CPU[u_8[u_2]] in
+       let rms_QE: rms_t = rms_CPU[u_8[u_2]] in
+       let macres_QE: macres_t = mac_CPU[u_8[u_2]] in
+       let rms_without_mac_QE: rms_without_mac_t = rms_without_mac_CPU[u_8[u_2]] in
+       let res2_QE: res_t = res2_CPU[u_8[u_2]] in
+       let rdata_QE: rdata_t = rdata_CPU[u_8[u_2]] in
+       let tcbh_QE: hashoutput2 = tcbh_CPU[u_8[u_2]] in
+       let tdih_QE: hashoutput1 = tdih_CPU[u_8[u_2]] in
+       let csvn_QE: csvn_t = csvn_CPU[u_8[u_2]] in
+       let res1_QE: res_t = res1_CPU[u_8[u_2]] in
+       let rtyp_QE: rtyp_t = rtyp_CPU[u_8[u_2]] in
+       let mes_QE_CPU_1: rms_t = rms_QE in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1]) && (mes_CPU_QE_1[u_1] = rms_without_mac_QE) then
+       event eve_QE(rtyp_QE, res1_QE, csvn_QE, tdih_QE, tcbh_QE, rdata_QE, res2_QE);
+       event QEaccepted2_14(smr_QE, tdi_QE);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_QE, tcbi_QE) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_QE, tdi_QE) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_3: enc_seed;
+       let m1: bitstring = enc_r(m_3, pk2, r_3) in
+       out(c19[i_4], m1)
+     ))
+
+
+Applying remove assignments of findcond
+  - Remove assignments on tdi_QE (definition removed, all usages removed)
+  - Remove assignments on res4_QE (definition removed, all usages removed)
+  - Remove assignments on smr_QE (definition removed, all usages removed)
+  - Remove assignments on tcbi_QE (definition removed, all usages removed)
+  - Remove assignments on rms_QE (definition removed, all usages removed)
+  - Remove assignments on macres_QE (definition removed, all usages removed)
+  - Remove assignments on rms_without_mac_QE (definition removed, all usages removed)
+  - Remove assignments on res2_QE (definition removed, all usages removed)
+  - Remove assignments on rdata_QE (definition removed, all usages removed)
+  - Remove assignments on tcbh_QE (definition removed, all usages removed)
+  - Remove assignments on tdih_QE (definition removed, all usages removed)
+  - Remove assignments on csvn_QE (definition removed, all usages removed)
+  - Remove assignments on res1_QE (definition removed, all usages removed)
+  - Remove assignments on rtyp_QE (definition removed, all usages removed)
+  - Remove assignments on mes_QE_CPU_1 (definition point kept, all usages removed)
+  - Remove assignments on tdih_CPU (definition removed, all usages removed)
+  - Remove assignments on rtyp_CPU (definition removed, all usages removed)
+  - Remove assignments on rdata_CPU (definition removed, all usages removed)
+  - Remove assignments on mes_CPU_TDXM_1 (definition removed, all usages removed)
+  - Remove assignments on mac_QE_to_CPU (definition removed, all usages removed)
+  - Remove assignments on rms_without_mac_QE_to_CPU (definition removed, all usages removed)
+  - Remove assignments on mes_CPU_QE_1 (definition point kept, all usages removed)
+  - Remove assignments on rms_without_mac_from_CPU_1 (definition removed, all usages removed)
+  - Remove assignments on mes_TDXM_CPU_1 (definition removed, all usages removed)
+  - Remove assignments on mes_TDXM_TD_1 (definition removed, all usages removed)
+  - Remove assignments on sk_TD (definition removed, all usages removed)
+  - Remove assignments on mes_TD_TDXM_1 (definition removed, all usages removed)
+  - Remove assignments on arg_TDXM_CPU_1 (definition removed, all usages removed)
+yields
+
+Game 4 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_2: keyseed;
+     let sk2: skey = skgen(k_2) in
+     let pk2: pkey = pkgen(k_2) in
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec(m2, sk2) in
+       let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+       if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+       let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+       let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+       let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+       let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+       event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r_2: enc_seed;
+       let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r_2) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+{150}  find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13], tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let rtyp_TDXM: rtyp_t = get_rtyp in
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+{177}  find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11], rdata_TD[u_11]) then
+       let res4_TDXM: res_t = get_res in
+       out(c7[i_2], ());
+       in(c10[i_2], ());
+{188}  find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9], smr_CPU[u_9]) then
+       event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+       let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+       event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+       out(c11[i_2], ())
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+{233}  find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], rdata_TD[u_10[u_7]], res4_TDXM[u_7], rtyp_TDXM[u_7], tdih_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+{323}  find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5], rms_without_mac_CPU[u_8[u_2[u_5]]], mac_CPU[u_8[u_2[u_5]]]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+{353}  find u_2 = u_3 <= qTDXM suchthat defined(rtyp_TDXM[u_6[u_8[u_3]]], tdih_TDXM[u_6[u_8[u_3]]], rdata_TD[u_10[u_6[u_8[u_3]]]], smr_CPU[u_8[u_3]], tdr_TDXM_1[u_3], tdr_TDXM_1[u_3], smr_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], csvn_CPU[u_8[u_3]], tcbh_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], mac_CPU[u_8[u_3]], rms_CPU[u_8[u_3]], tcbi_CPU[u_8[u_3]], res4_TDXM[u_3], tdi_TDXM[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+{406}  find u = u_1 <= qCPU suchthat defined(rms_without_mac_CPU[u_8[u_2[u_4[u_1]]]], mes_CPU_QE_1[u_1]) && {412}(rms_without_mac_CPU[u_8[u_2[u_4[u_1]]]] = rms_without_mac_CPU[u_8[u_2]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_CPU[u_8[u_2]], tcbi_CPU[u_8[u_2]]) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_TDXM[u_2], tdi_TDXM[u_2]) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_3: enc_seed;
+       let m1: bitstring = enc_r(m_3, pk2, r_3) in
+       out(c19[i_4], m1)
+     ))
+
+
+Applying simplify [probability qTD * qTD * Penccoll]
+  - Simplification pass
+    - Replaced (rms_without_mac_CPU[u_8[u_2[u_4[u_1]]]] = rms_without_mac_CPU[u_8[u_2]]) with (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) at 412
+    - Replaced defined condition rms_without_mac_CPU[u_8[u_2[u_4[u_1]]]], mes_CPU_QE_1[u_1] with mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]] in find at 406
+    - Replaced defined condition rtyp_TDXM[u_6[u_8[u_3]]], tdih_TDXM[u_6[u_8[u_3]]], rdata_TD[u_10[u_6[u_8[u_3]]]], smr_CPU[u_8[u_3]], tdr_TDXM_1[u_3], tdr_TDXM_1[u_3], smr_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], csvn_CPU[u_8[u_3]], tcbh_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], mac_CPU[u_8[u_3]], rms_CPU[u_8[u_3]], tcbi_CPU[u_8[u_3]], res4_TDXM[u_3], tdi_TDXM[u_3] with res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3] in find at 353
+    - Replaced defined condition mes_QE_CPU_1[u_5], rms_without_mac_CPU[u_8[u_2[u_5]]], mac_CPU[u_8[u_2[u_5]]] with mes_QE_CPU_1[u_5] in find at 323
+    - Replaced defined condition rdata_TD[u_10[u_7]], rdata_TD[u_10[u_7]], res4_TDXM[u_7], rtyp_TDXM[u_7], tdih_TDXM[u_7] with res4_TDXM[u_7], rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7] in find at 233
+    - Replaced defined condition smr_CPU[u_9], smr_CPU[u_9] with smr_CPU[u_9] in find at 188
+    - Replaced defined condition rdata_TD[u_11], rdata_TD[u_11] with rdata_TD[u_11] in find at 177
+    - Replaced defined condition tdr_TDXM_1[u_13], tdr_TDXM_1[u_13] with tdr_TDXM_1[u_13] in find at 150
+yields
+
+Game 5 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_2: keyseed;
+     let sk2: skey = skgen(k_2) in
+     let pk2: pkey = pkgen(k_2) in
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec(m2, sk2) in
+       let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+       if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+       let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+       let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+       let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+       let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+       event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r_2: enc_seed;
+       let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r_2) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let rtyp_TDXM: rtyp_t = get_rtyp in
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       let res4_TDXM: res_t = get_res in
+       out(c7[i_2], ());
+       in(c10[i_2], ());
+       find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+       event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+       let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+       event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+       out(c11[i_2], ())
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(res4_TDXM[u_7], rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_CPU[u_8[u_2]], tcbi_CPU[u_8[u_2]]) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_TDXM[u_2], tdi_TDXM[u_2]) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_3: enc_seed;
+       let m1: bitstring = enc_r(m_3, pk2, r_3) in
+       out(c19[i_4], m1)
+     ))
+
+
+Applying move all binders
+  - Move assignment to rtyp_TDXM
+yields
+
+Game 6 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_2: keyseed;
+     let sk2: skey = skgen(k_2) in
+     let pk2: pkey = pkgen(k_2) in
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec(m2, sk2) in
+       let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+       if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+       let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+       let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+       let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+       let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+       event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r_2: enc_seed;
+       let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r_2) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(res4_TDXM[u_7], rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_CPU[u_8[u_2]], tcbi_CPU[u_8[u_2]]) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_TDXM[u_2], tdi_TDXM[u_2]) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_3: enc_seed;
+       let m1: bitstring = enc_r(m_3, pk2, r_3) in
+       out(c19[i_4], m1)
+     ))
+
+
+Applying remove assignments of binder sk2
+  - Remove assignments on sk2 (definition removed, all usages removed)
+yields
+
+Game 7 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_2: keyseed;
+     let pk2: pkey = pkgen(k_2) in
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec(m2, skgen(k_2)) in
+       let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+       if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+       let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+       let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+       let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+       let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+       event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r_2: enc_seed;
+       let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r_2) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(res4_TDXM[u_7], rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_CPU[u_8[u_2]], tcbi_CPU[u_8[u_2]]) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_TDXM[u_2], tdi_TDXM[u_2]) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_3: enc_seed;
+       let m1: bitstring = enc_r(m_3, pk2, r_3) in
+       out(c19[i_4], m1)
+     ))
+
+
+Applying remove assignments of binder pk2
+  - Remove assignments on pk2 (definition removed, all usages removed)
+yields
+
+Game 8 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_2: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec(m2, skgen(k_2)) in
+       let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+       if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+       let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+       let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+       let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+       let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+       event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r_2: enc_seed;
+       let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r_2) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(res4_TDXM[u_7], rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_CPU[u_8[u_2]], tcbi_CPU[u_8[u_2]]) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_TDXM[u_2], tdi_TDXM[u_2]) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_3: enc_seed;
+       let m1: bitstring = enc_r(m_3, pkgen(k_2), r_3) in
+       out(c19[i_4], m1)
+     ))
+
+
+Applying equivalence ind_cca2(enc) with r_3, r_2, k_2 [probability (qQE + qChallenger) * Penc(time(context for game 8) + time + (-1 + qChallenger + qQE) * time(enc_r, max(maxlength(game 8: m_2), maxlength(game 8: m_3))), qChallenger)]
+  - Equivalence ind_cca2(enc) with variables: r_3 -> r1, r_2 -> r2, k_2 -> r
+yields
+
+Game 9 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+ {29}  let injbot(quote_t2bitstring(quote_Ch: quote_t)) = (let m_4: bitstring = m2 in {33}find u_15 = ri_1 <= qChallenger suchthat defined(m2_1[ri_1], y[ri_1], x[ri_1]) && (y[ri_1] = pkgen2_1(k_4)) && (m_4 = m2_1[ri_1]) then injbot(x[u_15]) orfind u_14 = ri <= qQE suchthat defined(m1_1[ri], x1[ri]) && (m_4 = m1_1[ri]) then injbot(x1[u_14]) else dec2(m_4, skgen2_1(k_4))) in
+ {68}  let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+ {71}  if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+ {79}  let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+ {82}  let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+ {85}  let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+ {88}  let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+       event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r3: enc_seed;
+       new r2: enc_seed;
+       let m2_Ch: bitstring = (let x: bitstring = m_2 in (let y: pkey = x1_Ch in {123}if defined(k_4) && (y = pkgen2_1(k_4)) then (let m2_1: bitstring = enc_r2(Z(x), y, r2) in m2_1) else enc_r(x, y, r3))) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+{285}  find u_6 = u_7 <= qTDXM suchthat defined(res4_TDXM[u_7], rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_CPU[u_8[u_2]], tcbi_CPU[u_8[u_2]]) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_TDXM[u_2], tdi_TDXM[u_2]) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_4: enc_seed;
+       let m1: bitstring = (let x1: bitstring = m_3 in (let m1_1: bitstring = enc_r2(Z(x1), pkgen2_1(k_4), r_4) in m1_1)) in
+       out(c19[i_4], m1)
+     ))
+
+
+Applying expand [probability qTD * Penccoll]
+  - Expand if/find/let
+    - Replaced defined condition res4_TDXM[u_7], rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7] with rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7] in find at 285
+    - Transformed find at 123 into a test
+    - Simplify pattern quote_t2bitstring(quote_Ch: quote_t) (tuple expanded), pattern injbot(quote_t2bitstring(quote_Ch: quote_t)) (tuple expanded) at 29
+    - Simplify pattern quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) (tuple expanded) at 68
+    - Test at 71 always true
+    - Simplify pattern tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) (tuple expanded) at 79
+    - Simplify pattern smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) (tuple expanded) at 82
+    - Simplify pattern rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) (tuple expanded) at 85
+    - Simplify pattern rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) (tuple expanded) at 88
+    - Transformed find at 123 into a test
+    - Test at 123 always false
+    - Replaced defined condition m1_1[ri], x1[ri] with pk_TD[u_10[u_6[u_8[u_2[ri]]]]], rdata_other[u_10[u_6[u_8[u_2[ri]]]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], res1_CPU[u_8[u_2[ri]]], csvn_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], tcbh_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rms_without_mac_CPU[u_8[u_2[ri]]], tcbi_CPU[u_8[u_2[ri]]], smr_without_mac_QE[ri], res4_TDXM[u_2[ri]], tdi_TDXM[u_2[ri]], tdr_without_mac_QE[ri], sig_QE[ri], quote_QE[ri], m1_1[ri] in find at 33
+    - Simplify pattern injbot(quote_t2bitstring(quote_Ch: quote_t)) (tuple expanded) at 29
+    - Transformed find at 123 into a test
+yields
+
+Game 10 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       let m_4: bitstring = m2 in
+       find u_15 = ri_1 <= qChallenger suchthat defined(m2_1[ri_1], y[ri_1], x[ri_1]) && (y[ri_1] = pkgen2_1(k_4)) && (m_4 = m2_1[ri_1]) then
+       (
+         let quote_t2bitstring(quote_Ch: quote_t) = x[u_15] in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3: enc_seed;
+         new r2: enc_seed;
+         let x: bitstring = m_2 in
+         let y: pkey = x1_Ch in
+         if y = pkgen2_1(k_4) then
+         (
+           let m2_1: bitstring = enc_r2(Z(x), y, r2) in
+           let m2_Ch: bitstring = m2_1 in
+           out(c23[i], m2_Ch)
+         )
+         else
+           let m2_Ch: bitstring = enc_r(x, y, r3) in
+           out(c23[i], m2_Ch)
+       )
+       orfind u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], rdata_other[u_10[u_6[u_8[u_2[ri]]]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], res1_CPU[u_8[u_2[ri]]], csvn_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], tcbh_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rms_without_mac_CPU[u_8[u_2[ri]]], tcbi_CPU[u_8[u_2[ri]]], smr_without_mac_QE[ri], res4_TDXM[u_2[ri]], tdi_TDXM[u_2[ri]], tdr_without_mac_QE[ri], sig_QE[ri], quote_QE[ri], m1_1[ri]) && (m_4 = m1_1[ri]) then
+       (
+         let quote_Ch: quote_t = quote_QE[u_14] in
+         let sig_Ch: signature = sig_QE[u_14] in
+         let tdr_without_mac_Ch: tdr_without_mac_t = tdr_without_mac_QE[u_14] in
+         let tdi_Ch: tdi_t = tdi_TDXM[u_2[u_14]] in
+         let res4_Ch: res_t = res4_TDXM[u_2[u_14]] in
+         let smr_without_mac_Ch: smr_without_mac_t = smr_without_mac_QE[u_14] in
+         let tcbi_Ch: tcbi_t = tcbi_CPU[u_8[u_2[u_14]]] in
+         let rms_without_mac_Ch: rms_without_mac_t = rms_without_mac_CPU[u_8[u_2[u_14]]] in
+         let res2_Ch: res_t = res2_CPU[u_8[u_2[u_14]]] in
+         let rdata_Ch: rdata_t = rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]] in
+         let tcbh_CH: hashoutput2 = tcbh_CPU[u_8[u_2[u_14]]] in
+         let tdih_Ch: hashoutput1 = tdih_TDXM[u_6[u_8[u_2[u_14]]]] in
+         let csvn_Ch: csvn_t = csvn_CPU[u_8[u_2[u_14]]] in
+         let res1_Ch: res_t = res1_CPU[u_8[u_2[u_14]]] in
+         let rtyp_Ch: rtyp_t = rtyp_TDXM[u_6[u_8[u_2[u_14]]]] in
+         let y1_Ch: user_data_t = rdata_other[u_10[u_6[u_8[u_2[u_14]]]]] in
+         let x1_Ch: pkey = pk_TD[u_10[u_6[u_8[u_2[u_14]]]]] in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3: enc_seed;
+         new r2: enc_seed;
+         let x: bitstring = m_2 in
+         let y: pkey = x1_Ch in
+         let m2_Ch: bitstring = enc_r(x, y, r3) in
+         out(c23[i], m2_Ch)
+       )
+       else
+         let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec2(m_4, skgen2_1(k_4)) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3: enc_seed;
+         new r2: enc_seed;
+         let x: bitstring = m_2 in
+         let y: pkey = x1_Ch in
+         if y = pkgen2_1(k_4) then
+         (
+           let m2_1: bitstring = enc_r2(Z(x), y, r2) in
+           let m2_Ch: bitstring = m2_1 in
+           out(c23[i], m2_Ch)
+         )
+         else
+           let m2_Ch: bitstring = enc_r(x, y, r3) in
+           out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_CPU[u_8[u_2]], tcbi_CPU[u_8[u_2]]) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_TDXM[u_2], tdi_TDXM[u_2]) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_4: enc_seed;
+       let x1: bitstring = m_3 in
+       let m1_1: bitstring = enc_r2(Z(x1), pkgen2_1(k_4), r_4) in
+       let m1: bitstring = m1_1 in
+       out(c19[i_4], m1)
+     ))
+
+
+Applying remove assignments of findcond
+  - Remove assignments on x1 (definition removed, all usages removed)
+  - Remove assignments on m1 (definition removed, all usages removed)
+  - Remove assignments on m_4 (definition removed, all usages removed)
+  - Remove assignments on m2_Ch (definition removed, all usages removed)
+  - Remove assignments on y (definition kept, array references kept)
+  - Remove assignments on x (definition kept, array references kept)
+  - Remove assignments on m2_Ch (definition removed, all usages removed)
+  - Remove assignments on y (definition kept, array references kept)
+  - Remove assignments on x (definition kept, array references kept)
+  - Remove assignments on quote_Ch (definition removed, all usages removed)
+  - Remove assignments on sig_Ch (definition removed, all usages removed)
+  - Remove assignments on tdr_without_mac_Ch (definition removed, all usages removed)
+  - Remove assignments on tdi_Ch (definition removed, all usages removed)
+  - Remove assignments on res4_Ch (definition removed, all usages removed)
+  - Remove assignments on smr_without_mac_Ch (definition removed, all usages removed)
+  - Remove assignments on tcbi_Ch (definition removed, all usages removed)
+  - Remove assignments on rms_without_mac_Ch (definition removed, all usages removed)
+  - Remove assignments on res2_Ch (definition removed, all usages removed)
+  - Remove assignments on rdata_Ch (definition removed, all usages removed)
+  - Remove assignments on tcbh_CH (definition removed, all usages removed)
+  - Remove assignments on tdih_Ch (definition removed, all usages removed)
+  - Remove assignments on csvn_Ch (definition removed, all usages removed)
+  - Remove assignments on res1_Ch (definition removed, all usages removed)
+  - Remove assignments on rtyp_Ch (definition removed, all usages removed)
+  - Remove assignments on y1_Ch (definition removed, all usages removed)
+  - Remove assignments on x1_Ch (definition removed, all usages removed)
+  - Remove assignments on y (definition kept, array references kept)
+  - Remove assignments on x (definition kept, array references kept)
+yields
+
+Game 11 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+ {29}  find u_15 = ri_1 <= qChallenger suchthat defined(m2_1[ri_1], y[ri_1], x[ri_1]) && {33}((y[ri_1] = pkgen2_1(k_4)) && (m2 = m2_1[ri_1])) then
+       (
+         let quote_t2bitstring(quote_Ch: quote_t) = {45}x[u_15] in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3: enc_seed;
+         new r2: enc_seed;
+         let x: bitstring = m_2 in
+         let y: pkey = x1_Ch in
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           let m2_1: bitstring = {109}enc_r2(Z(m_2), x1_Ch, r2) in
+           out(c23[i], m2_1)
+         )
+         else
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3) in
+           out(c23[i], m2_Ch)
+       )
+       orfind u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], rdata_other[u_10[u_6[u_8[u_2[ri]]]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], res1_CPU[u_8[u_2[ri]]], csvn_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], tcbh_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rms_without_mac_CPU[u_8[u_2[ri]]], tcbi_CPU[u_8[u_2[ri]]], smr_without_mac_QE[ri], res4_TDXM[u_2[ri]], tdi_TDXM[u_2[ri]], tdr_without_mac_QE[ri], sig_QE[ri], quote_QE[ri], m1_1[ri]) && (m2 = m1_1[ri]) then
+       (
+         event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3: enc_seed;
+{251}    new r2: enc_seed;
+         let x: bitstring = m_2 in
+         let y: pkey = pk_TD[u_10[u_6[u_8[u_2[u_14]]]]] in
+         let m2_Ch: bitstring = enc_r(m_2, pk_TD[u_10[u_6[u_8[u_2[u_14]]]]], r3) in
+         out(c23[i], m2_Ch)
+       )
+       else
+         let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec2(m2, skgen2_1(k_4)) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3: enc_seed;
+         new r2: enc_seed;
+         let x: bitstring = m_2 in
+         let y: pkey = x1_Ch in
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           let m2_1: bitstring = {352}enc_r2(Z(m_2), x1_Ch, r2) in
+           out(c23[i], m2_1)
+         )
+         else
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3) in
+           out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_CPU[u_8[u_2]], tcbi_CPU[u_8[u_2]]) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_TDXM[u_2], tdi_TDXM[u_2]) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_4: enc_seed;
+       let m1_1: bitstring = {769}enc_r2(Z(m_3), pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying simplify
+  - Simplification pass
+    - Replaced enc_r2(Z(m_3), pkgen2_1(k_4), r_4) with enc_r2(Zkey, pkgen2_1(k_4), r_4) at 769
+    - Replaced enc_r2(Z(m_2), x1_Ch, r2) with enc_r2(Zkey, x1_Ch, r2) at 352
+    - Remove random number generation at 251
+    - Replaced defined condition pk_TD[u_10[u_6[u_8[u_2[ri]]]]], rdata_other[u_10[u_6[u_8[u_2[ri]]]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], res1_CPU[u_8[u_2[ri]]], csvn_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], tcbh_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rms_without_mac_CPU[u_8[u_2[ri]]], tcbi_CPU[u_8[u_2[ri]]], smr_without_mac_QE[ri], res4_TDXM[u_2[ri]], tdi_TDXM[u_2[ri]], tdr_without_mac_QE[ri], sig_QE[ri], quote_QE[ri], m1_1[ri] with pk_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri] in find at 29
+    - Replaced ((y[ri_1] = pkgen2_1(k_4)) && (m2 = m2_1[ri_1])) with (m2 = m2_1[ri_1]) at 33
+    - Replaced x[u_15] with key2bitstring(session_key[u_15]) at 45
+    - Replaced enc_r2(Z(m_2), x1_Ch, r2) with enc_r2(Zkey, x1_Ch, r2) at 109
+    - Replaced defined condition m2_1[ri_1], y[ri_1], x[ri_1] with session_key[ri_1], m2_1[ri_1] in find at 29
+yields
+
+Game 12 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_15 = ri_1 <= qChallenger suchthat defined(session_key[ri_1], m2_1[ri_1]) && (m2 = m2_1[ri_1]) then
+       (
+         let quote_t2bitstring(quote_Ch: quote_t) = key2bitstring(session_key[u_15]) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3: enc_seed;
+         new r2: enc_seed;
+         let x: bitstring = m_2 in
+         let y: pkey = x1_Ch in
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2) in
+           out(c23[i], m2_1)
+         )
+         else
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3) in
+           out(c23[i], m2_Ch)
+       )
+       orfind u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       (
+         event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3: enc_seed;
+         let x: bitstring = m_2 in
+         let y: pkey = pk_TD[u_10[u_6[u_8[u_2[u_14]]]]] in
+         let m2_Ch: bitstring = enc_r(m_2, pk_TD[u_10[u_6[u_8[u_2[u_14]]]]], r3) in
+         out(c23[i], m2_Ch)
+       )
+       else
+         let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec2(m2, skgen2_1(k_4)) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3: enc_seed;
+         new r2: enc_seed;
+         let x: bitstring = m_2 in
+         let y: pkey = x1_Ch in
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2) in
+           out(c23[i], m2_1)
+         )
+         else
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3) in
+           out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_CPU[u_8[u_2]], tcbi_CPU[u_8[u_2]]) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_TDXM[u_2], tdi_TDXM[u_2]) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying move all binders
+  - Move assignment to y
+  - Move assignment to x
+  - Move random number generation r2
+  - Move random number generation r3
+  - Move assignment to m_2
+  - Move random number generation session_key
+  - Move assignment to y
+  - Move assignment to x
+  - Move random number generation r2
+  - Move random number generation r3
+  - Move assignment to m_2
+  - Move random number generation session_key
+yields
+
+Game 13 is
+     in(start, ());
+     new ks: skeyseed;
+     let ssk1: sskey = sskgen(ks) in
+     let spk1: spkey = spkgen(ks) in
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_15 = ri_1 <= qChallenger suchthat defined(session_key[ri_1], m2_1[ri_1]) && (m2 = m2_1[ri_1]) then
+       (
+         let quote_t2bitstring(quote_Ch: quote_t) = key2bitstring(session_key[u_15]) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           new r2: enc_seed;
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2) in
+           new session_key: key;
+           out(c23[i], m2_1)
+         )
+         else
+           new r3: enc_seed;
+           new session_key: key;
+           let m_2: bitstring = key2bitstring(session_key) in
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3) in
+           out(c23[i], m2_Ch)
+       )
+       orfind u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       (
+         event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3: enc_seed;
+         let x: bitstring = m_2 in
+         let y: pkey = pk_TD[u_10[u_6[u_8[u_2[u_14]]]]] in
+         let m2_Ch: bitstring = enc_r(m_2, pk_TD[u_10[u_6[u_8[u_2[u_14]]]]], r3) in
+         out(c23[i], m2_Ch)
+       )
+       else
+         let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec2(m2, skgen2_1(k_4)) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           new r2: enc_seed;
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2) in
+           new session_key: key;
+           out(c23[i], m2_1)
+         )
+         else
+           new r3: enc_seed;
+           new session_key: key;
+           let m_2: bitstring = key2bitstring(session_key) in
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3) in
+           out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       let smr_without_mac_QE: smr_without_mac_t = smr_without_mac_f(rms_without_mac_CPU[u_8[u_2]], tcbi_CPU[u_8[u_2]]) in
+       let tdr_without_mac_QE: tdr_without_mac_t = tdr_without_mac_f(smr_without_mac_QE, res4_TDXM[u_2], tdi_TDXM[u_2]) in
+       let sig_QE: signature = sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk1) in
+       let quote_QE: quote_t = quote_f(tdr_without_mac_QE, sig_QE) in
+       let m_3: bitstring = quote_t2bitstring(quote_QE) in
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying remove assignments of findcond
+  - Remove assignments on m_3 (definition removed, all usages removed)
+  - Remove assignments on x (definition removed, all usages removed)
+  - Remove assignments on y (definition removed, all usages removed)
+  - Rename variable r2 into r2_2, r2_1
+  - Rename variable r3 into r3_3, r3_2, r3_1
+  - Remove assignments on quote_QE (definition removed, all usages removed)
+  - Remove assignments on sig_QE (definition removed, all usages removed)
+  - Remove assignments on ssk1 (definition removed, all usages removed)
+  - Remove assignments on tdr_without_mac_QE (definition removed, all usages removed)
+  - Remove assignments on smr_without_mac_QE (definition removed, all usages removed)
+yields
+
+Game 14 is
+     in(start, ());
+     new ks: skeyseed;
+     let spk1: spkey = spkgen(ks) in
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_15 = ri_1 <= qChallenger suchthat defined(session_key[ri_1], m2_1[ri_1]) && (m2 = m2_1[ri_1]) then
+       (
+         let quote_t2bitstring(quote_Ch: quote_t) = key2bitstring(session_key[u_15]) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           new r2_2: enc_seed;
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2_2) in
+           new session_key: key;
+           out(c23[i], m2_1)
+         )
+         else
+           new r3_2: enc_seed;
+           new session_key: key;
+           let m_2: bitstring = key2bitstring(session_key) in
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3_2) in
+           out(c23[i], m2_Ch)
+       )
+       orfind u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       (
+         event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3_3: enc_seed;
+         let m2_Ch: bitstring = enc_r(m_2, pk_TD[u_10[u_6[u_8[u_2[u_14]]]]], r3_3) in
+         out(c23[i], m2_Ch)
+       )
+       else
+         let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec2(m2, skgen2_1(k_4)) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk1, sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           new r2_1: enc_seed;
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2_1) in
+           new session_key: key;
+           out(c23[i], m2_1)
+         )
+         else
+           new r3_1: enc_seed;
+           new session_key: key;
+           let m_2: bitstring = key2bitstring(session_key) in
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3_1) in
+           out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying remove assignments of binder spk1
+  - Remove assignments on spk1 (definition removed, all usages removed)
+yields
+
+Game 15 is
+     in(start, ());
+     new ks: skeyseed;
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_15 = ri_1 <= qChallenger suchthat defined(session_key[ri_1], m2_1[ri_1]) && (m2 = m2_1[ri_1]) then
+       (
+         let quote_t2bitstring(quote_Ch: quote_t) = key2bitstring(session_key[u_15]) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spkgen(ks), sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           new r2_2: enc_seed;
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2_2) in
+           new session_key: key;
+           out(c23[i], m2_1)
+         )
+         else
+           new r3_2: enc_seed;
+           new session_key: key;
+           let m_2: bitstring = key2bitstring(session_key) in
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3_2) in
+           out(c23[i], m2_Ch)
+       )
+       orfind u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       (
+         event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3_3: enc_seed;
+         let m2_Ch: bitstring = enc_r(m_2, pk_TD[u_10[u_6[u_8[u_2[u_14]]]]], r3_3) in
+         out(c23[i], m2_Ch)
+       )
+       else
+         let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec2(m2, skgen2_1(k_4)) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spkgen(ks), sig_Ch) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           new r2_1: enc_seed;
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2_1) in
+           new session_key: key;
+           out(c23[i], m2_1)
+         )
+         else
+           new r3_1: enc_seed;
+           new session_key: key;
+           let m_2: bitstring = key2bitstring(session_key) in
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3_1) in
+           out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(res4_TDXM[u_3], tcbi_CPU[u_8[u_3]], rms_without_mac_CPU[u_8[u_3]], tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying equivalence uf_cma(sign) with ks [probability Psign(time(context for game 15) + time + (-1 + qChallenger) * time(verify, length(tdr_without_mac_t2bitstring)), 0, -inf)]
+  - Equivalence uf_cma(sign) with variables: ks -> r
+yields
+
+Game 16 is
+     in(start, ());
+     new ks: skeyseed;
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_15 = ri_1 <= qChallenger suchthat defined(session_key[ri_1], m2_1[ri_1]) && (m2 = m2_1[ri_1]) then
+       (
+         let quote_t2bitstring(quote_Ch: quote_t) = key2bitstring(session_key[u_15]) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if (let m1_3: bitstring = tdr_without_mac_t2bitstring(tdr_without_mac_Ch) in (let si1_1: signature = sig_Ch in {47}find  else false)) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           new r2_2: enc_seed;
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2_2) in
+           new session_key: key;
+           out(c23[i], m2_1)
+         )
+         else
+           new r3_2: enc_seed;
+           new session_key: key;
+           let m_2: bitstring = key2bitstring(session_key) in
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3_2) in
+           out(c23[i], m2_Ch)
+       )
+       orfind u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       (
+         event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3_3: enc_seed;
+         let m2_Ch: bitstring = enc_r(m_2, pk_TD[u_10[u_6[u_8[u_2[u_14]]]]], r3_3) in
+         out(c23[i], m2_Ch)
+       )
+       else
+         let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec2(m2, skgen2_1(k_4)) in
+         let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+         if (let m1_2: bitstring = tdr_without_mac_t2bitstring(tdr_without_mac_Ch) in (let si1: signature = sig_Ch in {250}find  else false)) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           new r2_1: enc_seed;
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2_1) in
+           new session_key: key;
+           out(c23[i], m2_1)
+         )
+         else
+           new r3_1: enc_seed;
+           new session_key: key;
+           let m_2: bitstring = key2bitstring(session_key) in
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3_1) in
+           out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying simplify (non-expanded game)
+  - Simplification pass
+    - Find at 47 removed (else branch kept if any)
+    - Find at 250 removed (else branch kept if any)
+yields
+
+Game 17 is
+     in(start, ());
+     new ks: skeyseed;
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_15 = ri_1 <= qChallenger suchthat defined(session_key[ri_1], m2_1[ri_1]) && (m2 = m2_1[ri_1]) then
+       (
+ {31}    let quote_t2bitstring(quote_Ch: quote_t) = key2bitstring(session_key[u_15]) in
+ {36}    let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+ {39}    if {40}(let m1_3: bitstring = tdr_without_mac_t2bitstring(tdr_without_mac_Ch) in {44}(let si1_1: signature = sig_Ch in false)) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           new r2_2: enc_seed;
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2_2) in
+           new session_key: key;
+           out(c23[i], m2_1)
+         )
+         else
+           new r3_2: enc_seed;
+           new session_key: key;
+           let m_2: bitstring = key2bitstring(session_key) in
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3_2) in
+           out(c23[i], m2_Ch)
+       )
+       orfind u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       (
+         event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3_3: enc_seed;
+         let m2_Ch: bitstring = enc_r(m_2, pk_TD[u_10[u_6[u_8[u_2[u_14]]]]], r3_3) in
+         out(c23[i], m2_Ch)
+       )
+       else
+{232}    let injbot(quote_t2bitstring(quote_Ch: quote_t)) = dec2(m2, skgen2_1(k_4)) in
+{238}    let quote_f(tdr_without_mac_Ch: tdr_without_mac_t, sig_Ch: signature) = quote_Ch in
+{241}    if {242}(let m1_2: bitstring = tdr_without_mac_t2bitstring(tdr_without_mac_Ch) in {246}(let si1: signature = sig_Ch in false)) then
+         let tdr_without_mac_f(smr_without_mac_Ch: smr_without_mac_t, res4_Ch: res_t, tdi_Ch: tdi_t) = tdr_without_mac_Ch in
+         let smr_without_mac_f(rms_without_mac_Ch: rms_without_mac_t, tcbi_Ch: tcbi_t) = smr_without_mac_Ch in
+         let rms_without_mac_f(rtyp_Ch: rtyp_t, res1_Ch: res_t, csvn_Ch: csvn_t, tdih_Ch: hashoutput1, tcbh_CH: hashoutput2, rdata_Ch: rdata_t, res2_Ch: res_t) = rms_without_mac_Ch in
+         let rdata_f(x1_Ch: pkey, y1_Ch: user_data_t) = rdata_Ch in
+         event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch);
+         if x1_Ch = pkgen2_1(k_4) then
+         (
+           new r2_1: enc_seed;
+           let m2_1: bitstring = enc_r2(Zkey, x1_Ch, r2_1) in
+           new session_key: key;
+           out(c23[i], m2_1)
+         )
+         else
+           new r3_1: enc_seed;
+           new session_key: key;
+           let m_2: bitstring = key2bitstring(session_key) in
+           let m2_Ch: bitstring = enc_r(m_2, x1_Ch, r3_1) in
+           out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying expand
+  - Expand if/find/let
+    - Test at 241 always false
+    - Remove let at 246
+    - Remove let at 242
+    - Remove let at 238
+    - Remove let at 232
+    - Test at 39 always false
+    - Remove let at 44
+    - Remove let at 40
+    - Remove let at 36
+    - Remove let at 31
+yields
+
+Game 18 is
+     in(start, ());
+  {2}new ks: skeyseed;
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+ {23}  find u_15 = ri_1 <= qChallenger suchthat defined(session_key[ri_1], m2_1[ri_1]) && (m2 = m2_1[ri_1]) then
+         yield
+       orfind u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       (
+         event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+         new session_key: key;
+         let m_2: bitstring = key2bitstring(session_key) in
+         new r3_3: enc_seed;
+         let m2_Ch: bitstring = enc_r(m_2, pk_TD[u_10[u_6[u_8[u_2[u_14]]]]], r3_3) in
+         out(c23[i], m2_Ch)
+       )
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying simplify
+  - Simplification pass
+    - Remove branch 1 in find at 23
+    - Remove random number generation at 2
+yields
+
+Game 19 is
+     in(start, ());
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r3_3: enc_seed;
+       let m2_Ch: bitstring = enc_r(m_2, pk_TD[u_10[u_6[u_8[u_2[u_14]]]]], r3_3) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let res4_TDXM: res_t = get_res in
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying move all binders
+  - Move assignment to res4_TDXM
+yields
+
+Game 20 is
+     in(start, ());
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_14 = ri <= qQE suchthat defined(pk_TD[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r3_3: enc_seed;
+       let m2_Ch: bitstring = enc_r(m_2, pk_TD[u_10[u_6[u_8[u_2[u_14]]]]], r3_3) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let pk_TD: pkey = pkgen(k_3) in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pk_TD, rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let res4_TDXM: res_t = get_res in
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying remove assignments of binder pk_TD
+  - Remove assignments on pk_TD (definition removed, all usages removed)
+yields
+
+Game 21 is
+     in(start, ());
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_14 = ri <= qQE suchthat defined(k_3[u_10[u_6[u_8[u_2[ri]]]]], k_3[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r3_3: enc_seed;
+       let m2_Ch: bitstring = enc_r(m_2, pkgen(k_3[u_10[u_6[u_8[u_2[u_14]]]]]), r3_3) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_3: keyseed;
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pkgen(k_3), rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let res4_TDXM: res_t = get_res in
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying equivalence ind_cca2(enc) with k_3, r3_3 [probability qTD * qChallenger * Penc(time(context for game 21) + time + (-1 + qTD * qChallenger) * time(enc_r, maxlength(game 21: m_2)) + (-1 + qTD) * time(skgen) + (-1 + qTD) * time(pkgen), 0) + (0.5 * qTD * qTD + -0.5 * qTD) * Penccoll]
+  - Equivalence ind_cca2(enc) with variables: r3_3 -> r1, k_3 -> r
+yields
+
+Game 22 is
+     in(start, ());
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_14 = ri <= qQE suchthat defined(k_5[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r3_4: enc_seed;
+       let m2_Ch: bitstring = (let x1_3: bitstring = m_2 in (let m1_4: bitstring = enc_r2(Z(x1_3), pkgen2_1(k_5[u_10[u_6[u_8[u_2[u_14]]]]]), r3_4) in m1_4)) in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_5: keyseed;
+       let k_3: keyseed = cst_keyseed in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pkgen2_1(k_5), rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let res4_TDXM: res_t = get_res in
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying expand
+  - Expand if/find/let
+yields
+
+Game 23 is
+     in(start, ());
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_14 = ri <= qQE suchthat defined(k_5[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r3_4: enc_seed;
+       let x1_3: bitstring = m_2 in
+       let m1_4: bitstring = enc_r2(Z(x1_3), pkgen2_1(k_5[u_10[u_6[u_8[u_2[u_14]]]]]), r3_4) in
+       let m2_Ch: bitstring = m1_4 in
+       out(c23[i], m2_Ch)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_5: keyseed;
+       let k_3: keyseed = cst_keyseed in
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pkgen2_1(k_5), rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let res4_TDXM: res_t = get_res in
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying remove assignments of findcond
+  - Remove assignments on k_3 (definition removed, all usages removed)
+  - Remove assignments on x1_3 (definition removed, all usages removed)
+  - Remove assignments on m2_Ch (definition removed, all usages removed)
+yields
+
+Game 24 is
+     in(start, ());
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_14 = ri <= qQE suchthat defined(k_5[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r3_4: enc_seed;
+       let m1_4: bitstring = {109}enc_r2(Z(m_2), pkgen2_1(k_5[u_10[u_6[u_8[u_2[u_14]]]]]), r3_4) in
+       out(c23[i], m1_4)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_5: keyseed;
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pkgen2_1(k_5), rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let res4_TDXM: res_t = get_res in
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying simplify
+  - Simplification pass
+    - Replaced enc_r2(Z(m_2), pkgen2_1(k_5[u_10[u_6[u_8[u_2[u_14]]]]]), r3_4) with enc_r2(Zkey, pkgen2_1(k_5[u_10[u_6[u_8[u_2[u_14]]]]]), r3_4) at 109
+yields
+
+Game 25 is
+     in(start, ());
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_14 = ri <= qQE suchthat defined(k_5[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+       new session_key: key;
+       let m_2: bitstring = key2bitstring(session_key) in
+       new r3_4: enc_seed;
+       let m1_4: bitstring = enc_r2(Zkey, pkgen2_1(k_5[u_10[u_6[u_8[u_2[u_14]]]]]), r3_4) in
+       out(c23[i], m1_4)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_5: keyseed;
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pkgen2_1(k_5), rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let res4_TDXM: res_t = get_res in
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Applying remove assignments of findcond
+  - Remove assignments on m_2 (definition removed, all usages removed)
+yields
+
+Game 26 is
+     in(start, ());
+     new k_4: keyseed;
+     new hk1: key;
+     new hk2: key;
+     new mkey: key;
+     out(c1, ());
+     ((
+       ! i <= qChallenger
+       in(c20[i], ());
+       out(c21[i], ());
+       in(c22[i], m2: bitstring);
+       find u_14 = ri <= qQE suchthat defined(k_5[u_10[u_6[u_8[u_2[ri]]]]], res2_CPU[u_8[u_2[ri]]], rdata_TD[u_10[u_6[u_8[u_2[ri]]]]], tcbh_CPU[u_8[u_2[ri]]], tdih_TDXM[u_6[u_8[u_2[ri]]]], csvn_CPU[u_8[u_2[ri]]], res1_CPU[u_8[u_2[ri]]], rtyp_TDXM[u_6[u_8[u_2[ri]]]], m1_1[ri]) && (m2 = m1_1[ri]) then
+       event QuoteVerified(rtyp_TDXM[u_6[u_8[u_2[u_14]]]], res1_CPU[u_8[u_2[u_14]]], csvn_CPU[u_8[u_2[u_14]]], tdih_TDXM[u_6[u_8[u_2[u_14]]]], tcbh_CPU[u_8[u_2[u_14]]], rdata_TD[u_10[u_6[u_8[u_2[u_14]]]]], res2_CPU[u_8[u_2[u_14]]]);
+       new session_key: key;
+       new r3_4: enc_seed;
+       let m1_4: bitstring = enc_r2(Zkey, pkgen2_1(k_5[u_10[u_6[u_8[u_2[u_14]]]]]), r3_4) in
+       out(c23[i], m1_4)
+     ) | (
+       ! iH <= qH1
+       in(ch1[iH], x1_1: bitstring);
+       out(ch2[iH], hash1(hk1, x1_1))
+     ) | (
+       ! iH_1 <= qH2
+       in(ch1_1[iH_1], x1_2: bitstring);
+       out(ch2_1[iH_1], hash2(hk2, x1_2))
+     ) | (
+       ! i_1 <= qTD
+       in(c4[i_1], ());
+       new k_5: keyseed;
+       let rdata_other: user_data_t = get_user_data in
+       let rdata_TD: rdata_t = rdata_f(pkgen2_1(k_5), rdata_other) in
+       out(c5[i_1], ());
+       in(c12[i_1], ());
+       find u_12 = u_13 <= qTDXM suchthat defined(tdr_TDXM_1[u_13]) then
+       out(c13[i_1], tdr_TDXM_1[u_12])
+     ) | (
+       ! i_2 <= qTDXM
+       in(c6[i_2], ());
+       let tdi_TDXM: tdi_t = get_tdi in
+       let tdih_TDXM: hashoutput1 = hash1(hk1, tdi_t2bitstring(tdi_TDXM)) in
+       find u_10 = u_11 <= qTD suchthat defined(rdata_TD[u_11]) then
+       (
+         let rtyp_TDXM: rtyp_t = get_rtyp in
+         out(c7[i_2], ());
+         in(c10[i_2], ());
+         find u_8 = u_9 <= qCPU suchthat defined(smr_CPU[u_9]) then
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         let res4_TDXM: res_t = get_res in
+         let tdr_TDXM_1: tdr_t = tdr_f(smr_CPU[u_8], res4_TDXM, tdi_TDXM) in
+         event TDXMsentTDR_8(smr_CPU[u_8], tdi_TDXM);
+         out(c11[i_2], ())
+       )
+       else
+         let rtyp_TDXM: rtyp_t = get_rtyp
+     ) | (
+       ! i_3 <= qCPU
+       in(c8[i_3], ());
+       find u_6 = u_7 <= qTDXM suchthat defined(rdata_TD[u_10[u_7]], tdih_TDXM[u_7], rtyp_TDXM[u_7]) then
+       let res1_CPU: res_t = get_res in
+       let csvn_CPU: csvn_t = get_csvn in
+       let tcbi_CPU: tcbi_t = get_tcbi in
+       let res2_CPU: res_t = get_res in
+       let tcbh_CPU: hashoutput2 = hash2(hk2, tcbi_t2bitstring(tcbi_CPU)) in
+       let rms_without_mac_CPU: rms_without_mac_t = rms_without_mac_f(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU) in
+       let mac_CPU: macres_t = mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey) in
+       let rms_CPU: rms_t = rms_f(rms_without_mac_CPU, mac_CPU) in
+       let smr_CPU: smr_t = smr_f(rms_CPU, tcbi_CPU) in
+       event CPUsentSMR(rtyp_TDXM[u_6], res1_CPU, csvn_CPU, tdih_TDXM[u_6], tcbh_CPU, rdata_TD[u_10[u_6]], res2_CPU, mac_CPU);
+       out(c9[i_3], ());
+       in(c16[i_3], ());
+       find u_4 = u_5 <= qQE suchthat defined(mes_QE_CPU_1[u_5]) then
+       let mes_CPU_QE_1: rms_without_mac_t = cst_rms_without_mac_t in
+       out(c17[i_3], ())
+     ) | (
+       ! i_4 <= qQE
+       in(c14[i_4], tdr_QE: tdr_t);
+       find u_2 = u_3 <= qTDXM suchthat defined(tdi_TDXM[u_3], smr_CPU[u_8[u_3]], res2_CPU[u_8[u_3]], rdata_TD[u_10[u_6[u_8[u_3]]]], tcbh_CPU[u_8[u_3]], tdih_TDXM[u_6[u_8[u_3]]], csvn_CPU[u_8[u_3]], res1_CPU[u_8[u_3]], rtyp_TDXM[u_6[u_8[u_3]]], tdr_TDXM_1[u_3]) && (tdr_QE = tdr_TDXM_1[u_3]) then
+       let mes_QE_CPU_1: rms_t = cst_rms_t in
+       out(c15[i_4], ());
+       in(c18[i_4], ());
+       find u = u_1 <= qCPU suchthat defined(mes_CPU_QE_1[u_1], u_10[u_6[u_8[u_2[u_4[u_1]]]]]) && (u_10[u_6[u_8[u_2]]] = u_10[u_6[u_8[u_2[u_4[u_1]]]]]) then
+       event eve_QE(rtyp_TDXM[u_6[u_8[u_2]]], res1_CPU[u_8[u_2]], csvn_CPU[u_8[u_2]], tdih_TDXM[u_6[u_8[u_2]]], tcbh_CPU[u_8[u_2]], rdata_TD[u_10[u_6[u_8[u_2]]]], res2_CPU[u_8[u_2]]);
+       event QEaccepted2_14(smr_CPU[u_8[u_2]], tdi_TDXM[u_2]);
+       new r_4: enc_seed;
+       let m1_1: bitstring = enc_r2(Zkey, pkgen2_1(k_4), r_4) in
+       out(c19[i_4], m1_1)
+     ))
+
+
+Proved secrecy of session_key in game 26
+Proved event(QEaccepted2_14(x1, x2)) ==> event(TDXMsentTDR_8(x1, x2)) in game 26
+Proved event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8)) in game 26
+Proved event(eve_QE(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8)) in game 26
+Proved event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(eve_QE(x1, x2, x3, x4, x5, x6, x7)) in game 26
+Adv[Game 1: secrecy of session_key] <= 2 * qTD * qChallenger * Penc(time_1, 0) + 2 * Psign(time_2, 0, -inf) + (qTD + 3 * qTD * qTD) * Penccoll + (2 * qChallenger + 2 * qQE) * Penc(time_3, qChallenger) + Adv[Game 26: secrecy of session_key]
+Adv[Game 26: secrecy of session_key] <= 0
+RESULT Proved secrecy of session_key up to probability 2 * qTD * qChallenger * Penc(time_1, 0) + 2 * Psign(time_2, 0, -inf) + (qTD + 3 * qTD * qTD) * Penccoll + (2 * qChallenger + 2 * qQE) * Penc(time_3, qChallenger)
+Adv[Game 1: event(QEaccepted2_14(x1, x2)) ==> event(TDXMsentTDR_8(x1, x2))] <= qTD * qChallenger * Penc(time_1, 0) + Psign(time_2, 0, -inf) + (0.5 * qTD + 1.5 * qTD * qTD) * Penccoll + (qChallenger + qQE) * Penc(time_3, qChallenger) + Adv[Game 26: event(QEaccepted2_14(x1, x2)) ==> event(TDXMsentTDR_8(x1, x2))]
+Adv[Game 26: event(QEaccepted2_14(x1, x2)) ==> event(TDXMsentTDR_8(x1, x2))] <= 0
+RESULT Proved event(QEaccepted2_14(x1, x2)) ==> event(TDXMsentTDR_8(x1, x2)) up to probability qTD * qChallenger * Penc(time_1, 0) + Psign(time_2, 0, -inf) + (0.5 * qTD + 1.5 * qTD * qTD) * Penccoll + (qChallenger + qQE) * Penc(time_3, qChallenger)
+Adv[Game 1: event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8))] <= qTD * qChallenger * Penc(time_1, 0) + Psign(time_2, 0, -inf) + (0.5 * qTD + 1.5 * qTD * qTD) * Penccoll + (qChallenger + qQE) * Penc(time_3, qChallenger) + Adv[Game 26: event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8))]
+Adv[Game 26: event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8))] <= 0
+RESULT Proved event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8)) up to probability qTD * qChallenger * Penc(time_1, 0) + Psign(time_2, 0, -inf) + (0.5 * qTD + 1.5 * qTD * qTD) * Penccoll + (qChallenger + qQE) * Penc(time_3, qChallenger)
+Adv[Game 1: event(eve_QE(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8))] <= qTD * qChallenger * Penc(time_1, 0) + Psign(time_2, 0, -inf) + (0.5 * qTD + 1.5 * qTD * qTD) * Penccoll + (qChallenger + qQE) * Penc(time_3, qChallenger) + Adv[Game 26: event(eve_QE(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8))]
+Adv[Game 26: event(eve_QE(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8))] <= 0
+RESULT Proved event(eve_QE(x1, x2, x3, x4, x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8)) up to probability qTD * qChallenger * Penc(time_1, 0) + Psign(time_2, 0, -inf) + (0.5 * qTD + 1.5 * qTD * qTD) * Penccoll + (qChallenger + qQE) * Penc(time_3, qChallenger)
+Adv[Game 1: event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(eve_QE(x1, x2, x3, x4, x5, x6, x7))] <= qTD * qChallenger * Penc(time_1, 0) + Psign(time_2, 0, -inf) + (0.5 * qTD + 1.5 * qTD * qTD) * Penccoll + (qChallenger + qQE) * Penc(time_3, qChallenger) + Adv[Game 26: event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(eve_QE(x1, x2, x3, x4, x5, x6, x7))]
+Adv[Game 26: event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(eve_QE(x1, x2, x3, x4, x5, x6, x7))] <= 0
+RESULT Proved event(QuoteVerified(x1, x2, x3, x4, x5, x6, x7)) ==> event(eve_QE(x1, x2, x3, x4, x5, x6, x7)) up to probability qTD * qChallenger * Penc(time_1, 0) + Psign(time_2, 0, -inf) + (0.5 * qTD + 1.5 * qTD * qTD) * Penccoll + (qChallenger + qQE) * Penc(time_3, qChallenger)
+RESULT time_1 = time(context for game 21) + time + (-1 + qTD * qChallenger) * time(enc_r, maxlength(game 21: m_2)) + (-1 + qTD) * time(skgen) + (-1 + qTD) * time(pkgen)
+RESULT time_2 = time(context for game 15) + time + (-1 + qChallenger) * time(verify, length(tdr_without_mac_t2bitstring))
+RESULT time_3 = time(context for game 8) + time + (-1 + qChallenger + qQE) * time(enc_r, max(maxlength(game 8: m_2), maxlength(game 8: m_3)))
+RESULT time(context for game 8) = time(sskgen) + time(spkgen) + qChallenger * time(let injbot, length(quote_t2bitstring)) + qChallenger * time(let quote_t2bitstring) + qChallenger * time(let quote_f) + qChallenger * time(verify, length(tdr_without_mac_t2bitstring)) + (qChallenger + qQE) * time(tdr_without_mac_t2bitstring) + qChallenger * time(let tdr_without_mac_f) + qChallenger * time(let smr_without_mac_f) + qChallenger * time(let rms_without_mac_f) + qChallenger * time(let rdata_f) + qChallenger * time(([1,qChallenger])) + qChallenger * time(key2bitstring) + qH1 * time(hash1, maxlength(game 8: x1_1)) + qH2 * time(hash2, maxlength(game 8: x1_2)) + qTD * time(pkgen) + qTD * time(rdata_f) + qTDXM * time(hash1, length(tdi_t2bitstring)) + qTDXM * time(tdi_t2bitstring) + qTDXM * time(tdr_f) + 2 * qTDXM * time(([1,qTDXM])) + qCPU * time(hash2, length(tcbi_t2bitstring)) + qCPU * time(tcbi_t2bitstring) + qCPU * time(rms_without_mac_f) + qCPU * time(mac, length(rms_without_mac_t2bitstring)) + qCPU * time(rms_without_mac_t2bitstring) + qCPU * time(rms_f) + qCPU * time(smr_f) + qCPU * time(([1,qCPU])) + 2 * qQE * time(([1,qQE])) + qQE * time(smr_without_mac_f) + qQE * time(tdr_without_mac_f) + qQE * time(sign, length(tdr_without_mac_t2bitstring)) + qQE * time(quote_f) + qQE * time(quote_t2bitstring)
+RESULT time(context for game 15) = qChallenger * qChallenger * time(= bitstring, maxlength(game 15: m2), maxlength(game 15: m2_1)) + qChallenger * qQE * time(= bitstring, maxlength(game 15: m2), maxlength(game 15: m1_1)) + qChallenger * time(dec2, maxlength(game 15: m2)) + qChallenger * time(skgen2_1) + qChallenger * time(let injbot, length(quote_t2bitstring)) + qChallenger * time(let quote_t2bitstring) + qChallenger * time(let quote_f) + qChallenger * time(tdr_without_mac_t2bitstring) + qChallenger * time(let tdr_without_mac_f) + qChallenger * time(let smr_without_mac_f) + qChallenger * time(let rms_without_mac_f) + qChallenger * time(let rdata_f) + qChallenger * time(([1,qChallenger])) + (qChallenger + qQE) * time(pkgen2_1) + (qChallenger + qQE) * time(enc_r2, length(Zkey)) + 2 * qChallenger * time(key2bitstring) + qChallenger * time(enc_r, maxlength(game 15: m_2)) + qH1 * time(hash1, maxlength(game 15: x1_1)) + qH2 * time(hash2, maxlength(game 15: x1_2)) + qTD * time(pkgen) + qTD * time(rdata_f) + qTDXM * time(hash1, length(tdi_t2bitstring)) + qTDXM * time(tdi_t2bitstring) + qTDXM * time(tdr_f) + 2 * qTDXM * time(([1,qTDXM])) + qCPU * time(hash2, length(tcbi_t2bitstring)) + qCPU * time(tcbi_t2bitstring) + qCPU * time(rms_without_mac_f) + qCPU * time(mac, length(rms_without_mac_t2bitstring)) + qCPU * time(rms_without_mac_t2bitstring) + qCPU * time(rms_f) + qCPU * time(smr_f) + qCPU * time(([1,qCPU])) + 2 * qQE * time(([1,qQE]))
+RESULT time(context for game 21) = qChallenger * qQE * time(= bitstring, maxlength(game 21: m2), maxlength(game 21: m1_1)) + qChallenger * time(([1,qChallenger])) + qChallenger * time(key2bitstring) + qH1 * time(hash1, maxlength(game 21: x1_1)) + qH2 * time(hash2, maxlength(game 21: x1_2)) + qTD * time(rdata_f) + qTDXM * time(hash1, length(tdi_t2bitstring)) + qTDXM * time(tdi_t2bitstring) + qTDXM * time(tdr_f) + 2 * qTDXM * time(([1,qTDXM])) + qCPU * time(hash2, length(tcbi_t2bitstring)) + qCPU * time(tcbi_t2bitstring) + qCPU * time(rms_without_mac_f) + qCPU * time(mac, length(rms_without_mac_t2bitstring)) + qCPU * time(rms_without_mac_t2bitstring) + qCPU * time(rms_f) + qCPU * time(smr_f) + qCPU * time(([1,qCPU])) + 2 * qQE * time(([1,qQE])) + qQE * time(enc_r2, length(Zkey)) + qQE * time(pkgen2_1)
+All queries proved.
