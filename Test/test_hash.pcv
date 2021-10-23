@@ -7,7 +7,6 @@ type key[ large, fixed].
 type hashoutput1[large, fixed].
 type tdi_t[bounded].
 type smr_t[bounded].
-type macres_t[bounded].
 
 channel start, end, c1, c2, c3, c4, c5, c6.
 
@@ -23,51 +22,36 @@ expand ROM_hash_large(
     qH1                      (*qH is the number of queries to the hash oracle*)
 ).
 
+(*
+insert 10 "let tdi_t2bitstring(x11)=x1 in"
 
-(* MAC *)
-proba Pmac.
-expand SUF_CMA_det_mac(
-    key,            (*mkey is the type of keys, must be bounded*)
-    bitstring , (*macinput is the type of inputs of MACs*)
-    macres_t,  (*macres_t is the type of MACs.*)
-    mac,          (*mac(macinput ,mkey ) : macres_t is the MAC function.*)
-    check,      (*check (macinput ,mkey ,macres_t ) : bool is the verification function*)
-    Pmac        (*Pmac(t,N,N′,Nu′,l) is the probability of breaking the SUF-CMA property in time t for one key,
-                N MAC queries, N′ verification queries modified by the transformation and Nu verification queries
-                left unchanged by the transformation for messages of length at most l.*)
-).
+*)
+
 
 fun get_tdi():tdi_t.
-fun smr_f(tdi_t, hashoutput1, macres_t):smr_t[data].
-fun tdi_t2bitstring(tdi_t):bitstring.
-fun hashoutput1_2bitstring(hashoutput1):bitstring[data].
+fun smr_f(tdi_t, hashoutput1):smr_t[data].
+fun tdi_t2bitstring(tdi_t):bitstring[data].
 
 event test1(tdi_t).
 event test2(tdi_t).
 query x:tdi_t;
     event(test2(x)) ==>event(test1(x)).
 
-event test3(hashoutput1).
-event test4(hashoutput1).
-query x:hashoutput1;
-    event(test4(x))==>event(test3(x)).
+
 
 let A(hk_A:key,mk_A:key)=
     in(c1, ());
     let tdi=get_tdi() in
     let tdih_A:hashoutput1=hash1(hk_A, tdi_t2bitstring(tdi)) in
-    let macres_A=mac(hashoutput1_2bitstring(tdih_A), mk_A) in
-    let smr_A:smr_t=smr_f(tdi,tdih_A,macres_A) in
+    let smr_A:smr_t=smr_f(tdi,tdih_A) in
     event test1(tdi);
-    event test3(tdih_A);
     out(c2, (smr_A)).
 
 
 let B(hk_B:key,mk_B:key)=
     in(c3, (smr:smr_t));
-    let smr_f(tdi, tdih, macres_B)=smr in
-    if(check(hashoutput1_2bitstring(tdih) , mk_B, macres_B))then
-    event test4(tdih);
+    let smr_f(tdi, tdih)=smr in
+    find i<=iA suchthat defined (tdih_A[i]) && tdih=tdih_A[i] then
     if(hash1(hk_B, tdi_t2bitstring(tdi) )=tdih) then
         event test2(tdi);
         out(c4, ()).
