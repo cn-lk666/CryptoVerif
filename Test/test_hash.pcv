@@ -1,0 +1,45 @@
+
+param iA, iB.
+
+type key[large, fixed].
+type hashoutput1[fixed].
+
+
+channel start, end, c1, c2, c3, c4.
+
+expand ROM_hash_large(
+    key,                 (**)
+    bitstring,         (*hashinput is the type of the input of the hash function.*)
+    hashoutput1,        (*hashoutput is the type of the output of the hash function, 
+                                    must be bounded or nonuniform (typically fixed)*)
+                                (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
+    hash1,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
+    hashoracle1,  (*hashoracle is a process that allows the adversary to call the hash function*)
+    qH1                      (*qH is the number of queries to the hash oracle*)
+).
+
+fun get_str():bitstring.
+
+event test().
+query event(test())==>true.
+
+let A(hk_A:key)=
+    in(c1, ());
+    let str=get_str() in
+    let str_h=hash1(hk_A, str) in
+    out(c2, (str, str_h)).
+
+
+let B(hk_B:key)=
+    in(c3, (str_B:bitstring, str_h_B:hashoutput1));
+    if(hash1(hk_B, str_B)=str_h_B) then
+        event test();
+        out(c4, ()).
+
+process
+    in(start, ());
+    new hk:key;
+    out(end, ());
+    (hashoracle1(hk)|
+    !i<=iA A(hk)|
+    !i<=iB B(hk))
