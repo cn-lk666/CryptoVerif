@@ -27,17 +27,17 @@
 param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
 
 set interactiveMode = true.
+
 proof{
-    set maxIterSimplif = 4;
 
     insert 27 "let tdi_t2bitstring(x111)=x1_1 in";
+    insert 47 "let tcbi_t2bitstring(x222)=x1_2 in";
     crypto rom(hash1);
-    success;
     crypto rom(hash2);
-    success;
     crypto suf_cma(mac);
     success
 }
+
 (*
 
 
@@ -199,10 +199,6 @@ const hostname_QE:hostname.
 const hostname_Ch:hostname.
 const hostname_IAS:hostname.
 
-set casesInCorresp = false.
-    (* Distringuishing cases in the proof of correspondences
-       is too slow with the "unique channel id" property,
-       and not necessary *)
 
 fun get_rtyp():rtyp_t.
 fun get_tdi():tdi_t.
@@ -302,8 +298,17 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
         let rms_CPU=rms_f(rms_without_mac_CPU, mac_CPU) in
         let smr_CPU:smr_t=smr_f(rms_CPU, tcbi_CPU) in
         event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU, mac_CPU);
-        out(c9, ())
+        out(c9, ());
+        in(c18, ());
+        find j<=qQE suchthat defined(rms_QE[j]) then (
+            
+            let rms_f(rms_without_mac_QE_to_CPU, mac_QE_to_CPU) =rms_QE[j] in
+            if(check(rms_without_mac_t2bitstring(rms_without_mac_QE_to_CPU), mkey_CPU, mac_QE_to_CPU))then (
+               let rms_without_mac_from_CPU:rms_without_mac_t=rms_without_mac_QE_to_CPU in
 
+               out(c19, ())
+            )
+        )
     ).
 
 let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey, mk_QE:key)=
@@ -313,8 +318,9 @@ let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey, mk_QE:key
     let smr_f(rms_QE, tcbi_QE)=smr_QE in
     let rms_f(rms_without_mac_QE, macres_QE)=rms_QE in
     let rms_without_mac_f(rtyp_QE, res1_QE, csvn_QE, tdih_QE, tcbh_QE, rdata_QE, res2_QE)=rms_without_mac_QE in
-
-    if(check(rms_without_mac_t2bitstring(rms_without_mac_QE), mk_QE, macres_QE))then (
+    out(c17,());
+    in(c20,());
+    find j<=qCPU suchthat defined(rms_without_mac_from_CPU[j]) && rms_without_mac_QE=rms_without_mac_from_CPU[j] then(
         event eve_QE(rtyp_QE, res1_QE, csvn_QE, tdih_QE, tcbh_QE, rdata_QE, res2_QE);
         if tdih_QE=hash1(hk_QE1,tdi_t2bitstring(tdi_QE)) then 
         event test2(tdi_QE);

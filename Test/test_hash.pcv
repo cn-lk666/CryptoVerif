@@ -3,7 +3,12 @@ param iA, iB, iC.
 
 set interactiveMode = true.
 
-
+proof{
+    insert 12 "let tdi_t2bitstring(x11)=x1 in";
+    crypto rom(hash1);
+    crypto suf_cma(mac);
+    success
+}
 
 (*one hash check with an intermeidiate node
 
