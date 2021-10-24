@@ -2,6 +2,14 @@
 param iA, iB, iC.
 
 set interactiveMode = true.
+proof{
+    set uniqueBranchReorganize = false;
+    insert 12 "let tdi_t2bitstring(x11)=x1 in";
+    insert 32 "let tcbi_t2bitstring(x22)=x1_1 in";
+    crypto rom(hash2);
+    crypto rom(hash1);
+    success
+}
 
 type key[ large, fixed].
 type hashoutput1[large, fixed].
