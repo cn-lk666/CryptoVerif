@@ -5,16 +5,18 @@ set interactiveMode = true.
 
 
 
-(*first mac check then hash check*)
+(*first hash check then mac check
+
 proof{
     crypto suf_cma(mac);
     insert 13 "let tdi_t2bitstring(x11)=x1 in";
     crypto rom(hash1);
     success;
-    insert 84 "let tcbi_t2bitstring(x22)=x1_1 in";
+    insert 71 "let tcbi_t2bitstring(x22)=x1_1 in";
     crypto rom(hash2);
     success
 }
+*)
 
 
 
@@ -128,12 +130,13 @@ let A(hk_A1:key, hk_A2:key, mk_A:key)=
 let B(hk_B1:key, hk_B2:key, mk_B:key)=
     in(c3, (smr:smr_t));
     let smr_f(tdi,tcbi, tdih, tcbh, mac_B)=smr in
-    if(check((hashoutput1_2bitstring(tdih),hashoutput2_2bitstring(tcbh)),mk_B, mac_B)) then
-    event test4(tdih);
+    
     if( hash2(hk_B2, tcbi_t2bitstring(tcbi))=tcbh) then
     event test2( tcbi);
     if( hash1(hk_B1, tdi_t2bitstring(tdi))=tdih) then
     event test6(tdi);
+    if(check((hashoutput1_2bitstring(tdih),hashoutput2_2bitstring(tcbh)),mk_B, mac_B)) then
+    event test4(tdih);
         out(c4, ()).
 
 process
