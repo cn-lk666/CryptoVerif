@@ -5,15 +5,12 @@ set interactiveMode = true.
 
 
 
-(*first hash check then mac check
+(*one hash check with an intermeidiate node
 
 proof{
-    crypto suf_cma(mac);
-    insert 13 "let tdi_t2bitstring(x11)=x1 in";
+    insert 12 "let tdi_t2bitstring(x11)=x1 in";
     crypto rom(hash1);
-    success;
-    insert 71 "let tcbi_t2bitstring(x22)=x1_1 in";
-    crypto rom(hash2);
+    crypto suf_cma(mac);
     success
 }
 *)
@@ -91,52 +88,42 @@ expand SUF_CMA_det_mac(
 
 fun get_tdi():tdi_t.
 fun get_tcbi():tcbi_t.
-fun smr_f(tdi_t,tcbi_t, hashoutput1,hashoutput2, macres_t):smr_t[data].
+fun smr_f(tdi_t, hashoutput1, macres_t):smr_t[data].
 
 fun tdi_t2bitstring(tdi_t):bitstring[data].
 fun tcbi_t2bitstring(tcbi_t):bitstring[data].
 fun hashoutput1_2bitstring(hashoutput1):bitstring[data].
 fun hashoutput2_2bitstring(hashoutput2):bitstring[data].
-event test1(tcbi_t).
-event test2( tcbi_t).
-query  y:tcbi_t;
-    event(test2(y)) ==>event(test1(y)).
 
 event test5(tdi_t).
 event test6(tdi_t).
 query x:tdi_t;
     event(test6(x))==>event(test5(x)).
 
-event test3(hashoutput1).
-event test4(hashoutput1).
-query x:hashoutput1;
-    event(test4(x))==>event(test3(x)).
 
-let A(hk_A1:key, hk_A2:key, mk_A:key)=
+let A(hk_A1:key)=
     in(c1, ());
     let tdi=get_tdi() in
-    let tcbi=get_tcbi() in
     let tdih_A:hashoutput1=hash1(hk_A1, tdi_t2bitstring(tdi)) in
-    let tcbh_A:hashoutput2=hash2(hk_A2, tcbi_t2bitstring(tcbi))in
-    let mac_A=mac((hashoutput1_2bitstring(tdih_A),hashoutput2_2bitstring(tcbh_A)),mk_A) in
-    let smr_A:smr_t=smr_f(tdi,tcbi, tdih_A,tcbh_A, mac_A) in
-
-    event test1(tcbi);
     event test5(tdi);
-    event test3(tdih_A);
+    find i<=iC suchthat defined (mac_A[i])then
+    let smr_A=smr_f(tdi, tdih_A, mac_A[i]) in
     out(c2, (smr_A)).
 
+let C( mk_C:key)=
+    in(c5, ());
+    find i<=iA suchthat defined(tdih_A[i]) then 
+    let mac_A:macres_t=mac(hashoutput1_2bitstring(tdih_A[i]),mk_C) in
 
-let B(hk_B1:key, hk_B2:key, mk_B:key)=
+    out(c6, ()).
+
+let B(hk_B1:key, mk_B:key)=
     in(c3, (smr:smr_t));
-    let smr_f(tdi,tcbi, tdih, tcbh, mac_B)=smr in
+    let smr_f(tdi, tdih, mac_B)=smr in
+    if(check((hashoutput1_2bitstring(tdih)),mk_B, mac_B)) then
     
-    if( hash2(hk_B2, tcbi_t2bitstring(tcbi))=tcbh) then
-    event test2( tcbi);
     if( hash1(hk_B1, tdi_t2bitstring(tdi))=tdih) then
     event test6(tdi);
-    if(check((hashoutput1_2bitstring(tdih),hashoutput2_2bitstring(tcbh)),mk_B, mac_B)) then
-    event test4(tdih);
         out(c4, ()).
 
 process
@@ -146,6 +133,6 @@ process
     new mk:key;
     out(end, ());
     (hashoracle1(hk1)|
-    hashoracle2(hk2)|
-    !i<=iA A(hk1,hk2,mk)|
-    !i<=iB B(hk1,hk2,mk))
+    !i<=iA A(hk1)|
+    !i<=iB B(hk1, mk) |
+    !i<=iC C(mk))
