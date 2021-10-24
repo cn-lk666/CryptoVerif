@@ -2,14 +2,26 @@
 param iA, iB, iC.
 
 set interactiveMode = true.
+
+
+
+
+
 proof{
-    set uniqueBranchReorganize = false;
-    insert 12 "let tdi_t2bitstring(x11)=x1 in";
-    insert 32 "let tcbi_t2bitstring(x22)=x1_1 in";
-    crypto rom(hash2);
+    insert 13 "let tdi_t2bitstring(x11)=x1 in";
     crypto rom(hash1);
+    success;
+    insert 71 "let tcbi_t2bitstring(x22)=x1_1 in";
+    crypto rom(hash2);
+    crypto suf_cma(mac);
     success
 }
+
+
+
+
+
+
 
 type key[ large, fixed].
 type hashoutput1[large, fixed].
@@ -37,7 +49,7 @@ set uniqueBranchReorganize = false;
 
 
 insert 12 "let tdi_t2bitstring(x11)=x1 in"
-insert 32 "let tcbi_t2bitstring(x22)=x1_1 in"
+insert 83 "let tcbi_t2bitstring(x22)=x1_1 in"
 
 *)
 
@@ -63,11 +75,22 @@ expand ROM_hash_large(
     qH2                      (*qH is the number of queries to the hash oracle*)
 ).
 
-
+(* MAC *)
+proba Pmac.
+expand SUF_CMA_det_mac(
+    key,            (*mkey is the type of keys, must be bounded*)
+    bitstring , (*macinput is the type of inputs of MACs*)
+    macres_t,  (*macres_t is the type of MACs.*)
+    mac,          (*mac(macinput ,mkey ) : macres_t is the MAC function.*)
+    check,      (*check (macinput ,mkey ,macres_t ) : bool is the verification function*)
+    Pmac        (*Pmac(t,N,N′,Nu′,l) is the probability of breaking the SUF-CMA property in time t for one key,
+                N MAC queries, N′ verification queries modified by the transformation and Nu verification queries
+                left unchanged by the transformation for messages of length at most l.*)
+).
 
 fun get_tdi():tdi_t.
 fun get_tcbi():tcbi_t.
-fun smr_f(tdi_t,tcbi_t, hashoutput1,hashoutput2):smr_t[data].
+fun smr_f(tdi_t,tcbi_t, hashoutput1,hashoutput2, macres_t):smr_t[data].
 
 fun tdi_t2bitstring(tdi_t):bitstring[data].
 fun tcbi_t2bitstring(tcbi_t):bitstring[data].
@@ -88,23 +111,25 @@ event test4(hashoutput1).
 query x:hashoutput1;
     event(test4(x))==>event(test3(x)).
 
-let A(hk_A1:key, hk_A2:key)=
+let A(hk_A1:key, hk_A2:key, mk_A:key)=
     in(c1, ());
     let tdi=get_tdi() in
     let tcbi=get_tcbi() in
     let tdih_A:hashoutput1=hash1(hk_A1, tdi_t2bitstring(tdi)) in
     let tcbh_A:hashoutput2=hash2(hk_A2, tcbi_t2bitstring(tcbi))in
-    let smr_A:smr_t=smr_f(tdi,tcbi, tdih_A,tcbh_A) in
+    let mac_A=mac((hashoutput1_2bitstring(tdih_A),hashoutput2_2bitstring(tcbh_A)),mk_A) in
+    let smr_A:smr_t=smr_f(tdi,tcbi, tdih_A,tcbh_A, mac_A) in
+
     event test1(tcbi);
     event test5(tdi);
     event test3(tdih_A);
     out(c2, (smr_A)).
 
 
-let B(hk_B1:key, hk_B2:key)=
+let B(hk_B1:key, hk_B2:key, mk_B:key)=
     in(c3, (smr:smr_t));
-    let smr_f(tdi,tcbi, tdih, tcbh)=smr in
-    find i<=iA suchthat defined(tdih_A[i], tcbh_A[i]) && tdih=tdih_A[i] && tcbh=tcbh_A[i] then
+    let smr_f(tdi,tcbi, tdih, tcbh, mac_B)=smr in
+    if(check((hashoutput1_2bitstring(tdih),hashoutput2_2bitstring(tcbh)),mk_B, mac_B)) then
     event test4(tdih);
     if( hash2(hk_B2, tcbi_t2bitstring(tcbi))=tcbh) then
     event test2( tcbi);
@@ -116,8 +141,9 @@ process
     in(start, ());
     new hk1:key;
     new hk2:key;
+    new mk:key;
     out(end, ());
     (hashoracle1(hk1)|
     hashoracle2(hk2)|
-    !i<=iA A(hk1,hk2)|
-    !i<=iB B(hk1,hk2))
+    !i<=iA A(hk1,hk2,mk)|
+    !i<=iB B(hk1,hk2,mk))
