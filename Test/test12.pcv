@@ -28,17 +28,17 @@ param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
 
 set interactiveMode = true.
 
+
+(*
 proof{
 
-    insert 27 "let tdi_t2bitstring(x111)=x1_1 in";
-    insert 47 "let tcbi_t2bitstring(x222)=x1_2 in";
+    insert 110 "let tdi_t2bitstring(x111)=x1_1 in";
+    insert 130 "let tcbi_t2bitstring(x222)=x1_2 in";
     crypto rom(hash1);
     crypto rom(hash2);
     crypto suf_cma(mac);
     success
 }
-
-(*
 
 
 proof{
@@ -223,13 +223,12 @@ fun quote_t2bitstring(quote_t):bitstring[data].
 fun arg_TDXM_CPU_f(rdata_t, rtyp_t, hashoutput1):arg_TDXM_CPU_t[data].
 fun tcbi_t2bitstring(tcbi_t):bitstring[data].
 
-event CPUsentSMR(rtyp_t, res_t, csvn_t, hashoutput1,hashoutput2, rdata_t, res_t, macres_t).
-event eve_QE(rtyp_t, res_t, csvn_t, hashoutput1,hashoutput2, rdata_t, res_t).
+event QuoteVerified(rtyp_t, res_t, csvn_t, hashoutput1,hashoutput2, rdata_t, res_t).
+event CPUsentSMR(rtyp_t, res_t, csvn_t, hashoutput1,hashoutput2, rdata_t, res_t, macres_t, tcbi_t).
 
-query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput1, x5:hashoutput2, x6:rdata_t, x7:res_t, x8:macres_t;
-	event(eve_QE(x1, x2, x3, x4,x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8 )).
+query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput1, x5:hashoutput2, x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
+event(QuoteVerified(x1, x2, x3, x4,x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8, x9)).
 
-event TDXMsentTDR_8(smr_t, tdi_t).
 
 event test1(tdi_t).
 event test2(tdi_t).
@@ -240,6 +239,11 @@ query x:tdi_t;
     event(test2(x))==>event(test1(x)).
 query x:tcbi_t;
     event(test4(x))==>event(test3(x)).
+
+event QEaccepted2_14(smr_t,tdi_t).
+event TDXMsentTDR_8(smr_t, tdi_t).
+query x1:smr_t, x2:tdi_t;
+event(QEaccepted2_14(x1, x2)) ==> event(TDXMsentTDR_8(x1, x2)).
 
 const Zkey : bitstring.
 equation forall y:bitstring;
@@ -297,7 +301,7 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
         let mac_CPU=mac(rms_without_mac_t2bitstring(rms_without_mac_CPU), mkey_CPU) in
         let rms_CPU=rms_f(rms_without_mac_CPU, mac_CPU) in
         let smr_CPU:smr_t=smr_f(rms_CPU, tcbi_CPU) in
-        event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU, mac_CPU);
+        event CPUsentSMR(rtyp_CPU, res1_CPU, csvn_CPU, tdih_CPU, tcbh_CPU, rdata_CPU, res2_CPU, mac_CPU, tcbi_CPU);
         out(c9, ());
         in(c18, ());
         find j<=qQE suchthat defined(rms_QE[j]) then (
@@ -315,26 +319,37 @@ let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey, mk_QE:key
 
     in(c16, (tdr_QE:tdr_t));
     let tdr_f(smr_QE, res4_QE, tdi_QE)=tdr_QE in
-    let smr_f(rms_QE, tcbi_QE)=smr_QE in
+    let smr_f(rms_QE:rms_t, tcbi_QE)=smr_QE in
     let rms_f(rms_without_mac_QE, macres_QE)=rms_QE in
     let rms_without_mac_f(rtyp_QE, res1_QE, csvn_QE, tdih_QE, tcbh_QE, rdata_QE, res2_QE)=rms_without_mac_QE in
     out(c17,());
     in(c20,());
     find j<=qCPU suchthat defined(rms_without_mac_from_CPU[j]) && rms_without_mac_QE=rms_without_mac_from_CPU[j] then(
-        event eve_QE(rtyp_QE, res1_QE, csvn_QE, tdih_QE, tcbh_QE, rdata_QE, res2_QE);
         if tdih_QE=hash1(hk_QE1,tdi_t2bitstring(tdi_QE)) then 
         event test2(tdi_QE);
         if tcbh_QE=hash2(hk_QE2, tcbi_t2bitstring(tcbi_QE)) then
         event test4(tcbi_QE);
+        event QEaccepted2_14(smr_QE,tdi_QE);
         out(c20, ())
     ).
 
 let Challenger(spk:spkey, sk:skey)=
-    
     in(c14, ());
-    out(c15, ())
-.
+    out(c15, ());
 
+    in(c22, (m2:bitstring));
+    let injbot(quote_t2bitstring(quote_Ch))=dec(m2, sk) in
+    let quote_f(tdr_without_mac_Ch, sig_Ch) =quote_Ch in
+    if(verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk, sig_Ch)) then(
+        let tdr_without_mac_f(smr_without_mac_Ch, res4_Ch, tdi_Ch)=tdr_without_mac_Ch in
+        let smr_without_mac_f(rms_without_mac_Ch, tcbi_Ch)=smr_without_mac_Ch in
+        let rms_without_mac_f(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch, tcbh_CH, rdata_Ch, res2_Ch)=rms_without_mac_Ch in
+        let rdata_f(x1_Ch, y1_Ch)=rdata_Ch in
+        event QuoteVerified(rtyp_Ch, res1_Ch, csvn_Ch, tdih_Ch,tcbh_CH, rdata_Ch, res2_Ch);
+        new session_key:key;
+        let m2_Ch=enc(key2bitstring(session_key), x1_Ch) in
+        out(c23, (m2_Ch))  
+    ).
 
 
 (*
