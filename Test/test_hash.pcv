@@ -35,7 +35,7 @@ type macres_t[bounded].
 type tcbi_t[bounded].
 
 
-channel start, end, c1, c2, c3, c4, c5, c6.
+channel start, end, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10.
 
 (*
 insert 13 "let tdi_t2bitstring(x11)=x1 in"
@@ -119,16 +119,22 @@ let C( mk_C:key)=
     in(c5, ());
     find i<=iA suchthat defined(tdih_A[i]) then 
     let mac_A:macres_t=mac(hashoutput1_2bitstring(tdih_A[i]),mk_C) in
-
-    out(c6, ()).
+    out(c6, ());
+    in(c9,());
+    find j<=iB suchthat defined(tdih_C[j], mac_C[j]) then
+    if check((hashoutput1_2bitstring(tdih_C[j])),mk_C, mac_C[j])then 
+    let tdih_B_C:hashoutput1=tdih_C[j] in
+    out(c10,()).
 
 let B(hk_B1:key, mk_B:key)=
     in(c3, (smr:smr_t));
-    let smr_f(tdi, tdih, mac_B)=smr in
-    if(check((hashoutput1_2bitstring(tdih)),mk_B, mac_B)) then
-    
-    if( hash1(hk_B1, tdi_t2bitstring(tdi))=tdih) then
+    let smr_f(tdi, tdih_C:hashoutput1, mac_C:macres_t)=smr in
+   
+     if( hash1(hk_B1, tdi_t2bitstring(tdi))=tdih_C) then
     event test6(tdi);
+    out(c7,());
+    in(c8, ());
+    find i<=iC suchthat defined(tdih_B_C[i]) && tdih_C=tdih_B_C[i] then
         out(c4, ()).
 
 process
