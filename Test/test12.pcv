@@ -335,14 +335,16 @@ let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey, mk_QE:key
     let smr_f(rms_QE:rms_t, tcbi_QE)=smr_QE in
     let rms_f(rms_without_mac_QE, macres_QE)=rms_QE in
     let rms_without_mac_f(rtyp_QE, res1_QE, csvn_QE, tdih_QE, tcbh_QE, rdata_QE, res2_QE)=rms_without_mac_QE in
+    if tdih_QE=hash1(hk_QE1,tdi_t2bitstring(tdi_QE)) then 
+    (*Here we can't prove this event, because this hash isn't checked by mac
+    event test2(tdi_QE);
+    *)
+    if tcbh_QE=hash2(hk_QE2, tcbi_t2bitstring(tcbi_QE)) then
     out(c17,());
     in(c20,());
     find j<=qCPU suchthat defined(rms_without_mac_from_CPU[j]) && rms_without_mac_QE=rms_without_mac_from_CPU[j] then(
-        if tdih_QE=hash1(hk_QE1,tdi_t2bitstring(tdi_QE)) then 
         event test2(tdi_QE);
-        if tcbh_QE=hash2(hk_QE2, tcbi_t2bitstring(tcbi_QE)) then
         event test4(tcbi_QE);
-        
         let smr_without_mac_QE=smr_without_mac_f(rms_without_mac_QE, tcbi_QE) in
         let tdr_without_mac_QE=tdr_without_mac_f(smr_without_mac_QE, res4_QE, tdi_QE) in
         let sig_QE=sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk) in
