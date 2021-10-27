@@ -129,12 +129,14 @@ let C( mk_C:key)=
 let B(hk_B1:key, mk_B:key)=
     in(c3, (smr:smr_t));
     let smr_f(tdi, tdih_C:hashoutput1, mac_C:macres_t)=smr in
-   
-     if( hash1(hk_B1, tdi_t2bitstring(tdi))=tdih_C) then
+    if( hash1(hk_B1, tdi_t2bitstring(tdi))=tdih_C) then
+    (*Here we can't prove this event, because this hash is not checked by mac
     event test6(tdi);
+    *)
     out(c7,());
     in(c8, ());
     find i<=iC suchthat defined(tdih_B_C[i]) && tdih_C=tdih_B_C[i] then
+    event test6(tdi);
         out(c4, ()).
 
 process
