@@ -3,14 +3,6 @@ param iA, iB, iC.
 
 set interactiveMode = true.
 
-proof{
-    insert 12 "let tdi_t2bitstring(x11)=x1 in";
-    crypto rom(hash1);
-    crypto suf_cma(mac);
-    success
-}
-
-(*one hash check with an intermeidiate node
 
 proof{
     insert 12 "let tdi_t2bitstring(x11)=x1 in";
@@ -18,43 +10,17 @@ proof{
     crypto suf_cma(mac);
     success
 }
-*)
-
-
-
-
-
 
 
 type key[ large, fixed].
 type hashoutput1[large, fixed].
-type hashoutput2[large, fixed].
 type tdi_t[bounded].
 type smr_t[bounded].
 type macres_t[bounded].
-type tcbi_t[bounded].
 
 
-channel start, end, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10,c11, c12.
+channel start, end, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12.
 
-(*
-insert 13 "let tdi_t2bitstring(x11)=x1 in"
-
-insert 33 "let tcbi_t2bitstring(x11_1)=x1_1 in"
-
-crypto suf_cma(mac)
-
-crypto rom(hash2)
-
-crypto rom(hash1)
-
-set uniqueBranchReorganize = false;
-
-
-insert 12 "let tdi_t2bitstring(x11)=x1 in"
-insert 83 "let tcbi_t2bitstring(x22)=x1_1 in"
-
-*)
 
 expand ROM_hash_large(
     key,                 (**)
@@ -67,16 +33,6 @@ expand ROM_hash_large(
     qH1                      (*qH is the number of queries to the hash oracle*)
 ).
 
-expand ROM_hash_large(
-    key,                 (**)
-    bitstring,         (*hashinput is the type of the input of the hash function.*)
-    hashoutput2,        (*hashoutput is the type of the output of the hash function, 
-                                    must be bounded or nonuniform (typically fixed)*)
-                                (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
-    hash2,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
-    hashoracle2,  (*hashoracle is a process that allows the adversary to call the hash function*)
-    qH2                      (*qH is the number of queries to the hash oracle*)
-).
 
 (* MAC *)
 proba Pmac.
@@ -92,62 +48,55 @@ expand SUF_CMA_det_mac(
 ).
 
 fun get_tdi():tdi_t.
-fun get_tcbi():tcbi_t.
 fun smr_f(tdi_t, hashoutput1, macres_t):smr_t[data].
 
 fun tdi_t2bitstring(tdi_t):bitstring[data].
-fun tcbi_t2bitstring(tcbi_t):bitstring[data].
 fun hashoutput1_2bitstring(hashoutput1):bitstring[data].
-fun hashoutput2_2bitstring(hashoutput2):bitstring[data].
 
-event test5(tdi_t).
-event test6(tdi_t).
-query x:tdi_t;
-    event(test6(x))==>event(test5(x)).
+event test5().
+event test6().
+query 
+    event(test6())==>event(test5()).
 
 
 let A(hk_A1:key)=
     in(c1, ());
     let tdi=get_tdi() in
     let tdih_A:hashoutput1=hash1(hk_A1, tdi_t2bitstring(tdi)) in
-    out(c12,());
-    in(c11,());
-    find i<=iC suchthat defined (mac_A[i])then
-    let smr_A=smr_f(tdi, tdih_A, mac_A[i]) in
-    event test5(tdi);
-    out(c2, (smr_A)).
+    out(c2,());
+    in(c5,());
+    find i<=iC suchthat defined (mac_C[i], tdih_A[u[i]]) && tdih_A=tdih_A[u[i]] then
+    let smr_A=smr_f(tdi, tdih_A, mac_C[i]) in
+    event test5();
+    out(c6, (smr_A)).
 
 let C( mk_C:key)=
-    in(c5, ());
-    find i<=iA suchthat defined(tdih_A[i]) then 
-    let mac_A:macres_t=mac(hashoutput1_2bitstring(tdih_A[i]),mk_C) in
-    out(c6, ());
+    in(c3, ());
+    find u=j<=iA suchthat defined(tdih_A[j]) then 
+    let mac_C:macres_t=mac(hashoutput1_2bitstring(tdih_A[u]),mk_C) in
+    out(c4, ());
     in(c9,());
     find j<=iB suchthat defined(tdih_C[j], mac_C[j]) then
     if check((hashoutput1_2bitstring(tdih_C[j])),mk_C, mac_C[j])then 
     let tdih_B_C:hashoutput1=tdih_C[j] in
     out(c10,()).
 
-let B(hk_B1:key, mk_B:key)=
-    in(c3, (smr:smr_t));
-    let smr_f(tdi, tdih_C:hashoutput1, mac_C:macres_t)=smr in
-    if( hash1(hk_B1, tdi_t2bitstring(tdi))=tdih_C) then
-    (*Here we can't prove this event, because this hash is not checked by mac
-    event test6(tdi);
-    *)
-    out(c7,());
-    in(c8, ());
+let B(hk_B1:key)=
+    in(c7, (smr:smr_t));
+    let smr_f(tdi_B, tdih_B:hashoutput1, mac_B:macres_t)=smr in
+    if( hash1(hk_B1, tdi_t2bitstring(tdi_B))=tdih_B) then
+    out(c8,());
+    in(c11, ());
     find i<=iC suchthat defined(tdih_B_C[i]) && tdih_C=tdih_B_C[i] then
-    event test6(tdi);
-        out(c4, ()).
+    event test6();
+    out(c12, ()).
 
 process
     in(start, ());
     new hk1:key;
-    new hk2:key;
     new mk:key;
     out(end, ());
     (hashoracle1(hk1)|
     !i<=iA A(hk1)|
-    !i<=iB B(hk1, mk) |
+    !i<=iB B(hk1) |
     !i<=iC C(mk))
