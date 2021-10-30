@@ -1,0 +1,98 @@
+
+param iA, iB, iC.
+
+set interactiveMode = true.
+
+
+proof{
+    insert 12 "let tdi_t2bitstring(x11)=x1 in";
+    crypto rom(hash1);
+    crypto suf_cma(mac);
+    success
+}
+
+
+type key[ large, fixed].
+type hashoutput1[large, fixed].
+type tdi_t[bounded].
+type smr_t[bounded].
+type macres_t[bounded].
+
+
+channel start, end, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12.
+
+
+expand ROM_hash_large(
+    key,                 (**)
+    bitstring,         (*hashinput is the type of the input of the hash function.*)
+    hashoutput1,        (*hashoutput is the type of the output of the hash function, 
+                                    must be bounded or nonuniform (typically fixed)*)
+                                (*如果这里这里说了fixed，那么我们还可以用bitstring吗?还是定义一个type*)    
+    hash1,               (*hash (key ,hashinput ) : hashoutput is the hash function.*)
+    hashoracle1,  (*hashoracle is a process that allows the adversary to call the hash function*)
+    qH1                      (*qH is the number of queries to the hash oracle*)
+).
+
+
+(* MAC *)
+proba Pmac.
+expand SUF_CMA_det_mac(
+    key,            (*mkey is the type of keys, must be bounded*)
+    bitstring , (*macinput is the type of inputs of MACs*)
+    macres_t,  (*macres_t is the type of MACs.*)
+    mac,          (*mac(macinput ,mkey ) : macres_t is the MAC function.*)
+    check,      (*check (macinput ,mkey ,macres_t ) : bool is the verification function*)
+    Pmac        (*Pmac(t,N,N′,Nu′,l) is the probability of breaking the SUF-CMA property in time t for one key,
+                N MAC queries, N′ verification queries modified by the transformation and Nu verification queries
+                left unchanged by the transformation for messages of length at most l.*)
+).
+
+fun get_tdi():tdi_t.
+fun smr_f(tdi_t, hashoutput1, macres_t):smr_t[data].
+
+fun tdi_t2bitstring(tdi_t):bitstring[data].
+fun hashoutput1_2bitstring(hashoutput1):bitstring[data].
+
+event test5().
+event test6().
+query 
+    event(test6())==>event(test5()).
+
+
+let A(hk_A1:key, mk_C:key)=
+    in(c1, ());
+    let tdi=get_tdi() in
+    let tdih_A:hashoutput1=hash1(hk_A1, tdi_t2bitstring(tdi)) in
+    out(c2,());
+    in(c5,());
+    let mac_A:macres_t=mac(hashoutput1_2bitstring(tdih_A),mk_C) in
+    let smr_A=smr_f(tdi, tdih_A, mac_A) in
+    event test5();
+    out(c6, (smr_A)).
+
+let C( mk_C:key)=
+    in(c9,());
+    find j<=iB suchthat defined(tdih_C[j], mac_C[j]) then
+    if check((hashoutput1_2bitstring(tdih_C[j])),mk_C, mac_C[j])then 
+    let tdih_B_C:hashoutput1=tdih_C[j] in
+    out(c10,()).
+
+let B(hk_B1:key)=
+    in(c7, (smr:smr_t));
+    let smr_f(tdi, tdih_C:hashoutput1, mac_C:macres_t)=smr in
+    if( hash1(hk_B1, tdi_t2bitstring(tdi))=tdih_C) then
+    out(c8,());
+    in(c11, ());
+    find i<=iC suchthat defined(tdih_B_C[i]) && tdih_C=tdih_B_C[i] then
+    event test6();
+    out(c12, ()).
+
+process
+    in(start, ());
+    new hk1:key;
+    new mk:key;
+    out(end, ());
+    (hashoracle1(hk1)|
+    !i<=iA A(hk1, mk)|
+    !i<=iB B(hk1) |
+    !i<=iC C(mk))
