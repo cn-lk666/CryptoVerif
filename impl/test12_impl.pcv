@@ -27,13 +27,18 @@
 param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
 
 set interactiveMode = true.
+
 proof{
+    crypto suf_cma(mac);
+    insert 112 "let tdi_t2bitstring(x111)=x1_1 in";
+    crypto rom(hash1);
+    insert 170 "let tcbi_t2bitstring(x222)=x1_2 in";
+    crypto rom(hash2);
     crypto ind_cca2(enc);
     crypto uf_cma(sign);
     crypto ind_cca2(enc);
     success
 }
-
 (*
     bounded means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other
         words, the type is a finite subset of bitstrings plus ⊥.
@@ -156,11 +161,6 @@ expand IND_CCA2_public_key_enc(
                                                 in time t for one key and N decryption queries.*)
         Penccoll                    (*Penccoll is the probability of collision between independently generated keys.*)
 ).
-
-set casesInCorresp = false.
-    (* Distringuishing cases in the proof of correspondences
-       is too slow with the "unique channel id" property,
-       and not necessary *)
 
 fun get_rtyp():rtyp_t.
 fun get_user_data():user_data_t.
@@ -362,7 +362,6 @@ TDX_CPU{
 let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey)=
 TDX_QE{
     in(c14, (tdr_QE:tdr_t));
-    get mes_TDXM_TD_8(tdr_TDXM) suchthat tdr_QE=tdr_TDXM in
     let tdr_f(smr_QE, res4_QE, tdi_QE)=tdr_QE in
     let smr_f(rms_QE, tcbi_QE)=smr_QE in
     let rms_f(rms_without_mac_QE, macres_QE)=rms_QE in

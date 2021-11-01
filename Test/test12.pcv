@@ -82,12 +82,9 @@ proof{
 *)
 
 (*
-    bounded means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other
-        words, the type is a finite subset of bitstrings plus ⊥.
-    fixed means that the type is the set of all bitstrings of a certain length n. In particular, the
-        type is a finite set, so fixed implies bounded.
-    large: By default, large means that the type T is large enough so that all collisions with ran-
-        dom elements of T can be eliminated
+    bounded means that the type is a set of bitstrings of bounded length or perhaps ⊥. In other words, the type is a finite subset of bitstrings plus ⊥.
+    fixed means that the type is the set of all bitstrings of a certain length n. In particular, the type is a finite set, so fixed implies bounded.
+    large: By default, large means that the type T is large enough so that all collisions with random elements of T can be eliminated
 *)
 (*These three types are used in the macro IND_CCA2_public_key_enc and UF_CMA_det_signature*)
 type skey [bounded].
@@ -241,24 +238,30 @@ fun quote_t2bitstring(quote_t):bitstring[data].
 fun arg_TDXM_CPU_f(rdata_t, rtyp_t, hashoutput1):arg_TDXM_CPU_t[data].
 fun tcbi_t2bitstring(tcbi_t):bitstring[data].
 
+(*proved*)
 event QuoteVerified(rtyp_t, res_t, csvn_t, hashoutput1,hashoutput2, rdata_t, res_t).
 event CPUsentSMR(rtyp_t, res_t, csvn_t, hashoutput1,hashoutput2, rdata_t, res_t, macres_t, tcbi_t).
-
 query x1:rtyp_t, x2:res_t, x3:csvn_t, x4:hashoutput1, x5:hashoutput2, x6:rdata_t, x7:res_t, x8:macres_t, x9:tcbi_t;
 event(QuoteVerified(x1, x2, x3, x4,x5, x6, x7)) ==> event(CPUsentSMR(x1, x2, x3, x4, x5, x6, x7, x8, x9)).
-
 
 event test1(tdi_t).
 event test2(tdi_t).
 event test3(tcbi_t).
 event test4(tcbi_t).
-
 query x:tdi_t;
     event(test2(x))==>event(test1(x)).
 query x:tcbi_t;
     event(test4(x))==>event(test3(x)).
 
 query secret session_key.
+
+(*unproved*)
+event TDXMsentTDR_8(smr_t, tdi_t).
+event QEaccepted2_14(smr_t, tdi_t).
+
+query x1:smr_t, x2:tdi_t;
+    event(QEaccepted2_14(x1, x2))==>event(TDXMsentTDR_8(x1, x2)).
+
 
 const Zkey : bitstring.
 equation forall y:bitstring;
@@ -295,6 +298,7 @@ let TDXM(hk_TDXM:key)=
             let smr_f(rms_TDXM, tcbi_TDXM)=smr_CPU[j] in
             
             let tdr_TDXM:tdr_t=tdr_f(smr_CPU[j], res4_TDXM, tdi_TDXM) in
+            event TDXMsentTDR_8(smr_CPU[j], tdi_TDXM);
             out(c11, ())
         )
     ).
@@ -331,6 +335,7 @@ let CPU(hk_CPU:key, mkey_CPU:key)=
 let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey, mk_QE:key)=
 
     in(c16, (tdr_QE:tdr_t));
+    (* find i<=qTD suchthat defined (tdr_TD[i]) && tdr_QE=tdr_TD[i] then*)
     let tdr_f(smr_QE, res4_QE, tdi_QE)=tdr_QE in
     let smr_f(rms_QE:rms_t, tcbi_QE)=smr_QE in
     let rms_f(rms_without_mac_QE, macres_QE)=rms_QE in
@@ -345,6 +350,7 @@ let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey, mk_QE:key
     find j<=qCPU suchthat defined(rms_without_mac_from_CPU[j]) && rms_without_mac_QE=rms_without_mac_from_CPU[j] then(
         event test2(tdi_QE);
         event test4(tcbi_QE);
+        event QEaccepted2_14(smr_QE, tdi_QE);
         let smr_without_mac_QE=smr_without_mac_f(rms_without_mac_QE, tcbi_QE) in
         let tdr_without_mac_QE=tdr_without_mac_f(smr_without_mac_QE, res4_QE, tdi_QE) in
         let sig_QE=sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk) in
@@ -370,23 +376,6 @@ let Challenger(spk:spkey, sk:skey)=
         let m2_Ch=enc(key2bitstring(session_key), x1_Ch) in
         out(c23, (m2_Ch))  
     ).
-
-
-(*
-let IAS(spk:spkey, sk:skey)=
-    in(c28, ());
-    get Ch_IAS_19(x, y, m1) suchthat x=hostname_Ch && y=hostname_IAS in
-    let injbot(quote_t2bitstring(quote))=dec(m1, sk) in
-    let quote_f(tdr_without_mac, sig) =quote in
-    if(verify(tdr_without_mac_t2bitstring(tdr_without_mac), spk, sig)) then(
-        let tdr_without_mac_f(smr_without_mac, res4, tdi)=tdr_without_mac in
-        let smr_without_mac_f(rms_without_mac, tcbi)=smr_without_mac in
-        let rms_without_mac_f(rtyp, res1, csvn, tcbh, tdih, rdata, res2)=rms_without_mac in
-        let rdata_f(x1, y1)=rdata in
-        insert IAS_Ch_20(hostname_IAS, hostname_Ch, x1);
-        out(c29, ())
-    ).
-*)
 
 
 process
