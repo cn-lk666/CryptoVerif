@@ -45,17 +45,17 @@ let injbot_inv= function
 
 let injbot x = Some x
 
-let get_rtyp= "data_rtyp"
+let get_rtyp()= "data_rtyp"
 
-let get_tdi="data_tdi"
+let get_tdi()="data_tdi"
 
-let get_csvn="data_csvn"
+let get_csvn()="data_csvn"
 
-let get_tcbi="data_tcbi"
+let get_tcbi()="data_tcbi"
 
-let get_res="data_res"
+let get_res()="data_res"
 
-let get_user_data="data_user"
+let get_user_data()="data_user"
 
 let rdata_f a b=Base.compos[(pkey_to a);b]
 let inv_rdata_f x=
@@ -77,42 +77,84 @@ let inv_arg_TDXM_CPU_f x=
 
 let smr_f a b=Base.compos [a;b]
 let inv_smr_f x=
+  try 
+    match (Base.decompos x) with 
+        [a;b] -> (a,b) 
+      | _ -> raise Base.Match_fail
+  with 
+      _ -> raise Base.Match_fail
 
 let rms_f a b=Base.compos [a;b]
 let inv_rms_f x=
+  try 
+    match (Base.decompos x) with 
+        [a;b] -> (a,b) 
+      | _ -> raise Base.Match_fail
+  with 
+      _ -> raise Base.Match_fail
 
 let tdr_f a b c=Base.compos [a;b;c]
 let inv_tdr_f x=
+  try 
+    match (Base.decompos x) with 
+        [a;b;c] -> (a,b,c) 
+      | _ -> raise Base.Match_fail
+  with 
+      _ -> raise Base.Match_fail
 
 let smr_without_mac_f a b= Base.compos [a;b]
-let inv_smr_without_mac_f x
+let inv_smr_without_mac_f x=
+  try 
+    match (Base.decompos x) with 
+        [a;b] -> (a,b) 
+      | _ -> raise Base.Match_fail
+  with 
+      _ -> raise Base.Match_fail
 
-let rms_without_mac_f a b c d e f g=
+let rms_without_mac_f a b c d e f g=Base.compos [a;b;c;d;e;f;g]
 let inv_rms_without_mac_f x=
+  try 
+    match (Base.decompos x) with 
+        [a;b;c;d;e;f;g] -> (a,b,c,d,e,f,g) 
+      | _ -> raise Base.Match_fail
+  with 
+      _ -> raise Base.Match_fail
 
-let tdr_without_mac_f a b c =
+let tdr_without_mac_f a b c =Base.compos [a;b;c]
 let inv_tdr_without_mac_f x=
+  try 
+    match (Base.decompos x) with 
+        [a;b;c] -> (a,b,c) 
+      | _ -> raise Base.Match_fail
+  with 
+      _ -> raise Base.Match_fail
 
-let quote_f a b=
+let quote_f a b=Base.compos [a;b]
 let inv_quote_f x=
+  try 
+    match (Base.decompos x) with 
+        [a;b] -> (a,b) 
+      | _ -> raise Base.Match_fail
+  with 
+      _ -> raise Base.Match_fail
 
-let tcbi_t2bitstring x= id x
-let bitstring2tcbi_t x=id x
+let tcbi_t2bitstring x= Base.id x
+let bitstring2tcbi_t x=Base.id x
 
-let tdi_t2bitstring x= id x
-let bitstring2tdi_t x= id x
+let tdi_t2bitstring x= Base.id x
+let bitstring2tdi_t x= Base.id x
 
-let key2bitstring x= id x
-let bitstring2key x = id x
+let key2bitstring x= Base.id x
+let bitstring2key x = Base.id x
 
-let rms_without_mac_t2bitstring x = id x
-let bitstring2rms_without_mac_t x= id x
+let rms_without_mac_t2bitstring x = Base.id x
+let bitstring2rms_without_mac_t x= Base.id x
 
-let tdr_without_mac_t2bitstring x= id x
-let bitstring2tdr_without_mac_t x = id x
+let tdr_without_mac_t2bitstring x= Base.id x
+let bitstring2tdr_without_mac_t x = Base.id x
 
-let quote_t2bitstring x = id x
-let bitstring2quote_t x =id x
+let quote_t2bitstring x = Base.id x
+let bitstring2quote_t x =Base.id x
 
 (* Padding functions *)
 

@@ -64,12 +64,57 @@ val injbot_inv : string option -> string
 
 (* Concatenation  and decomposition functions for pairs and triples of strings,
    and pairs public key, string *)
-val concat_str_str : string -> string -> string
-val unconcat_str_str : string -> (string * string)
-val concat_str_str_str : string -> string -> string -> string
-val unconcat_str_str_str : string -> (string * string * string)
-val concat_pk_str : pkey -> string -> string
-val unconcat_pk_str : string -> (pkey * string)
+val get_csvn: unit->string
+val get_res: unit->string
+val get_rtyp: unit->string
+val get_tcbi: unit->string
+val get_tdi: unit->string
+val get_user_data: unit->string
+
+val rdata_f: pkey -> string -> string
+val inv_rdata_f: string -> (pkey*string)
+
+val arg_TDXM_CPU_f: string->string->string->string
+val inv_arg_TDXM_CPU_f: string->(string*string*string)
+
+val smr_f: string->string->string
+val inv_smr_f: string->(string*string)
+
+val rms_f: string->string->string
+val inv_rms_f: string->(string*string)
+
+val tdr_f: string->string->string->string
+val inv_tdr_f: string->(string*string*string)
+
+val smr_without_mac_f: string->string->string
+val inv_smr_without_mac_f: string->(string*string)
+
+val rms_without_mac_f: string->string->string->string->string->string->string->string
+val inv_rms_without_mac_f: string->(string*string*string*string*string*string*string) 
+
+val tdr_without_mac_f: string->string->string->string
+val inv_tdr_without_mac_f: string->(string*string*string)
+
+val quote_f: string->string->string
+val inv_quote_f: string->(string*string)
+
+val tcbi_t2bitstring :string->string
+val bitstring2tcbi_t :string->string
+
+val tdi_t2bitstring :string->string
+val bitstring2tdi_t :string->string
+
+val key2bitstring :string->string
+val bitstring2key :string->string
+
+val rms_without_mac_t2bitstring :string->string
+val bitstring2rms_without_mac_t :string->string
+
+val tdr_without_mac_t2bitstring:string->string
+val bitstring2tdr_without_mac_t:string->string
+
+val quote_t2bitstring :string->string
+val bitstring2quote_t :string->string
 
 (*Padding*)
 val pad : Cryptokit.Padding.scheme -> int -> string -> string

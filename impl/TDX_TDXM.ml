@@ -21,7 +21,7 @@ let init () =
          let var_rtyp_5fTDXM_0 = (get_rtyp ()) in 
          let var_tdi_5fTDXM_0 = (get_tdi ()) in 
            output_string_to_file "Impl_tdi_TDXM" (id var_tdi_5fTDXM_0);
-         let var_tdih_5fTDXM_0 = (Ssh_crypto.hash var_hk1_0 (tdi_t2bitstring var_tdi_5fTDXM_0)) in 
+         let var_tdih_5fTDXM_0 = (hash var_hk1_0 (tdi_t2bitstring var_tdi_5fTDXM_0)) in 
          let list_5 = get_from_table "mes_TD_TDXM_2"
            (function
                | [tvar_6] -> begin
@@ -57,9 +57,9 @@ let init () =
                   end else begin
                     let (var_smr_5fTDXM_0) = rand_list list_8 in
                     
-                    let var_tdr_5fTDXM_1 = (tdr_f var_smr_5fTDXM_0 var_res4_5fTDXM_0 var_tdi_5fTDXM_0) in 
+                    let var_tdr_5fTDXM_0 = (tdr_f var_smr_5fTDXM_0 var_res4_5fTDXM_0 var_tdi_5fTDXM_0) in 
                     
-                    insert_in_table "mes_TDXM_TD_8" [(id (var_tdr_5fTDXM_1))];
+                    insert_in_table "mes_TDXM_TD_8" [(id (var_tdr_5fTDXM_0))];
 
                     ()
                   end
