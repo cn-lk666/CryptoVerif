@@ -10,7 +10,7 @@ let init () =
   if !token then raise Bad_call;
   token := true;
 
-  let var_hk1_0= exc_bad_file "Impl_hk1" (size_from 16) (input_string_from_file "Impl_hk1") in
+  let var_hk1_0= exc_bad_file "Impl_hk1" (fun _ -> ()) (input_string_from_file "Impl_hk1") in
   (
    begin
      let token_4 = ref true in
@@ -21,7 +21,7 @@ let init () =
          let var_rtyp_5fTDXM_0 = (get_rtyp ()) in 
          let var_tdi_5fTDXM_0 = (get_tdi ()) in 
            output_string_to_file "Impl_tdi_TDXM" (id var_tdi_5fTDXM_0);
-         let var_tdih_5fTDXM_0 = (hash var_hk1_0 (tdi_t2bitstring var_tdi_5fTDXM_0)) in 
+         let var_tdih_5fTDXM_0 = (Crypto.hash var_hk1_0 (tdi_t2bitstring var_tdi_5fTDXM_0)) in 
          let list_5 = get_from_table "mes_TD_TDXM_2"
            (function
                | [tvar_6] -> begin

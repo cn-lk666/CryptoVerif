@@ -1,3 +1,3 @@
 set +e
-rm keygen.ml TDX_Ch.ml TDX_CPU.ml TDX_QE.ml TDX_TD.ml TDX_TDXM.ml keygen.mli TDX_Ch.mli TDX_CPU.mli TDX_QE.mli TDX_TD.mli TDX_TDXM.mli
+rm keygen.ml TDX_Ch.ml TDX_CPU.ml TDX_QE.ml TDX_TD.ml TDX_TDXM.ml keygen.mli TDX_Ch.mli TDX_CPU.mli TDX_QE.mli TDX_TD.mli TDX_TDXM.mli crypto.cmi crypto.cmx crytpo.o Impl_hk1 Impl_hk2 Impl_mkey Impl_pk_TD Impl_pk2 Impl_res4_TDXM Impl_sk_TD Impl_sk2 Impl_spk1 Impl_ssk1 Impl_tdi_TDXM keygen.cmi keygen.cmx keygen.o mes_CPU_QE_14 mes_CPU_TDXM_6 mes_QE_CPU_12 mes_TD_TDXM_2 mes_TDXM_CPU_4 mes_TDXM_TD_8 TDX_Ch.cmi TDX_Ch.cmx TDX_CPU.cmi TDX_Ch.o TDX_CPU.cmx TDX_CPU.o TDX_QE.cmi TDX_QE.cmx TDX_QE.o TDX_TD.cmx TDX_TD.cmi TDX_TDXM.cmi TDX_TDXM.cmx TDX_TDXM.o test.cmi test.cmx test.o test base.cmi base.cmx base.o crypto.o TDX_TD.o
 set -e

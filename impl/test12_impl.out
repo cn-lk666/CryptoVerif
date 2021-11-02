@@ -65,7 +65,7 @@ Doing remove assignments of binder sk2... Done.
 Doing remove assignments of binder pk2... Done.
 Trying equivalence ind_cca2(enc) with r_12, r_2, k_2, r_13, r_14, r_15... Transf. OK Transf. done Succeeded.
 Doing simplify (non-expanded game)... No change.
-Doing expand... Applied collision new r1: keyseed; new r2: keyseed; return((pkgen(r1) = pkgen2_1(r2))) <=(Penccoll)=> return(false) with r2 -> k_4, r1 -> k_3[i2_1198] Probability: Penccoll * qTD
+Doing expand... Applied collision new r1: keyseed; new r2: keyseed; return((pkgen(r1) = pkgen2_1(r2))) <=(Penccoll)=> return(false) with r2 -> k_4, r1 -> k_3[i2_1194] Probability: Penccoll * qTD
 Done.
 Doing remove assignments of findcond... Done.
 Doing simplify... Doing global dependency analysis on r_6 inside simplify... At 663, output message r_6[u_22] depends on r_6.
@@ -231,8 +231,8 @@ Game 1 is
       in(start, ());
       let skp(spk1: spkey, ssk1: sskey) = (new ks: skeyseed; skp(spkgen(ks), sskgen(ks))) in
       let kp(pk2: pkey, sk2: skey) = (new k_2: keyseed; kp(pkgen(k_2), skgen(k_2))) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -348,8 +348,8 @@ Game 2 is
       in(start, ());
    {2}let skp(spk1: spkey, ssk1: sskey) = (new ks: skeyseed; skp(spkgen(ks), sskgen(ks))) in
    {9}let kp(pk2: pkey, sk2: skey) = (new k_2: keyseed; kp(pkgen(k_2), skgen(k_2))) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -471,8 +471,8 @@ Game 3 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -609,8 +609,8 @@ Game 4 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -728,8 +728,8 @@ Game 5 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -842,8 +842,8 @@ Game 6 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -963,8 +963,8 @@ Game 7 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -1087,8 +1087,8 @@ Game 8 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -1213,8 +1213,8 @@ Game 9 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -1339,8 +1339,8 @@ Game 10 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -1463,8 +1463,8 @@ Game 11 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -1584,8 +1584,8 @@ Game 12 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk1: key;
-      new hk2: key;
+      new hk1: hashkey;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -1709,7 +1709,7 @@ Game 13 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk2: key;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -1844,7 +1844,7 @@ Game 14 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk2: key;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -1970,7 +1970,7 @@ Game 15 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk2: key;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -2178,7 +2178,7 @@ Game 16 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk2: key;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -2394,7 +2394,7 @@ Game 17 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk2: key;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -2602,7 +2602,7 @@ Game 18 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk2: key;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -2801,7 +2801,7 @@ Game 19 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk2: key;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((
@@ -2999,7 +2999,7 @@ Game 20 is
       new k_2: keyseed;
       let sk2: skey = skgen(k_2) in
       let pk2: pkey = pkgen(k_2) in
-      new hk2: key;
+      new hk2: hashkey;
       new mkey: key;
       out(c1, ());
       ((

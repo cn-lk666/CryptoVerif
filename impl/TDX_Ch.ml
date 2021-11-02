@@ -54,7 +54,7 @@ let init () =
                                         let (var_x1_5fCh_0,var_y1_5fCh_0)=inv_rdata_f bvar_33 in
                                         if true then begin 
                                           
-                                          let var_session_5fkey_0 = (rand_string 16) () in
+                                          let var_session_5fkey_0 = (rand_string 8) () in
                                           let var_m2_5fCh_0 = (pk_enc (key2bitstring var_session_5fkey_0) var_x1_5fCh_0) in 
                                           (
                                             ()

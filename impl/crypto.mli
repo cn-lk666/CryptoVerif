@@ -130,6 +130,7 @@ val mac : (string -> Cryptokit.hash) -> string -> string -> string
 (* [mac_check f] is the MAC verification function 
    [mac_check f msg key vmac] returns true when [vmac] is a correct mac of [msg] with key [key]
    It simply compares [vmac] with the MAC computed by [mac f msg key] *)
+val mac_check : (string -> Cryptokit.hash) -> string -> string -> string -> bool
 
 (* Public key cryptography *)
 

@@ -40,34 +40,36 @@ and heuristic_decompos_list_list = function
 
 let _ =
 print_string "start...";print_newline ();
-let start = keygen.init () in
+let start = Keygen.init () in
 start ();
 print_string "enc_key=";heuristic_decompos (Base.input_string_from_file "Impl_pk2");
-print_string ",mac_key=";heuristic_decompos (Base.input_string_from_file "Impl_mkey");
+print_newline ();
+print_string "mac_key=";heuristic_decompos (Base.input_string_from_file "Impl_mkey");
 print_newline ();
 print_string "Challenger...";print_newline ();
-let Ch=TDX_Ch.init () in
-let Ch_1=Ch() in
+let ch=TDX_Ch.init () in
+let ch_1=ch() in
 print_string "TD...";print_newline ();
-let TD=TDX_TD.init () in
-let TD_1=TD() in
+let tD=TDX_TD.init () in
+let tD_1=tD() in
 print_string "TDXM...";print_newline ();
-let TDXM=TDX_TDXM.init () in
-let TDXM_1=TDXM () in
+let tDXM=TDX_TDXM.init () in
+let tDXM_1=tDXM () in
 print_string "CPU...";print_newline ();
-let CPU=TDX_CPU.init () in
-let CPU_1=CPU() in
+let cPU=TDX_CPU.init () in
+let cPU_1=cPU() in
 print_string "CPU sent SMR to TDXM";print_newline ();
-let TDXM_2=TDXM_1() in
+let tDXM_2=tDXM_1() in
 print_string "TDXM sent TDR to TDXM";print_newline ();
-let tdr=TD_1() in
+let (_,tdr)=tD_1() in
 print_string "TD forward the TDR to QE";print_newline ();
-let QE=TDX_QE.init() in
-let QE_1=QE(tdr) in
+let qE=TDX_QE.init() in
+let qE_1=qE(tdr) in
 print_string "QE forward the RMS to CPU to verify the mac";print_newline ();
-let CPU_2=CPU_1() in
+let cPU_2=cPU_1() in
 print_string "QE sign and enc the quote";print_newline ();
-let m1=QE_1() in
+let (_,m1)=qE_1() in
+
 print_string "Ch receive the quote";print_newline ();
-let m2=Ch_1(m1) in ()
+let m2=ch_1(m1) in ()
 

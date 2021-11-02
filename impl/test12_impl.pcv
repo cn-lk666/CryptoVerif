@@ -78,13 +78,13 @@ type smr_without_mac_t[bounded].
 type tdr_t[bounded].
 type tdr_without_mac_t[bounded].
 type quote_t[bounded].
-
+type hashkey[bounded].
 (*channel name*)
 channel c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14,c15, c16, c17, c18, c19, c20, c21, c22, c23,c24, c25, start.
 
 (* Hash *)
 expand ROM_hash_large(
-    key,                 (**)
+    hashkey,                 (**)
     bitstring,         (*hashinput is the type of the input of the hash function.*)
     hashoutput1,        (*hashoutput is the type of the output of the hash function, 
                                     must be bounded or nonuniform (typically fixed)*)
@@ -95,7 +95,7 @@ expand ROM_hash_large(
 ).
 
 expand ROM_hash_large(
-    key,                 (**)
+    hashkey,                 (**)
     bitstring,         (*hashinput is the type of the input of the hash function.*)
     hashoutput2,        (*hashoutput is the type of the output of the hash function, 
                                     must be bounded or nonuniform (typically fixed)*)
@@ -235,16 +235,17 @@ implementation table mes_CPU_QE_14="mes_CPU_QE_14".
 implementation
     type skeyseed=64;
     type keyseed=64;
-    type key = 128;
-    type user_data_t=1024;
+    type key = 64;
+    type user_data_t=128;
     type macres_t = "string";
+    type hashkey = "unit" [serial = "(fun () -> \"\")","(fun _ -> ())"; random = "(fun () -> ())"];
     type pkey="pkey" [serial = "pkey_to","pkey_from"];
     type skey="skey" [serial = "skey_to","skey_from"];
     type spkey="pkey" [serial = "pkey_to","pkey_from"];
     type sskey="skey" [serial = "skey_to","skey_from"];
     type signature="string";
-    type hashoutput1=160;
-    type hashoutput2=160;
+    type hashoutput1=80;
+    type hashoutput2=80;
     type rdata_t="string" [serial = "id", "id"];
     type tdr_t="string" [serial = "id", "id"];
     type rms_t ="string"[serial="id", "id"];
@@ -264,8 +265,8 @@ implementation
     fun dec="pk_dec";
     fun sign="(rsassa_pss_sign 8)";
     fun injbot="injbot" [inverse =  "injbot_inv"];
-    fun hash1 = "hash";
-    fun hash2 = "hash";
+    fun hash1 = "Crypto.hash";
+    fun hash2 = "Crypto.hash";
     fun verify="(rsassa_pss_verify 8)";
     fun mac = "(mac Cryptokit.MAC.hmac_sha1)";
     fun check = "(mac_check Cryptokit.MAC.hmac_sha1)";
@@ -278,7 +279,7 @@ implementation
 
     fun rdata_f="rdata_f"[inverse = "inv_rdata_f"];
     fun arg_TDXM_CPU_f="arg_TDXM_CPU_f"[inverse ="inv_arg_TDXM_CPU_f"];
-    fun smr_f="smr_F"[inverse="inv_smr_f"];
+    fun smr_f="smr_f"[inverse="inv_smr_f"];
     fun rms_f="rms_f"[inverse="inv_rms_f"];
     fun tdr_f="tdr_f"[inverse="inv_tdr_f"];
     fun smr_without_mac_f="smr_without_mac_f"[inverse="inv_smr_without_mac_f"];
@@ -307,7 +308,7 @@ TDX_TD[pk_TD>Impl_pk_TD, sk_TD>Impl_sk_TD]{
 }.
 
 
-let TDXM(hk_TDXM:key)=
+let TDXM(hk_TDXM:hashkey)=
 TDX_TDXM[res4_TDXM> Impl_res4_TDXM, tdi_TDXM>Impl_tdi_TDXM]{
     in(c6, ());
     let rtyp_TDXM=get_rtyp() in
@@ -329,7 +330,7 @@ TDX_TDXM[res4_TDXM> Impl_res4_TDXM, tdi_TDXM>Impl_tdi_TDXM]{
 }.
   
 
-let CPU(hk_CPU:key, mkey_CPU:key)=
+let CPU(hk_CPU:hashkey, mkey_CPU:key)=
 TDX_CPU{
     in(c8, ());
     get mes_TDXM_CPU_4(arg_TDXM_CPU) in
@@ -359,7 +360,7 @@ TDX_CPU{
 
 
 
-let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey)=
+let QE(hk_QE1:hashkey,hk_QE2:hashkey, ssk:sskey, pk: pkey, spk:spkey, sk:skey)=
 TDX_QE{
     in(c14, (tdr_QE:tdr_t));
     let tdr_f(smr_QE, res4_QE, tdi_QE)=tdr_QE in
@@ -405,8 +406,8 @@ keygen[spk1>Impl_spk1, ssk1>Impl_ssk1, pk2>Impl_pk2, sk2>Impl_sk2, hk1>Impl_hk1,
     in(start, ());
     let skp (spk1:spkey,ssk1:sskey) = kgen_s () in
     let kp(pk2:pkey, sk2:skey)=kgen() in
-    new hk1:key;(*key for hash*)
-    new hk2:key;(*key for hash*)
+    new hk1:hashkey;(*key for hash*)
+    new hk2:hashkey;(*key for hash*)
     new mkey:key;(*key for mac*)
     out (c1, ())
 };

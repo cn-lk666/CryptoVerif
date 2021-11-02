@@ -28,11 +28,11 @@ let init () =
                if true then begin 
                   output_string_to_file "Impl_pk2" (pkey_to var_pk2_0);
                   output_string_to_file "Impl_sk2" (skey_to var_sk2_0);
-                 let var_hk1_0 = (rand_string 16) () in
-                 output_string_to_file "Impl_hk1" (id var_hk1_0);
-                 let var_hk2_0 = (rand_string 16) () in
-                 output_string_to_file "Impl_hk2" (id var_hk2_0);
-                 let var_mkey_0 = (rand_string 16) () in
+                 let var_hk1_0 = (fun () -> ()) () in
+                 output_string_to_file "Impl_hk1" ((fun () -> "") var_hk1_0);
+                 let var_hk2_0 = (fun () -> ()) () in
+                 output_string_to_file "Impl_hk2" ((fun () -> "") var_hk2_0);
+                 let var_mkey_0 = (rand_string 8) () in
                  output_string_to_file "Impl_mkey" (id var_mkey_0);
                  ()
                end

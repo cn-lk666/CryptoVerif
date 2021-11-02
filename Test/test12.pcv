@@ -28,22 +28,18 @@ param qChallenger, qTD, qTDXM, qCPU, qQE, qIAS.
 
 set interactiveMode = true.
 
-proof{
 
+proof{
     crypto suf_cma(mac);
     success;
-    insert 116 "let tdi_t2bitstring(x111)=x1_1 in";
+    insert 103 "let tdi_t2bitstring(x111)=x1_1 in";
     crypto rom(hash1);
-    insert 174 "let tcbi_t2bitstring(x222)=x1_2 in";
+    insert 161 "let tcbi_t2bitstring(x222)=x1_2 in";
     crypto rom(hash2);
-    crypto ind_cca2(enc);
     crypto uf_cma(sign);
-
-crypto ind_cca2(enc);
-    
+    crypto ind_cca2(enc);
     success
 }
-
 (*
 proof{
 
@@ -355,16 +351,14 @@ let QE(hk_QE1:key,hk_QE2:key, ssk:sskey, pk: pkey, spk:spkey, sk:skey, mk_QE:key
         let tdr_without_mac_QE=tdr_without_mac_f(smr_without_mac_QE, res4_QE, tdi_QE) in
         let sig_QE=sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk) in
         let quote_QE =quote_f(tdr_without_mac_QE, sig_QE) in
-        let m1=enc(quote_t2bitstring(quote_QE), pk) in
-        out(c21, (m1))
+        out(c21, (quote_QE))
     ).
 
-let Challenger(spk:spkey, sk:skey)=
+let Challenger(spk:spkey)=
     in(c14, ());
     out(c15, ());
 
-    in(c22, (m2:bitstring));
-    let injbot(quote_t2bitstring(quote_Ch))=dec(m2, sk) in
+    in(c22, (quote_Ch:quote_t));
     let quote_f(tdr_without_mac_Ch, sig_Ch) =quote_Ch in
     if(verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk, sig_Ch)) then(
         let tdr_without_mac_f(smr_without_mac_Ch, res4_Ch, tdi_Ch)=tdr_without_mac_Ch in
@@ -396,7 +390,7 @@ process
     out (c1, ());
 
 	(
-        (!i<= qChallenger Challenger(spk1, sk2)) | 
+        (!i<= qChallenger Challenger(spk1)) | 
         (hashoracle1(hk1) ) |
         (hashoracle2(hk2) ) |
         (!i<=qTD TD(pk3, sk3) ) |

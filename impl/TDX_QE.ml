@@ -10,8 +10,8 @@ let init () =
   if !token then raise Bad_call;
   token := true;
 
-  let var_hk1_0= exc_bad_file "Impl_hk1" (size_from 16) (input_string_from_file "Impl_hk1") in
-  let var_hk2_0= exc_bad_file "Impl_hk2" (size_from 16) (input_string_from_file "Impl_hk2") in
+  let var_hk1_0= exc_bad_file "Impl_hk1" (fun _ -> ()) (input_string_from_file "Impl_hk1") in
+  let var_hk2_0= exc_bad_file "Impl_hk2" (fun _ -> ()) (input_string_from_file "Impl_hk2") in
   let var_pk2_0= exc_bad_file "Impl_pk2" pkey_from (input_string_from_file "Impl_pk2") in
   let var_ssk1_0= exc_bad_file "Impl_ssk1" skey_from (input_string_from_file "Impl_ssk1") in
   (
@@ -39,7 +39,7 @@ let init () =
                        if true then begin 
                          insert_in_table "mes_QE_CPU_12" [(id (var_rms_5fQE_0))];
 
-                         if ((&&) ((=) var_tdih_5fQE_0 (hash var_hk1_0 (tdi_t2bitstring var_tdi_5fQE_0))) ((=) var_tcbh_5fQE_0 (hash var_hk2_0 (tcbi_t2bitstring var_tcbi_5fQE_0)))) then
+                         if ((&&) ((=) var_tdih_5fQE_0 (Crypto.hash var_hk1_0 (tdi_t2bitstring var_tdi_5fQE_0))) ((=) var_tcbh_5fQE_0 (Crypto.hash var_hk2_0 (tcbi_t2bitstring var_tcbi_5fQE_0)))) then
                          begin
                            (
                             begin

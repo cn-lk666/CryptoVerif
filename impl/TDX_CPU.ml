@@ -10,8 +10,8 @@ let init () =
   if !token then raise Bad_call;
   token := true;
 
-  let var_hk2_0= exc_bad_file "Impl_hk2" (size_from 16) (input_string_from_file "Impl_hk2") in
-  let var_mkey_0= exc_bad_file "Impl_mkey" (size_from 16) (input_string_from_file "Impl_mkey") in
+  let var_hk2_0= exc_bad_file "Impl_hk2" (fun _ -> ()) (input_string_from_file "Impl_hk2") in
+  let var_mkey_0= exc_bad_file "Impl_mkey" (size_from 8) (input_string_from_file "Impl_mkey") in
   (
    begin
      let token_34 = ref true in
@@ -38,11 +38,11 @@ let init () =
                let var_csvn_5fCPU_0 = (get_csvn ()) in 
                let var_tcbi_5fCPU_0 = (get_tcbi ()) in 
                let var_res2_5fCPU_0 = (get_res ()) in 
-               let var_tcbh_5fCPU_0 = (hash var_hk2_0 (tcbi_t2bitstring var_tcbi_5fCPU_0)) in 
+               let var_tcbh_5fCPU_0 = (Crypto.hash var_hk2_0 (tcbi_t2bitstring var_tcbi_5fCPU_0)) in 
                let var_rms_5fwithout_5fmac_5fCPU_0 = (rms_without_mac_f var_rtyp_5fCPU_0 var_res1_5fCPU_0 var_csvn_5fCPU_0 var_tdih_5fCPU_0 var_tcbh_5fCPU_0 var_rdata_5fCPU_0 var_res2_5fCPU_0) in 
                let var_mac_5fCPU_0 = ((mac Cryptokit.MAC.hmac_sha1) (rms_without_mac_t2bitstring var_rms_5fwithout_5fmac_5fCPU_0) var_mkey_0) in 
                let var_rms_5fCPU_0 = (rms_f var_rms_5fwithout_5fmac_5fCPU_0 var_mac_5fCPU_0) in 
-               let var_smr_5fCPU_0 = (smr_F var_rms_5fCPU_0 var_tcbi_5fCPU_0) in 
+               let var_smr_5fCPU_0 = (smr_f var_rms_5fCPU_0 var_tcbi_5fCPU_0) in 
                
                insert_in_table "mes_CPU_TDXM_6" [(id (var_smr_5fCPU_0))];
 
