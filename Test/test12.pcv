@@ -41,40 +41,7 @@ proof{
     success
 }
 (*
-proof{
 
-    crypto suf_cma(mac);
-    success;
-    insert 116 "let tdi_t2bitstring(x111)=x1_1 in";
-    crypto rom(hash1);
-    insert 174 "let tcbi_t2bitstring(x222)=x1_2 in";
-    crypto rom(hash2);
-    crypto ind_cca2(enc);
-
-    success
-}
-
-
-proof{
-    set maxIterSimplif = 4;
-
-    insert 27 "let tdi_t2bitstring(x111)=x1_1 in";
-    insert 47 "let tcbi_t2bitstring(x222)=x1_2 in";
-    crypto rom(hash1);
-    crypto rom(hash2);
-    crypto suf_cma(mac);
-    success
-}
-
-proof{
-
-    crypto suf_cma(mac);
-    insert 27 "let tdi_t2bitstring(x111)=x1_1 in";
-    insert 47 "let tcbi_t2bitstring(x222)=x1_2 in";
-    crypto rom(hash1);
-    crypto rom(hash2);
-    success
-}
 *)
 
 (*
@@ -184,7 +151,6 @@ expand IND_CCA2_public_key_enc(
         Penccoll                    (*Penccoll is the probability of collision between independently generated keys.*)
 ).
 
-
 type rtyp_t[fixed].
 type res_t[fixed].
 type csvn_t[fixed].
@@ -201,15 +167,6 @@ type smr_without_mac_t[bounded].
 type tdr_t[bounded].
 type tdr_without_mac_t[bounded].
 type quote_t[bounded].
-
-type hostname[bounded].
-const hostname_TD:hostname.
-const hostname_TDXM:hostname.
-const hostname_CPU:hostname.
-const hostname_QE:hostname.
-const hostname_Ch:hostname.
-const hostname_IAS:hostname.
-
 
 fun get_rtyp():rtyp_t.
 fun get_tdi():tdi_t.
@@ -388,7 +345,6 @@ process
     new hk2:key;(*key for hash*)
     new mkey:key;(*key for mac*)
     out (c1, ());
-
 	(
         (!i<= qChallenger Challenger(spk1)) | 
         (hashoracle1(hk1) ) |
