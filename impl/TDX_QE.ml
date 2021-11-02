@@ -12,7 +12,6 @@ let init () =
 
   let var_hk1_0= exc_bad_file "Impl_hk1" (fun _ -> ()) (input_string_from_file "Impl_hk1") in
   let var_hk2_0= exc_bad_file "Impl_hk2" (fun _ -> ()) (input_string_from_file "Impl_hk2") in
-  let var_pk2_0= exc_bad_file "Impl_pk2" pkey_from (input_string_from_file "Impl_pk2") in
   let var_ssk1_0= exc_bad_file "Impl_ssk1" skey_from (input_string_from_file "Impl_ssk1") in
   (
    begin
@@ -62,10 +61,9 @@ let init () =
                                     let var_tdr_5fwithout_5fmac_5fQE_0 = (tdr_without_mac_f var_smr_5fwithout_5fmac_5fQE_0 var_res4_5fQE_0 var_tdi_5fQE_0) in 
                                     let var_sig_5fQE_0 = ((rsassa_pss_sign 8) (tdr_without_mac_t2bitstring var_tdr_5fwithout_5fmac_5fQE_0) var_ssk1_0) in 
                                     let var_quote_5fQE_0 = (quote_f var_tdr_5fwithout_5fmac_5fQE_0 var_sig_5fQE_0) in 
-                                    let var_m1_0 = (pk_enc (quote_t2bitstring var_quote_5fQE_0) var_pk2_0) in 
                                     (
                                       ()
-                                      ,var_m1_0
+                                      ,var_quote_5fQE_0
                                     )
                                   end else begin 
                                     raise Match_fail

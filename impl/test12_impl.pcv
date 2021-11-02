@@ -30,11 +30,10 @@ set interactiveMode = true.
 
 proof{
     crypto suf_cma(mac);
-    insert 112 "let tdi_t2bitstring(x111)=x1_1 in";
+    insert 99 "let tdi_t2bitstring(x111)=x1_1 in";
     crypto rom(hash1);
-    insert 170 "let tcbi_t2bitstring(x222)=x1_2 in";
+    insert 157 "let tcbi_t2bitstring(x222)=x1_2 in";
     crypto rom(hash2);
-    crypto ind_cca2(enc);
     crypto uf_cma(sign);
     crypto ind_cca2(enc);
     success
@@ -236,7 +235,7 @@ implementation
     type skeyseed=64;
     type keyseed=64;
     type key = 64;
-    type user_data_t=128;
+    type user_data_t=1024;
     type macres_t = "string";
     type hashkey = "unit" [serial = "(fun () -> \"\")","(fun _ -> ())"; random = "(fun () -> ())"];
     type pkey="pkey" [serial = "pkey_to","pkey_from"];
@@ -244,8 +243,8 @@ implementation
     type spkey="pkey" [serial = "pkey_to","pkey_from"];
     type sskey="skey" [serial = "skey_to","skey_from"];
     type signature="string";
-    type hashoutput1=80;
-    type hashoutput2=80;
+    type hashoutput1=128;
+    type hashoutput2=128;
     type rdata_t="string" [serial = "id", "id"];
     type tdr_t="string" [serial = "id", "id"];
     type rms_t ="string"[serial="id", "id"];
@@ -255,6 +254,7 @@ implementation
     type tcbi_t="string" [serial = "id", "id"];
     type rtyp_t="string" [serial = "id", "id"];
     type smr_t="string" [serial = "id", "id"];
+    type quote_t="string"[serial="id", "id"];
     type arg_TDXM_CPU_t="string"[serial = "id", "id"];
 
     fun kgen = "(pk_kgen 1024)";
@@ -378,16 +378,14 @@ TDX_QE{
     let tdr_without_mac_QE=tdr_without_mac_f(smr_without_mac_QE, res4_QE, tdi_QE) in
     let sig_QE=sign(tdr_without_mac_t2bitstring(tdr_without_mac_QE), ssk) in
     let quote_QE =quote_f(tdr_without_mac_QE, sig_QE) in
-    let m1=enc(quote_t2bitstring(quote_QE), pk) in
-    out(c19, (m1))
+    out(c19, (quote_QE))
 }.
 
 let Challenger(spk:spkey, sk:skey)=
 TDX_Ch{
     in(c20, ());
     out(c21, ());
-    in(c22, (m2:bitstring));
-    let injbot(quote_t2bitstring(quote_Ch))=dec(m2, sk) in
+    in(c22, (quote_Ch:quote_t));
     let quote_f(tdr_without_mac_Ch, sig_Ch) =quote_Ch in
     if(verify(tdr_without_mac_t2bitstring(tdr_without_mac_Ch), spk, sig_Ch)) then
         let tdr_without_mac_f(smr_without_mac_Ch, res4_Ch, tdi_Ch)=tdr_without_mac_Ch in

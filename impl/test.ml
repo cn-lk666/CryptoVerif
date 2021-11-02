@@ -39,6 +39,13 @@ and heuristic_decompos_list_list = function
   | x::l -> heuristic_decompos_list x;print_string ";";heuristic_decompos_list_list l
 
 let _ =
+Sys.remove "mes_CPU_QE_14";
+Sys.remove "mes_CPU_TDXM_6";
+Sys.remove "mes_QE_CPU_12";
+Sys.remove "mes_TD_TDXM_2";
+Sys.remove "mes_TDXM_CPU_4";
+Sys.remove "mes_TDXM_TD_8";
+
 print_string "start...";print_newline ();
 let start = Keygen.init () in
 start ();
